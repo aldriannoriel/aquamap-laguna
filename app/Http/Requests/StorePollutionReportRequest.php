@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\PollutionReport;
 use App\Models\WaterBody;
+use App\Rules\ReportFormToken;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,6 +29,8 @@ class StorePollutionReportRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'website' => ['nullable', 'string', 'max:2048', 'prohibited'],
+            'report_form_token' => ['bail', 'required', 'string', 'max:2048', new ReportFormToken($this)],
             'water_body_id' => ['bail', 'required', 'integer', Rule::exists(WaterBody::class, 'id')],
             'pollution_type' => ['required', 'string', Rule::in(array_keys(PollutionReport::TYPES))],
             'description' => ['required', 'string', 'max:5000'],
@@ -42,6 +45,8 @@ class StorePollutionReportRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'website.prohibited' => 'This submission could not be verified. Please review your entries below and try again.',
+            'report_form_token.required' => 'Please open the reporting form before submitting. Your entries have been kept.',
             'water_body_id.required' => 'Please choose a lake.',
             'water_body_id.exists' => 'Please choose an existing lake.',
             'pollution_type.required' => 'Please choose an observation type.',
@@ -54,9 +59,15 @@ class StorePollutionReportRequest extends FormRequest
 
     public function safeOldInput(): array
     {
-        return array_filter($this->only([
+        $input = array_filter($this->only([
             'water_body_id', 'pollution_type', 'description', 'latitude', 'longitude', 'reporter_name', 'reporter_email',
         ]), fn (mixed $value): bool => is_scalar($value) || $value === null);
+        $token = $this->input('report_form_token');
+        if (is_string($token) && strlen($token) <= 2048) {
+            $input['report_form_token'] = $token;
+        }
+
+        return $input;
     }
 
     protected function failedValidation(Validator $validator): void

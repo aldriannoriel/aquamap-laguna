@@ -8,6 +8,8 @@ Reports support private review and necessary follow-up of community observations
 
 Collect only the optional contact details and photo the reporter chooses to provide. Do not copy contact information into review notes. Photos can contain embedded location/person information. Avoid downloads, screenshots, shared copies and exports unless necessary; those copies require the same access and retention controls as the application.
 
+Local anti-spam checks add no citizen account, external service or identity fingerprint. An encrypted form token is tied to the existing anonymous session and expires after two hours. The session stores at most ten successful report IDs for repeat warnings; queries consider only those records submitted within the last hour. Older/missing receipts are pruned on the next successful submission or disappear when the session ends. No report contents, names or email addresses are copied into this receipt list. A shared browser session can share its repeat-warning history. Clearing the session removes these hints but does not reset the existing IP rate limit or delete reports.
+
 ## Manual review schedule
 
 | Data | Prototype retention review |

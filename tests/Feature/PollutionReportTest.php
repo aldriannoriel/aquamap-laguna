@@ -22,9 +22,11 @@ class PollutionReportTest extends TestCase
     private function payload(): array
     {
         $this->seed(WaterBodySeeder::class);
+        $token = $this->get(route('reports.create'))->assertOk()->viewData('reportFormToken');
+        $this->travel(3)->seconds();
 
         return ['water_body_id' => WaterBody::where('name', 'Pandin Lake')->sole()->id,
-            'pollution_type' => 'solid_waste', 'description' => 'Synthetic isolated test observation; never a real report.'];
+            'pollution_type' => 'solid_waste', 'description' => 'Synthetic isolated test observation; never a real report.', 'report_form_token' => $token];
     }
 
     public function test_form_and_map_navigation_load(): void

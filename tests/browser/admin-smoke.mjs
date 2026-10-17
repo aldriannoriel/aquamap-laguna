@@ -152,8 +152,12 @@ try {
 
 
     async function navigate(url, condition) {
-        await send('Page.navigate',{url:base+url});
-        await waitFor(()=>evaluate(condition),'Administrator page did not become ready.');
+        const navigation=await send('Page.navigate',{url:base+url});
+        await waitFor(async()=>{
+            const {frameTree}=await send('Page.getFrameTree');
+            if(navigation.loaderId && frameTree.frame.loaderId!==navigation.loaderId) return false;
+            return evaluate(`document.readyState==='complete' && (${condition})`);
+        },'Administrator page did not become ready.');
     }
     async function field(id,value) {
         await evaluate(`(()=>{const e=document.getElementById(${JSON.stringify(id)});e.value=${JSON.stringify(value)};e.dispatchEvent(new Event('change',{bubbles:true}));})()`);

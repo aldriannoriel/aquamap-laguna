@@ -11,6 +11,12 @@
         <section id="report-success" role="status" tabindex="-1" class="mb-6 rounded-xl border border-moss/30 bg-white p-5">
             <h2 class="text-lg font-semibold text-moss">Your report has been received.</h2>
             <p class="mt-2 text-sm leading-6">Status: pending review. Your report, photo and contact details are not published. Review and response times are not guaranteed.</p>
+            @if (session('possible_duplicate'))
+                <div id="duplicate-warning" class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+                    <h3 class="font-semibold">Possible repeat submission</h3>
+                    <p class="mt-1">You recently submitted a report for this lake and observation type in this browser session. This report has still been saved privately for administrator review. Different incidents can have similar details.</p>
+                </div>
+            @endif
             <a href="{{ route('map.index') }}" class="mt-3 inline-block font-semibold text-water underline underline-offset-4">Return to the lake explorer</a>
         </section>
     @endif
@@ -20,7 +26,7 @@
             <h2 class="font-semibold text-red-800">Please check your report</h2>
             <ul class="mt-2 list-disc space-y-1 pl-5">
                 @foreach ($errors->messages() as $field => $messages)
-                    <li><a href="#{{ $field === 'submission' ? 'report-form' : (in_array($field, ['latitude', 'longitude']) ? 'incident-map' : $field) }}" class="underline underline-offset-4">{{ $messages[0] }}</a></li>
+                    <li><a href="#{{ in_array($field, ['submission', 'website', 'report_form_token']) ? 'report-form' : (in_array($field, ['latitude', 'longitude']) ? 'incident-map' : $field) }}" class="underline underline-offset-4">{{ $messages[0] }}</a></li>
                 @endforeach
             </ul>
             <p class="mt-3 text-muted">Your text and selected point have been kept. Please select your photo again, if any.</p>
@@ -30,6 +36,11 @@
     <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
         <form id="report-form" action="{{ route('reports.store') }}" method="POST" enctype="multipart/form-data" class="min-w-0 space-y-6 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-7">
             @csrf
+            <input type="hidden" name="report_form_token" value="{{ $reportFormToken }}">
+            <div hidden aria-hidden="true">
+                <label for="website">Leave this field blank</label>
+                <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+            </div>
             <fieldset class="space-y-5">
                 <legend class="mb-5 text-xl font-semibold">What did you observe?</legend>
                 <p class="text-xs text-muted">Fields marked * are required.</p>

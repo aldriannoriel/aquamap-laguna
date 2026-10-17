@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePollutionReportRequest;
 use App\Models\PollutionReport;
 use App\Models\WaterBody;
+use App\Rules\ReportFormToken;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -13,13 +15,14 @@ use Throwable;
 
 class PollutionReportController extends Controller
 {
-    public function create(): Response
+    public function create(Request $request): Response
     {
         $lakes = WaterBody::query()->orderBy('name')->get(['id', 'name', 'latitude', 'longitude']);
 
         return response()->view('reports.create', [
             'lakes' => $lakes,
             'types' => PollutionReport::TYPES,
+            'reportFormToken' => ReportFormToken::issue($request),
         ])->header('Cache-Control', 'no-store, private');
     }
 
@@ -29,6 +32,12 @@ class PollutionReportController extends Controller
         $photoPath = null;
 
         try {
+            $receiptIds = $request->session()->get('recent_pollution_report_ids', []);
+            $receiptIds = is_array($receiptIds) ? array_slice(array_filter($receiptIds, 'is_int'), -10) : [];
+            $recent = PollutionReport::query()->whereKey($receiptIds)->where('created_at', '>=', now()->subHour())
+                ->orderBy('id')->get(['id', 'water_body_id', 'pollution_type']);
+            $possibleDuplicate = $recent->contains(fn (PollutionReport $previous): bool => (int) $previous->water_body_id === (int) $data['water_body_id'] && $previous->pollution_type === $data['pollution_type']);
+
             if ($request->hasFile('photo')) {
                 $photoPath = $request->file('photo')->store('', ['disk' => 'pollution-reports', 'visibility' => 'private']);
             }
@@ -61,7 +70,9 @@ class PollutionReportController extends Controller
                 ->header('Cache-Control', 'no-store, private');
         }
 
-        return redirect()->route('reports.create')->with('report_received', true)
+        $request->session()->put('recent_pollution_report_ids', $recent->pluck('id')->push($report->id)->take(-10)->all());
+
+        return redirect()->route('reports.create')->with('report_received', true)->with('possible_duplicate', $possibleDuplicate)
             ->header('Cache-Control', 'no-store, private');
     }
 }
