@@ -1,56 +1,58 @@
-﻿# Day 3 checkpoint
+# Day 4 checkpoint
 
-**2026-10-17 - Complete for the requested Day 3 scope.** Baseline: `0cc06e7` on `main`. Day 1 lake data and original migrations, Day 2 GIS interactions, and the visible coordinate caveat are preserved. No Day 4/5 features are implemented.
+**2026-10-17 - Complete for the requested Day 4 scope.** Baseline: `b3c55db` on `main`. Days 1-3, all migrations/seed data, GIS/fish interactions and the visible coordinate limitation are preserved. Day 5 admin features are not implemented.
 
 ## Implemented
 
-- One sourced profile: Nile tilapia (`Oreochromis niloticus`), with general FAO habitat information and a separate species reference.
-- Three lake associations: Sampaloc, Pandin and Yambo, classified as historical **aquaculture**, sampled **July-September 2017**, article published **2019**. No wild-occurrence records were added. This is a limited evidence set, not a complete fish inventory.
-- `FishSpeciesSeeder` imports trusted metadata in one transaction, reuses species/link identities, refuses missing/ambiguous target lakes and duplicate species identities, and independently verifies the configured and connected `aquamap_laguna` database. Serial repeat runs preserve IDs/timestamps and unrelated records.
-- The existing `water_body_fish` table gains only nullable `evidence_type`, `sampling_period`, and `publication_year` columns. Original rows are preserved as unknown. Month-level sampling text avoids inventing exact collection days.
-- Selecting a lake/marker on `/map` now displays responsive fish cards with common/scientific names, general habitat, study period/year and two distinct references. Documented occurrence and potential habitat compatibility have separate sections. All seeded links and public compatibility displays remain `insufficient_data`; no assessment engine, predictive score or measurement is present.
-- Missing/unsafe sources, missing habitat text, incomplete evidence and absent links have honest fallbacks. No link does not establish absence. Escaped server-rendered cards are cloned into the selection panel; the existing eight-field lake JSON contract is unchanged. No new dependencies or endpoints were added.
-
-## Research and limitations
-
-[RESEARCH_SOURCES.md](RESEARCH_SOURCES.md) records exact references, claims and access limits. The UPLB and publisher abstracts explicitly support cultured Nile tilapia collected in each target lake. Publisher metadata establishes 27 July 2019 publication; the repository's recommended citation year is 2021, which is not used as the study year. FAO 2009 supplies general biology, including a preferred 31-36 degrees Celsius range; this is not a lake threshold or lake measurement. FAO 2013 supports the freshwater aquaculture context.
-
-FishBase returned 403; its numerical claims were not used. The supplied Philippine Journal of Science reference was reviewed only through indexed publisher abstract metadata because direct access was restricted; it provides aquaculture-management background, not additional lake/species claims. The occurrence paper's full body is subscription content; only public abstract/metadata were reviewed.
-
-Still missing: present lake observations with dates, station/depth/method/units, complete species/life-stage requirements, additional species/wild evidence, and authoritative geographic datum/precision. These limitations remain visible; historical aquaculture does not establish current presence, wild populations, safety or suitability.
+- Public reporting form at `GET /reports/create`, linked from shared navigation and the GIS page; submissions use `POST /reports`.
+- Required existing lake, predefined observation type and description (up to 5,000 characters). Optional reporter name/email, explicit incident coordinate pair and JPEG/PNG/WebP photo up to 5 MB (5,120 KiB).
+- Server validation, Laravel web CSRF/origin protection and five POST attempts/hour/IP, including invalid submissions. A friendly 429 includes retry headers; shared networks share the quota.
+- Guarded model with explicit attribute assignment and server-only `pending` status. Client status, file paths, IDs and timestamps are ignored. No schema changes were necessary.
+- Generated photo filenames on a dedicated private disk outside the web root, no download/list/detail routes, hidden contact/path model attributes and no-store form responses. Pending reports and personal details are never included in the public map or form data.
+- Save failure returns a generic error and attempts photo cleanup without logging request data or SQL bindings. Storage unavailability can require operator cleanup of an orphaned private file.
+- Validation restores only scalar form fields and an explicitly selected point; all rendered values are escaped. Photos must be reselected. Success uses a generic pending confirmation without report contents or identifiers.
+- Responsive incident map: database reference circles, deliberate click/tap selection, keyboard-accessible map-center selection, zoom/pan and clearing. Choosing a lake centers the map without assigning or moving an incident point. Coordinates remain optional and carry no accuracy guarantee.
 
 ## Verification
 
 | Check | Result |
 | --- | --- |
-| `php artisan test --compact` | PASS: 43 tests, 329 assertions, 0 failures; isolated SQLite `:memory:` |
-| New fish tests | PASS: identities, reciprocal links, source/date/type/status metadata, root wiring, repeatability across time, refused targets/duplicates/missing lakes, transaction rollback |
-| Forward-upgrade test | PASS: applied original migrations, inserted a legacy fixture, then added nullable columns without losing original attributes/records; no resets/rollback commands |
-| Map safety/integration tests | PASS: scoped fish associations, exact public fields, incomplete/missing data, suppressed unsafe URLs, HTML escaping, no unsupported compatibility promotion |
-| Pint | PASS: `--dirty` plus explicit new PHP paths |
-| Production build | PASS: `npm.cmd run build` |
-| JS / manifest / routes | PASS: Node syntax checks for app/browser script, Composer validation, existing public map/home routes |
-| Edge desktop 1440 x 1100 | PASS: all three lake selections show fish, historical period/type, both references and insufficient data; marker selection, zoom, keyboard panning and reset preserved |
-| Edge mobile 390 x 844 | PASS: touch selection, readable stacked fish card, popup, references, reset and no horizontal overflow |
-| Browser integrity | PASS: zero JS exceptions; lake/species/link record hashes unchanged by browser tests; temporary browser/profile/server closed |
-| MySQL deployment | PASS: verified `aquamap_laguna`, applied only the new nullable-column migration, seeded only fish data twice, confirmed 1 species/3 links, stable fish IDs/timestamps, unchanged lake attributes and unrelated counts |
-| `code-reviewer` | No actionable defects found in the Day 3 diff/new files; reviewed schema preservation, transaction/target guards, evidence separation, field allowlists, sources, escaping and GIS regression checks |
+| Laravel suite | PASS: 76 tests, 615 assertions, zero failures; PHPUnit SQLite `:memory:` guard retained |
+| New reporting coverage | PASS: 33 cases covering persistence/relationships, anonymous/optional fields, required/invalid lakes/types/shapes/lengths, paired/bounded coordinates, JPEG/PNG/WebP, 5 MB boundary/oversize, unsafe MIME/extensions, status/path/ID tampering, privacy, escaped safe old input, 429/address separation/expiry and failed-save photo cleanup |
+| Formatting/build | PASS: Pint dirty + explicit new PHP paths; `npm.cmd run build`; JS syntax; Composer validation; Git whitespace check; local server script syntax |
+| Real MySQL safe check | PASS: configured/connected `aquamap_laguna`, existing pollution columns verified, real reporting GET returns 200 and all three lake names |
+| Data integrity | PASS: lake/species/link/report/user hashes unchanged from preflight; real reports remain zero; no migration/seeding/reset or synthetic report writes to MySQL |
+| Reporting browser | PASS: Edge desktop 1440 x 1100 and mobile 390 x 844; native/server errors, focused summary, retained text/point, explicit photo reselection, map click/tap/zoom/clear, 3 MB private uploads, pending confirmation and no horizontal overflow |
+| Browser isolation | PASS: two synthetic pending reports/photos only in temporary SQLite/private storage; CSRF middleware active, tokenless untrusted POST rejected; real MySQL data and shared cache hashes unchanged; browser/profile/server/fixture cleaned up |
+| GIS/fish browser regression | PASS: all lake/marker selections, popups/sources, historical fish cards, insufficient data, zoom/keyboard pan/reset and mobile layout; zero JS exceptions |
+| Final code review | No actionable defects found in the Day 4 diff/new files after tracing validation, privacy, server status, upload/cleanup, rate limiting, map behavior and test isolation |
 
-Run browser checks with `node tests/browser/map-smoke.mjs --fish` (installed Edge/Chromium, Node built-ins, no packages). Existing Day 2 mode still works without `--fish`. Results and inspected screenshots are under ignored `storage/app/day3-browser/`: `results.json`, `desktop-fish.png`, `mobile-fish.png`, plus overview screenshots. This is local browser/mobile emulation, not physical-device certification.
+Browser commands (installed Edge/Chromium and Node built-ins, no new packages):
+
+- `node tests/browser/reports-smoke.mjs`
+- `node tests/browser/map-smoke.mjs --fish`
+
+Results/screenshots are in ignored `storage/app/day4-browser/` and `storage/app/day3-browser/`; desktop/mobile screenshots were inspected. This is browser/device emulation, not physical-device certification. A fixture cache-ordering defect encountered during verification was corrected before the final successful run; final checks explicitly protect the shared cache.
 
 ## Files changed
 
-- Added: `database/migrations/2026_10_17_065926_add_evidence_metadata_to_water_body_fish_table.php`, `database/seeders/FishSpeciesSeeder.php`, `resources/views/map/fish-cards.blade.php`, `tests/Feature/{FishSpeciesSeederTest,FishMapTest,FishEvidenceMigrationTest}.php`.
-- Updated: `app/Http/Controllers/MapController.php`, `app/Models/{WaterBody,FishSpecies,WaterBodyFish}.php`, `database/seeders/DatabaseSeeder.php`, `resources/js/app.js`, `resources/views/map/index.blade.php`, `tests/browser/map-smoke.mjs`.
-- Adjusted `WaterBodySeederTest` to test the lake-only seeder directly; the root seeder now includes fish and is separately tested. Original lake assertions are preserved.
-- Updated memory: this checkpoint, `docs/PROJECT_CONTEXT.md`, `docs/RESEARCH_SOURCES.md`, `.agents/architecture/architecture.md`, `AGENTS.md`. Generated assets remain ignored. Composer/npm manifests and lockfiles are unchanged.
+- Added backend: `app/Http/Controllers/PollutionReportController.php`, `app/Http/Requests/StorePollutionReportRequest.php`.
+- Added views: `resources/views/layouts/reporting.blade.php`, `resources/views/partials/header.blade.php`, `resources/views/reports/{create,rate-limited}.blade.php`.
+- Added assets/tooling: `resources/js/incident-map.js`, `scripts/serve-local.ps1`.
+- Added tests: `tests/Feature/PollutionReportTest.php`, `tests/browser/{report-fixture.php,reports-smoke.mjs}`.
+- Updated: `app/Models/PollutionReport.php`, `app/Providers/AppServiceProvider.php`, `config/filesystems.php`, `routes/web.php`, `resources/{css/app.css,js/app.js,views/map/index.blade.php}`.
+- Updated memory: this checkpoint, `docs/PROJECT_CONTEXT.md`, `.agents/architecture/architecture.md`, `AGENTS.md`. Dependency manifests/locks, credentials, migrations and seeders are unchanged. Generated assets/runtime artifacts remain ignored.
 
-## Git and safety
+## Running locally and remaining limits
 
-This document belongs to the local Day 3 checkpoint after successful checks; use `git log -1 --oneline` for its ID. No automatic push or remote setup. Credentials and local/runtime databases remain excluded. No credentials were read into output or changed. Persistent writes were limited to the verified evidence migration and fish seeding; no lake reseeding or destructive commands were used. Ordinary browser requests may write Laravel sessions.
+PHP on this machine defaults to a 2 MB upload limit. Start the local server with `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/serve-local.ps1` (optional `-Port 8001`). This sets 5 MB upload and 8 MB POST limits only for the launched process; it changes no global policy, PHP configuration or credentials. Other web/PHP servers must support those limits. No production deployment was performed.
 
-For another installation, apply forward migrations before serving the new model relationships, then run the root seeder or the fish seeder after the three lakes exist. The evidence migration's `down()` would drop study metadata; do not use routine rollback/reset as a data-safe recovery method. Lake/species identities lack individual unique indexes: keep seed runs serial; pair uniqueness is enforced. One representative study per pair is supported; multiple-study history needs a future design.
+The system stores observations pending review, without automatic review or email. Reports are not confirmed pollution findings or scientific measurements. Photos remain private but may retain embedded metadata; filesystem administrators/backups require appropriate access protection. Coordinate datum/accuracy, present water-quality observations and habitat compatibility remain unverified. Research references and their limitations remain in [RESEARCH_SOURCES.md](RESEARCH_SOURCES.md).
 
-## Planned Day 4 handoff
+Framework APIs were checked against installed Laravel and the official [validation](https://laravel.com/docs/13.x/validation), [file storage](https://laravel.com/docs/13.x/filesystem) and [routing](https://laravel.com/docs/13.x/routing) documentation after Boost documentation search was unreachable.
 
-Confirm the pollution-reporting brief before implementation. Build on the existing `PollutionReport` model with real submissions, validation, privacy for reporter details, and clear pending-review behavior. Keep historical research separate from actual incidents. Preserve fish-source distinctions, the unassessed compatibility state and visible coordinate caveat. Admin features remain outside this checkpoint and reserved for a later request.
+## Git and Day 5 handoff
+
+This checkpoint belongs to the local verified Day 4 commit; obtain its ID with `git log -1 --oneline`. No push or remote setup. All requested checks passed before committing. Recover through Git history or reviewed forward fixes; never reset databases to recover code.
+
+**Planned Day 5:** confirm the admin brief, then implement authenticated/authorized review of pending submissions and protected photo access with explicit status transitions. Decide retention/contact handling and review workflow before exposing any approved public fields. Keep unreviewed contents and personal information private, preserve the coordinate caveat and separate community observations from historical research and compatibility claims.

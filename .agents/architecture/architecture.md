@@ -1,11 +1,11 @@
 # AquaMap Laguna architecture
 
-Updated 2026-10-17 for Day 3 against code, MySQL metadata, primary research abstracts/profiles, isolated Laravel tests and local Edge checks. The Day 1/2 baseline is Git checkpoint `0cc06e7` on `main`; lake records and original migrations are preserved.
+Updated 2026-10-17 for Day 4 against code, MySQL metadata, isolated Laravel tests and local Edge checks. Day 4 starts from `b3c55db` on `main`; all Day 1-3 records, relationships and migrations are preserved. Scientific provenance remains the verified Day 3 evidence set.
 
 ## System and request flow (Observed)
 
 - PHP 8.4, Laravel 13.37, MySQL; Composer manifest/lock define backend dependencies. Laravel Boost is a development dependency installed as required by the original `AGENTS.md`; it generated agent guidelines, skills and MCP configuration.
-- `public/index.php` enters `bootstrap/app.php`. `routes/web.php` redirects `/` to the public named `GET /map` route, handled by `MapController@index` and `resources/views/map/index.blade.php`. Laravel's `/up` health route remains configured in `bootstrap/app.php`. There are no domain APIs or write routes.
+- `public/index.php` enters `bootstrap/app.php`. `routes/web.php` redirects `/` to `GET /map`, handled by `MapController@index`. Public `GET /reports/create` and throttled `POST /reports` now use `PollutionReportController@create/store`. Laravel's `/up` health route remains configured in `bootstrap/app.php`. There is no public report listing/detail/download API or admin interface.
 - `config/database.php` defines connections; the current default and connected schema were verified as `aquamap_laguna` on MySQL without recording credentials. Session and infrastructure tables exist. There are no queued domain jobs, domain events, or scheduled domain tasks.
 
 ## Data model (Observed)
@@ -20,6 +20,20 @@ Updated 2026-10-17 for Day 3 against code, MySQL metadata, primary research abst
 Many-to-many methods explicitly name the existing pivot table/keys and expose its status, explanation, provenance, study metadata and timestamps. `WaterBody` permits only its metadata fields for mass assignment and casts coordinates to decimal strings. Other domain models remain guarded; the fish seeder explicitly force-fills trusted constants. `WaterBodyFish` casts publication year to integer. Original foreign keys/cascades and unique pairs are preserved. The Day 3 migration only adds three nullable columns, without backfilling unknown evidence or changing old rows.
 
 `User` and Laravel infrastructure tables remain separate from the domain: no user foreign key is declared on pollution reports. There is no water-quality measurement entity or table.
+
+## Community reporting flow (Observed)
+
+The shared `resources/views/partials/header.blade.php` and a map-page link lead to the reporting form. `PollutionReportController@create` selects only lake IDs/names/reference coordinates from existing `WaterBody` records; it never loads reports. `resources/views/reports/create.blade.php` uses the existing environmental theme, labeled fields, accessible error summaries, mobile stacking and no-store responses.
+
+`StorePollutionReportRequest` validates an existing lake, a predefined observation type (`PollutionReport::TYPES`), description up to 5,000 characters, optional bounded coordinate pair, optional name/email and optional JPEG/PNG/WebP up to 5,120 KiB. Upload content and filename extension are checked. Standard web middleware provides CSRF/origin protection. `AppServiceProvider` defines the named IP limiter: five POST attempts per hour, including invalid submissions, with a friendly 429 and retry headers. Users sharing an internet address share the limit.
+
+The controller explicitly assigns validated attributes to the guarded model and always sets `status = pending`; client status/path/ID/timestamps are ignored. Photos receive generated names on the dedicated `pollution-reports` disk, rooted outside `public`, with private visibility and no serving route. Contact attributes and photo paths are also hidden from model serialization. There are no report read/download routes. Hidden attributes are defense in depth, not authorization for future APIs.
+
+A failed database save attempts to delete its newly stored photo and returns a generic error. Cleanup/storage failures log only generic context and exception class, without request contents or SQL bindings. If storage is unavailable, orphan cleanup can require operator intervention. Only scalar form fields are flashed on validation/save failure; Blade escapes them. Photos must be reselected. Success redirects to a generic pending confirmation without report IDs, contents, paths or contact details.
+
+`resources/js/incident-map.js` initializes a separate conditional Leaflet map using database reference points. Lake selection centers the map without assigning or changing incident coordinates. Explicit map clicks/taps or the keyboard-accessible map-center button select an orange incident point; blue circles remain lake references. Clearing, optional omission and restoration after validation work independently. No device geolocation or incident accuracy claim is made. Coordinate datum/precision caveats remain visible on both maps; community observations do not become scientific measurements, suitability conclusions or confirmed pollution findings.
+
+No migration, dependency, seed-data change or admin feature was needed. `scripts/serve-local.ps1` starts a local-only PHP server with process-local 5 MB upload / 8 MB POST limits; the machine's default PHP upload limit is 2 MB. Other servers must configure equivalent limits. Credentials/global PHP settings are untouched.
 
 ## Public map flow and browser boundary (Observed)
 
@@ -55,8 +69,9 @@ The locality field is a label, not a jurisdiction polygon. Yambo's description r
 
 - `phpunit.xml` forces testing with SQLite `:memory:` and clears `DB_URL`; cache and sessions use arrays. `tests/TestCase.php` refuses persistent databases before test traits/setups run.
 - Database feature tests run only forward `migrate` against a new in-memory database. They use no database refresh/reset traits or destructive migration commands. Synthetic fish/report fixtures exist only in isolated tests.
-- Tests cover Day 1/2 behavior plus fish identities/links/provenance, repeatability across time, atomic rollback, refused targets, duplicate identities, legacy-data-preserving forward migration, map integration, incomplete evidence, scoped associations and HTML/source safety. Laravel tests stub Vite; real asset behavior is checked in Edge.
+- Tests cover Day 1-3 plus reporting persistence/relationships, anonymous/optional fields, allowed image formats/size boundaries, unsafe content/extensions, validation shapes/lengths, paired coordinates, server-controlled status, privacy, scalar-only escaped old input, rate limits/expiry/address separation and failed-save photo cleanup. The Day 4 suite passes 76 tests / 615 assertions. Laravel tests stub Vite; real asset behavior is checked in Edge.
 - Day 3 persistent writes were limited to the new nullable-column migration and verified fish metadata seeding on `aquamap_laguna`. Map queries are read-only apart from normal HTTP sessions. Browser verification checks configured/connected schema names before navigation and hashes water-body, fish-species and link records before/after. No credentials are written or documented.
 - `tests/browser/map-smoke.mjs` uses Node built-ins and an installed Edge/Chromium browser in a separate headless profile. It starts/closes only its own local PHP server/browser, checks desktop and mobile interactions, captures screenshots under ignored storage, and removes its temporary profile. Browser ports are dynamically allocated. `AQUAMAP_BROWSER` optionally selects an installed Chromium executable.
 - Vite assets were built and desktop/mobile screenshots inspected. `node tests/browser/map-smoke.mjs --fish` adds fish-card/source/date/status checks to all map regressions, with results/screenshots under ignored `storage/app/day3-browser/`. No production deployment was performed.
+- `node tests/browser/reports-smoke.mjs` uses an isolated profile, temporary SQLite file and private photo/session/cache directories under ignored `storage/app/day4-browser/fixture-*`. The test-only router `tests/browser/report-fixture.php` applies isolation before providers resolve the cache/limiter; it is not mounted by application routes. Existing seeders run only in memory, then their records are copied into the new disposable file through forward migrations/inserts. Real CSRF middleware stays active. Desktop/mobile checks verify errors, map selection/clear, 3 MB uploads, photo reselection and pending confirmation. Two synthetic reports/photos exist only in the fixture, which is removed afterward. Before/after hashes verify unchanged real MySQL records and shared application cache. PHPUnit retains its strict in-memory guard.
 - Scientific measurements, current water quality, habitat suitability, legal boundary geometry, and production deployment configuration remain unknown/unimplemented.

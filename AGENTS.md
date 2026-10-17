@@ -151,7 +151,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - Start with `docs/PROJECT_CONTEXT.md` and `docs/CURRENT_STATE.md`; read `docs/ARCHITECTURE.md` for architecture changes and `docs/RESEARCH_SOURCES.md` before changing lake or scientific data.
 - Modify only this project. Verify both configured and connected database names are `aquamap_laguna` before persistent database work. Never access other project databases, expose/change credentials, or run destructive migrations/resets.
-- Tests must use SQLite `:memory:`. Preserve the test database guard and use forward migrations only.
+- PHPUnit tests must use SQLite `:memory:`. Preserve the test database guard and use forward migrations only. Multi-request browser tests use a confined disposable SQLite file and isolated photo/session/cache directories under ignored storage; never submit synthetic reports to MySQL. Apply fixture configuration before providers resolve services, and verify unchanged real records/cache afterward.
 - Never fabricate environmental measurements, fish suitability results, or pollution reports. Missing evidence remains unknown. Run the lake seeder serially.
 - Keep the coordinate datum/accuracy limitation visible on the map until authoritative confirmation is documented.
-- Days 1-3 are complete; implement later-day features only when requested. Update the concise checkpoint and affected architecture notes after verified changes.
+- Days 1-4 are complete; implement later-day features only when requested. New reports must always be server-assigned `pending`; do not publish report contents, contact details or private photo paths. Update the concise checkpoint and affected architecture notes after verified changes.

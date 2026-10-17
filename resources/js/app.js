@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import './incident-map';
 
 const mapElement = document.getElementById('lake-map');
 
