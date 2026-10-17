@@ -9,6 +9,11 @@ class WaterBodyFish extends Model
 {
     protected $table = 'water_body_fish';
 
+    protected function casts(): array
+    {
+        return ['publication_year' => 'integer'];
+    }
+
     public function waterBody(): BelongsTo
     {
         return $this->belongsTo(WaterBody::class);

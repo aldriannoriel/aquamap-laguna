@@ -8,6 +8,7 @@ import path from 'node:path';
 
 // Uses an installed browser and an isolated profile; no browser packages or downloads.
 const root = process.cwd();
+const verifyFish = process.argv.includes('--fish');
 function databaseSnapshot() {
     const check = spawnSync('php', [], {
         cwd: root, windowsHide: true, encoding: 'utf8',
@@ -19,7 +20,7 @@ try {
     $connection = Illuminate\\Support\\Facades\\DB::connection();
     if ($connection->getDriverName() !== 'mysql' || $connection->getDatabaseName() !== 'aquamap_laguna') { exit(1); }
     if ($connection->selectOne('SELECT DATABASE() AS name', [], false)->name !== 'aquamap_laguna') { exit(1); }
-    echo hash('sha256', json_encode(App\\Models\\WaterBody::orderBy('id')->get()->toArray()));
+    echo hash('sha256', json_encode([App\\Models\\WaterBody::orderBy('id')->get()->toArray(), App\\Models\\FishSpecies::orderBy('id')->get()->toArray(), App\\Models\\WaterBodyFish::orderBy('id')->get()->toArray()]));
 } catch (Throwable $exception) { exit(1); }
 `,
     });
@@ -30,9 +31,10 @@ try {
 const originalRecords = databaseSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const output = path.join(root, 'storage/app/day2-browser');
+const artifactDirectory = verifyFish ? 'day3-browser' : 'day2-browser';
+const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
-assert(profile.startsWith(`${path.resolve(root, 'storage/app/day2-browser')}${path.sep}`));
+assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
 await mkdir(output, { recursive: true });
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -112,9 +114,13 @@ try {
         }
         await pause(400);
     }
-    async function screenshot(name) {
+    async function screenshot(name, fullPage = false) {
         await evaluate('window.scrollTo(0, 0)');
-        const shot = await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+        const metrics = fullPage ? await send('Page.getLayoutMetrics') : null;
+        const shot = await send('Page.captureScreenshot', {
+            format: 'png', captureBeyondViewport: fullPage,
+            ...(fullPage ? { clip: { x: 0, y: 0, width: metrics.cssContentSize.width, height: metrics.cssContentSize.height, scale: 1 } } : {}),
+        });
         await writeFile(path.join(output, name), Buffer.from(shot.data, 'base64'));
     }
     await send('Runtime.enable');
@@ -137,11 +143,22 @@ try {
         assert.equal(await evaluate('document.querySelector(".leaflet-popup .lake-detail-title")?.textContent'), lake.name);
         assert.equal(await evaluate('document.querySelector("#selected-lake .lake-detail-description")?.textContent'), lake.description);
         assert.equal(await evaluate('document.querySelector("#selected-lake .lake-detail-source")?.href'), lake.source_url);
+        if (verifyFish) {
+            assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-fish-card]").length'), 1);
+            assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-card] h4").textContent'), 'Nile tilapia');
+            assert.equal(await evaluate('document.querySelector("#selected-lake [data-sampling-period]").textContent'), 'July-September 2017');
+            assert.equal(await evaluate('document.querySelector("#selected-lake [data-compatibility-status]").dataset.compatibilityStatus'), 'insufficient_data');
+            assert.match(await evaluate('document.querySelector("#selected-lake [data-evidence-badge]").textContent'), /Historical aquaculture/);
+            assert.equal(await evaluate('[...document.querySelectorAll("#selected-lake [data-fish-card] a")].filter(link => link.rel === "noopener noreferrer").length'), 2);
+            if (lake.id === lakes[0].id) await screenshot('desktop-fish.png', true);
+        }
         await click('#reset-map');
     }
     results.push('All three sidebar selections: correct popup, selected state, description and safe research link; reset clears selection.');
+    if (verifyFish) results.push('All three lakes show Nile tilapia, July-September 2017 sampling, historical aquaculture evidence, two references and insufficient_data compatibility.');
     await click('.lake-marker[title="Sampaloc Lake"]');
     assert.equal(await evaluate('document.querySelector("#selected-lake h2")?.textContent'), 'Sampaloc Lake');
+    if (verifyFish) assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-card] h4").textContent'), 'Nile tilapia');
     results.push('Marker pointer click updates the sidebar and lake detail panel.');
     await click('#reset-map');
 
@@ -172,14 +189,20 @@ try {
     const popupLayout = await evaluate('({popup:document.querySelector(".leaflet-popup").getBoundingClientRect().top,map:document.getElementById("lake-map").getBoundingClientRect().top})');
     assert(popupLayout.popup >= popupLayout.map, 'Mobile popup title must remain inside the map.');
     await screenshot('mobile.png');
+    if (verifyFish) {
+        assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-card] h4").textContent'), 'Nile tilapia');
+        assert.equal(await evaluate('document.querySelector("#selected-lake [data-compatibility-status]").dataset.compatibilityStatus'), 'insufficient_data');
+        await screenshot('mobile-fish.png', true);
+        results.push('Mobile fish card remains readable, distinguishes occurrence/compatibility and retains source links without overflow.');
+    }
     await click('#reset-map');
     assert.equal(await evaluate('document.querySelectorAll("[aria-pressed=true]").length'), 0);
     results.push('390px mobile: map-first stacked layout, selection, popup and reset work without horizontal overflow.');
     assert.deepEqual(failures, [], 'Browser JavaScript exceptions occurred.');
-    assert.equal(databaseSnapshot(), originalRecords, 'Browser verification changed lake records.');
-    results.push('Live water body records unchanged after browser verification.');
+    assert.equal(databaseSnapshot(), originalRecords, 'Browser verification changed lake or fish records.');
+    results.push('Live water body, species and association records unchanged after browser verification.');
     await writeFile(path.join(output, 'results.json'), JSON.stringify({ passed: true, results, javascriptExceptions: failures }, null, 2));
-    console.log(JSON.stringify({ passed: true, results, screenshots: ['storage/app/day2-browser/desktop.png', 'storage/app/day2-browser/mobile.png'] }, null, 2));
+    console.log(JSON.stringify({ passed: true, results, artifacts: `storage/app/${artifactDirectory}` }, null, 2));
 } catch (error) {
     await writeFile(path.join(output, 'results.json'), JSON.stringify({ passed: false, results, error: error.message }, null, 2));
     if (send && socket?.readyState === WebSocket.OPEN) {

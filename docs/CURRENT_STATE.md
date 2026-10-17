@@ -1,56 +1,56 @@
-﻿# Day 2 checkpoint
+﻿# Day 3 checkpoint
 
-**2026-10-17 - Complete for the requested Day 2 scope.** Day 1 schema, models, relationships, seeders and live lake records are preserved. No Day 3-5 features are implemented.
+**2026-10-17 - Complete for the requested Day 3 scope.** Baseline: `0cc06e7` on `main`. Day 1 lake data and original migrations, Day 2 GIS interactions, and the visible coordinate caveat are preserved. No Day 4/5 features are implemented.
 
 ## Implemented
 
-- Public `GET /map` (`map.index`) renders the responsive lake explorer; `/` redirects there. `MapController@index` reads Sampaloc, Pandin and Yambo through `WaterBody`, restricted to the existing San Pablo City project locality label.
-- The browser receives only `id`, `name`, `municipality`, `water_type`, `latitude`, `longitude`, `description`, and `source_url`. No timestamps, reporter information or model relationships are exposed.
-- Leaflet 1.9.4 with OpenStreetMap tiles, visible attribution, keyboard/pointer controls, zoom buttons, panning, scale, linked markers/sidebar selections, full lake details and a Show all lakes reset derived from database coordinates.
-- Tailwind v4 environmental dashboard with Instrument Sans, teal/water/mist palette, desktop sidebar and mobile map-first layout. Selection state, focus styling, live status, safe research links, reduced-motion behavior, and non-JavaScript reference details are present.
-- Missing descriptions/sources have explicit fallbacks. Unsafe URL schemes are suppressed. Empty/invalid locations produce no invented map center. Tile failure notices preserve access to lake information.
-- Published points are displayed with an explicit WGS84 assumption and datum/precision/boundary limitations. No lake coordinates, environmental measurements or suitability results are hardcoded into the map implementation.
+- One sourced profile: Nile tilapia (`Oreochromis niloticus`), with general FAO habitat information and a separate species reference.
+- Three lake associations: Sampaloc, Pandin and Yambo, classified as historical **aquaculture**, sampled **July-September 2017**, article published **2019**. No wild-occurrence records were added. This is a limited evidence set, not a complete fish inventory.
+- `FishSpeciesSeeder` imports trusted metadata in one transaction, reuses species/link identities, refuses missing/ambiguous target lakes and duplicate species identities, and independently verifies the configured and connected `aquamap_laguna` database. Serial repeat runs preserve IDs/timestamps and unrelated records.
+- The existing `water_body_fish` table gains only nullable `evidence_type`, `sampling_period`, and `publication_year` columns. Original rows are preserved as unknown. Month-level sampling text avoids inventing exact collection days.
+- Selecting a lake/marker on `/map` now displays responsive fish cards with common/scientific names, general habitat, study period/year and two distinct references. Documented occurrence and potential habitat compatibility have separate sections. All seeded links and public compatibility displays remain `insufficient_data`; no assessment engine, predictive score or measurement is present.
+- Missing/unsafe sources, missing habitat text, incomplete evidence and absent links have honest fallbacks. No link does not establish absence. Escaped server-rendered cards are cloned into the selection panel; the existing eight-field lake JSON contract is unchanged. No new dependencies or endpoints were added.
 
-## Final checks
+## Research and limitations
+
+[RESEARCH_SOURCES.md](RESEARCH_SOURCES.md) records exact references, claims and access limits. The UPLB and publisher abstracts explicitly support cultured Nile tilapia collected in each target lake. Publisher metadata establishes 27 July 2019 publication; the repository's recommended citation year is 2021, which is not used as the study year. FAO 2009 supplies general biology, including a preferred 31-36 degrees Celsius range; this is not a lake threshold or lake measurement. FAO 2013 supports the freshwater aquaculture context.
+
+FishBase returned 403; its numerical claims were not used. The supplied Philippine Journal of Science reference was reviewed only through indexed publisher abstract metadata because direct access was restricted; it provides aquaculture-management background, not additional lake/species claims. The occurrence paper's full body is subscription content; only public abstract/metadata were reviewed.
+
+Still missing: present lake observations with dates, station/depth/method/units, complete species/life-stage requirements, additional species/wild evidence, and authoritative geographic datum/precision. These limitations remain visible; historical aquaculture does not establish current presence, wild populations, safety or suitability.
+
+## Verification
 
 | Check | Result |
 | --- | --- |
-| `php artisan test --compact` | PASS: 25 tests, 152 assertions, 0 failures; SQLite `:memory:` only |
-| Map feature tests | PASS: public route, exact serialized fields, database values/scoping, missing/unsafe optional data, HTML/JSON escaping, empty state |
-| Existing Day 1 tests | PASS: seed safety, idempotency, transactions, relationships, constraints and health behavior |
-| Pint on four changed PHP files | PASS; explicit file paths were used before Git initialization |
-| `npm.cmd run build` | PASS: production JS/CSS and local fonts generated; no optional font package added |
-| JS syntax / Composer manifest | PASS: `node --check` for app/browser script; `composer validate --no-check-publish` |
-| Installed Edge, desktop 1440 x 1100 | PASS: three live markers/cards, loaded OSM tiles, all sidebar selections, pointer marker click, popup/details/source synchronization, zoom, keyboard panning, reset, no horizontal overflow |
-| Installed Edge, mobile 390 x 844 | PASS: stacked map-first layout, touch selection, visible popup title, reset and no horizontal overflow |
-| Browser runtime / database integrity | PASS: zero JS exceptions; all live lake attributes, IDs and timestamps unchanged |
-| Final `code-reviewer` inspection | No actionable defects found in Day 2 changes; traced route/query, public fields, JSON/HTML/DOM escaping, links, map interactions and responsive popup behavior |
+| `php artisan test --compact` | PASS: 43 tests, 329 assertions, 0 failures; isolated SQLite `:memory:` |
+| New fish tests | PASS: identities, reciprocal links, source/date/type/status metadata, root wiring, repeatability across time, refused targets/duplicates/missing lakes, transaction rollback |
+| Forward-upgrade test | PASS: applied original migrations, inserted a legacy fixture, then added nullable columns without losing original attributes/records; no resets/rollback commands |
+| Map safety/integration tests | PASS: scoped fish associations, exact public fields, incomplete/missing data, suppressed unsafe URLs, HTML escaping, no unsupported compatibility promotion |
+| Pint | PASS: `--dirty` plus explicit new PHP paths |
+| Production build | PASS: `npm.cmd run build` |
+| JS / manifest / routes | PASS: Node syntax checks for app/browser script, Composer validation, existing public map/home routes |
+| Edge desktop 1440 x 1100 | PASS: all three lake selections show fish, historical period/type, both references and insufficient data; marker selection, zoom, keyboard panning and reset preserved |
+| Edge mobile 390 x 844 | PASS: touch selection, readable stacked fish card, popup, references, reset and no horizontal overflow |
+| Browser integrity | PASS: zero JS exceptions; lake/species/link record hashes unchanged by browser tests; temporary browser/profile/server closed |
+| MySQL deployment | PASS: verified `aquamap_laguna`, applied only the new nullable-column migration, seeded only fish data twice, confirmed 1 species/3 links, stable fish IDs/timestamps, unchanged lake attributes and unrelated counts |
+| `code-reviewer` | No actionable defects found in the Day 3 diff/new files; reviewed schema preservation, transaction/target guards, evidence separation, field allowlists, sources, escaping and GIS regression checks |
 
-Browser smoke script: `npm.cmd run test:browser` (Node built-ins plus an installed Chromium browser; no test packages/downloads). It verifies the configured and connected `aquamap_laguna` target before navigation, compares lake-record hashes afterward, and starts/stops only its own PHP server and separate headless browser/profile. Set `AQUAMAP_BROWSER` to an installed Chromium executable if Edge is not in its usual Windows location. Ports are dynamically allocated; no `.env` changes are needed.
+Run browser checks with `node tests/browser/map-smoke.mjs --fish` (installed Edge/Chromium, Node built-ins, no packages). Existing Day 2 mode still works without `--fish`. Results and inspected screenshots are under ignored `storage/app/day3-browser/`: `results.json`, `desktop-fish.png`, `mobile-fish.png`, plus overview screenshots. This is local browser/mobile emulation, not physical-device certification.
 
-Browser results and inspected screenshots are under ignored `storage/app/day2-browser/`: `results.json`, `desktop.png`, and `mobile.png`. Temporary browser profiles were removed; no preview server is left running. Browser coverage is local Edge with mobile emulation, not physical-device or cross-browser certification.
+## Files changed
 
-## Files created or modified
+- Added: `database/migrations/2026_10_17_065926_add_evidence_metadata_to_water_body_fish_table.php`, `database/seeders/FishSpeciesSeeder.php`, `resources/views/map/fish-cards.blade.php`, `tests/Feature/{FishSpeciesSeederTest,FishMapTest,FishEvidenceMigrationTest}.php`.
+- Updated: `app/Http/Controllers/MapController.php`, `app/Models/{WaterBody,FishSpecies,WaterBodyFish}.php`, `database/seeders/DatabaseSeeder.php`, `resources/js/app.js`, `resources/views/map/index.blade.php`, `tests/browser/map-smoke.mjs`.
+- Adjusted `WaterBodySeederTest` to test the lake-only seeder directly; the root seeder now includes fish and is separately tested. Original lake assertions are preserved.
+- Updated memory: this checkpoint, `docs/PROJECT_CONTEXT.md`, `docs/RESEARCH_SOURCES.md`, `.agents/architecture/architecture.md`, `AGENTS.md`. Generated assets remain ignored. Composer/npm manifests and lockfiles are unchanged.
 
-- Created: `app/Http/Controllers/MapController.php`, `resources/views/map/index.blade.php`, `tests/Feature/MapTest.php`, `tests/browser/map-smoke.mjs`, `package-lock.json`.
-- Modified: `routes/web.php`, `resources/js/app.js`, `resources/css/app.css`, `package.json`, `vite.config.js`, `tests/Feature/ExampleTest.php` (home redirect expectation).
-- Updated memory: `AGENTS.md`, `docs/PROJECT_CONTEXT.md`, `docs/RESEARCH_SOURCES.md`, this checkpoint, and `.agents/architecture/architecture.md`. `docs/ARCHITECTURE.md` remains the pointer to the current map.
-- Generated local assets: ignored `public/build/`; installed existing frontend tooling plus the requested Leaflet runtime dependency. No Composer dependency changes were needed for Day 2.
+## Git and safety
 
-No destructive database commands, persistent migrations, lake reseeding, or credential edits were performed. MySQL lake queries were read-only; ordinary browser requests may create Laravel session records.
+This document belongs to the local Day 3 checkpoint after successful checks; use `git log -1 --oneline` for its ID. No automatic push or remote setup. Credentials and local/runtime databases remain excluded. No credentials were read into output or changed. Persistent writes were limited to the verified evidence migration and fish seeding; no lake reseeding or destructive commands were used. Ordinary browser requests may write Laravel sessions.
 
-## Git checkpoint
+For another installation, apply forward migrations before serving the new model relationships, then run the root seeder or the fish seeder after the three lakes exist. The evidence migration's `down()` would drop study metadata; do not use routine rollback/reset as a data-safe recovery method. Lake/species identities lack individual unique indexes: keep seed runs serial; pair uniqueness is enforced. One representative study per pair is supported; multiple-study history needs a future design.
 
-Git was initialized locally on branch `main` after Day 2. The initial checkpoint contains the completed source, tests, migrations/seeders, dependency lockfiles and project documentation. Environment files and variants are ignored except the reviewed template `.env.example`; dependencies, runtime storage, local databases and generated build files are excluded by project ignore rules. Use `git log -1 --oneline` to identify this checkpoint. No remote backup is configured.
+## Planned Day 4 handoff
 
-The map's open data-notes panel still discloses the unconfirmed datum/precision and WGS84 display assumption. Preserve that visible limitation until authoritative verification is documented; no application or geographic data changes were needed for this checkpoint.
-
-## Known limits and Day 3 handoff
-
-1. Confirm the Day 3 brief before building more features. No domain CRUD/API, fish browser, pollution submission, measurement ingestion or suitability engine exists yet.
-2. Geographic datum/accuracy and official boundary geometry remain unverified. WGS84 is an explicitly disclosed display assumption; Yambo's full description preserves San Pablo City, Rizal and Nagcarlan. Do not use these markers as surveyed centroids or legal boundaries.
-3. Current scientific measurements remain absent. Obtain sourced, dated lake observations and species/life-stage habitat requirements before assessments; retain `insufficient_data` when evidence is missing.
-4. OSM tiles require network/service availability. Initial font builds may also need access to the existing Bunny font provider; runtime fonts and Leaflet assets are local. The sandbox initially blocked font retrieval; the authorized network-enabled build succeeded.
-5. The existing lake seed identity has no unique constraint; keep any future seed runs serial. No new Day 2 schema change is required.
-
-See [RESEARCH_SOURCES.md](RESEARCH_SOURCES.md) for data provenance and [ARCHITECTURE.md](ARCHITECTURE.md) for implemented architecture.
+Confirm the pollution-reporting brief before implementation. Build on the existing `PollutionReport` model with real submissions, validation, privacy for reporter details, and clear pending-review behavior. Keep historical research separate from actual incidents. Preserve fish-source distinctions, the unassessed compatibility state and visible coordinate caveat. Admin features remain outside this checkpoint and reserved for a later request.

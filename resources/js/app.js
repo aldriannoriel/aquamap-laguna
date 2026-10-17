@@ -55,6 +55,12 @@ if (mapElement) {
         details.querySelector('h2').id = 'selected-lake-heading';
         document.getElementById('lake-information').setAttribute('aria-labelledby', 'selected-lake-heading');
         selected.replaceChildren(details);
+        const fishRecords = document.getElementById(`fish-records-${lake.id}`);
+        if (fishRecords) {
+            const fishDetails = fishRecords.cloneNode(true);
+            fishDetails.removeAttribute('id');
+            selected.append(fishDetails);
+        }
         selected.hidden = false;
         buttons.forEach((button) => {
             const active = button.dataset.lakeId === String(lake.id);

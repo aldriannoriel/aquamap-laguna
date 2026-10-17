@@ -56,7 +56,7 @@
                             <li class="rounded-xl bg-mist p-4 text-sm leading-6 text-muted">No lake records are available. Please check again later.</li>
                         @endforelse
                     </ul>
-                    <details id="research-notes" class="mx-5 mt-auto mb-6 scroll-mt-5 rounded-xl border border-line bg-mist p-4" open>
+                    <details id="research-notes" class="mx-5 mb-6 scroll-mt-5 rounded-xl border border-line bg-mist p-4" open>
                         <summary class="cursor-pointer text-sm font-semibold text-estuary">A map with context</summary>
                         <p class="mt-3 text-xs leading-5 text-muted">Markers show published lake locations. Their datum and precision are unconfirmed; WGS84 is assumed for this display. They do not define shorelines or legal boundaries.</p>
                         <p class="mt-2 text-xs leading-5 text-muted">Water quality and fish suitability have not been established. Each lake’s research link provides its geographic reference.</p>
@@ -80,7 +80,7 @@
                     <div id="lake-information" class="scroll-mt-4 border-t border-line p-5 sm:p-6" aria-labelledby="overview-heading">
                         <div id="selection-placeholder">
                             <h2 id="overview-heading" class="text-xl font-semibold">Every lake has a story.</h2>
-                            <p class="mt-2 text-sm leading-6 text-muted">Select a marker or a lake from the list to explore its location and research.</p>
+                            <p class="mt-2 text-sm leading-6 text-muted">Select a marker or a lake from the list to explore its location, fish records, and research.</p>
                         </div>
                         <div id="selected-lake" hidden></div>
                     </div>
@@ -101,6 +101,9 @@
                                 @else
                                     <p class="mt-3 text-muted">No research source is available for this lake.</p>
                                 @endif
+                                <div id="fish-records-{{ $lake['id'] }}">
+                                    @include('map.fish-cards', ['fish' => $fishByLake[$lake['id']] ?? []])
+                                </div>
                             </article>
                         @endforeach
                     </div>

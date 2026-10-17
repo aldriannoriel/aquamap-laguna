@@ -21,7 +21,7 @@ class WaterBody extends Model
     public function fishSpecies(): BelongsToMany
     {
         return $this->belongsToMany(FishSpecies::class, 'water_body_fish', 'water_body_id', 'fish_species_id')
-            ->withPivot(['id', 'compatibility_status', 'explanation', 'source_url'])
+            ->withPivot(['id', 'compatibility_status', 'explanation', 'source_url', 'evidence_type', 'sampling_period', 'publication_year'])
             ->withTimestamps();
     }
 

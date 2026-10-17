@@ -154,4 +154,4 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Tests must use SQLite `:memory:`. Preserve the test database guard and use forward migrations only.
 - Never fabricate environmental measurements, fish suitability results, or pollution reports. Missing evidence remains unknown. Run the lake seeder serially.
 - Keep the coordinate datum/accuracy limitation visible on the map until authoritative confirmation is documented.
-- Days 1 and 2 are complete; implement later-day features only when requested. Update the concise checkpoint and affected architecture notes after verified changes.
+- Days 1-3 are complete; implement later-day features only when requested. Update the concise checkpoint and affected architecture notes after verified changes.

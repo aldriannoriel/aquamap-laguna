@@ -23,7 +23,7 @@ class WaterBodySeederTest extends TestCase
 
     public function test_seeds_three_sourced_freshwater_lakes_without_scientific_or_user_records(): void
     {
-        $this->seed(DatabaseSeeder::class);
+        $this->seed(WaterBodySeeder::class);
 
         $this->assertDatabaseCount('water_bodies', 3);
         foreach ([
