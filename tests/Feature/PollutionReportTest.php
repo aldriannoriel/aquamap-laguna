@@ -35,7 +35,7 @@ class PollutionReportTest extends TestCase
         $this->get(route('reports.create'))->assertOk()->assertViewIs('reports.create')
             ->assertSee('Sampaloc Lake')->assertSee('Pandin Lake')->assertSee('Yambo Lake')
             ->assertSee('name="_token"', false)->assertSee('No incident location selected.')
-            ->assertSee('datum and precision remain unconfirmed')->assertHeader('Cache-Control', 'no-store, private');
+            ->assertSee('positional precision remains unconfirmed')->assertHeader('Cache-Control', 'no-store, private');
         $this->get(route('map.index'))->assertOk()->assertSee(route('reports.create'));
     }
 
@@ -90,17 +90,17 @@ class PollutionReportTest extends TestCase
     public function test_required_fields_are_validated(): void
     {
         $this->post(route('reports.store'), [])->assertRedirectToRoute('reports.create')->assertSessionHasErrors([
-            'water_body_id' => 'Please choose a lake.', 'pollution_type' => 'Please choose an observation type.',
+            'water_body_id' => 'Please choose a water body.', 'pollution_type' => 'Please choose an observation type.',
             'description' => 'Please describe what you observed.']);
         $this->assertDatabaseCount('pollution_reports', 0);
     }
 
     public function test_empty_lake_catalog_explains_unavailability_and_prevents_submission(): void
     {
-        $this->get(route('reports.create'))->assertOk()->assertSee('No lake records are available.')
+        $this->get(route('reports.create'))->assertOk()->assertSee('No water body records are available.')
             ->assertSee('id="submit-report"', false)->assertSee('disabled', false);
         $this->post(route('reports.store'), ['water_body_id' => 1, 'pollution_type' => 'other', 'description' => 'Isolated fixture.'])
-            ->assertSessionHasErrors(['water_body_id' => 'Please choose an existing lake.']);
+            ->assertSessionHasErrors(['water_body_id' => 'Please choose an existing water body.']);
         $this->assertDatabaseCount('pollution_reports', 0);
     }
 

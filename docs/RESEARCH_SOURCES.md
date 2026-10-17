@@ -1,6 +1,59 @@
 # Research sources
 
-Reviewed on 2026-10-17 for Days 1-3. Lake geographic metadata and one sourced fish species with three historical aquaculture associations are seeded. No lake measurements or suitability conclusions are seeded.
+Reviewed on 2026-10-17 for Days 1-3 and the GIS expansion. The expansion adds source-checked display geography alongside the original published points, without replacing them. No scientific measurements or suitability conclusions are seeded.
+
+## GIS expansion: imported inventory
+
+`database/data/explorer.json` is the reviewed import snapshot. `ExplorerSeeder` supplements the original three profiles and inserts eight more, preserving original IDs, coordinate columns, descriptions, source URLs and fish links. Run it serially and explicitly; the original `DatabaseSeeder` remains unchanged. This is a verified-first subset, **not the complete requested provincial catalogue**.
+
+`source_verified` means the named source object and coordinate representation were inspected. It does **not** mean surveyed, field-verified, current, legally authoritative or accurate to the stored decimal places. OSM uses [WGS84](https://wiki.openstreetmap.org/wiki/Converting_to_WGS84). GeoJSON stores longitude, latitude; Leaflet converts for display. The original journal points' datum/precision limitation below remains unresolved.
+
+| Imported profile | Represented locality | Primary geographic source / shape | Revision inspected |
+| --- | --- | --- | --- |
+| Sampaloc Lake | San Pablo City | Polygon, [OSM relation 1557746](https://www.openstreetmap.org/relation/1557746) | v15, 2026-04-06 |
+| Pandin Lake | San Pablo City | Shoreline node 420519219 from [way 24821810](https://www.openstreetmap.org/way/24821810), member of [Pandin relation 10521183](https://www.openstreetmap.org/relation/10521183) | way v17, 2019-12-31 |
+| Yambo Lake | San Pablo project locality; existing multi-municipality qualification retained | Polygon, [OSM relation 6476645](https://www.openstreetmap.org/relation/6476645) | v7, 2026-04-06 |
+| Bunot Lake | San Pablo City | Polygon, [OSM way 24821711](https://www.openstreetmap.org/way/24821711) | v20, 2026-04-06 |
+| Mohicap Lake | San Pablo City | Polygon, [OSM way 25032575](https://www.openstreetmap.org/way/25032575) | v16, 2023-09-03 |
+| Bumbungan / Pagsanjan River | Selected reaches in Pagsanjan | MultiLineString, ways [773118744](https://www.openstreetmap.org/way/773118744), [1258614370](https://www.openstreetmap.org/way/1258614370) | v3, 2024-03-07; v2, 2025-09-12 |
+| Balanac River | Selected reaches in Pagsanjan; not complete Magdalena coverage | MultiLineString, ways [146487700](https://www.openstreetmap.org/way/146487700), [146487702](https://www.openstreetmap.org/way/146487702), [1258614372](https://www.openstreetmap.org/way/1258614372), [1258681190](https://www.openstreetmap.org/way/1258681190) | v4/v5/v1/v1, 2024-03-07 |
+| Pagsanjan / Cavinti / Magdapio Falls | Cavinti | [OSM node 1332879056](https://www.openstreetmap.org/node/1332879056): 14.2625628 N, 121.4999861 E | v6, 2025-08-02 |
+| Hulugan Falls | Luisiana | [OSM node 4418310415](https://www.openstreetmap.org/node/4418310415): 14.2107508 N, 121.4801151 E | v4, 2020-07-11 |
+| Talay Falls | Luisiana | [OSM node 5682123306](https://www.openstreetmap.org/node/5682123306): 14.2108556 N, 121.4823098 E | v1, 2018-06-11 |
+| Al Fresco Springs Resort | Los Baños | Operator's [Location page](https://alfrescosprings.com/location): 14.176666 N, 121.209719 E | Publication date unavailable; checked 2026-10-17 |
+
+Complete OSM outer rings were joined by shared node identity, without invented closing segments or simplification. All referenced nodes were available. Pandin's retrieved way is open; its complete relation was unavailable, so an existing shoreline node is used, explicitly **not a centroid, entrance or full polygon**. River ways came from a small Pagsanjan bounding-box response, retaining complete node sequences for selected reaches, not entire rivers. Polygon/line selection markers use display bounds centers, not surveyed points. Reporting uses a geometry vertex as an orientation reference; lake selection never assigns an incident point.
+
+OSM-derived geographic data in the snapshot is available under the [Open Database License 1.0](https://opendatacommons.org/licenses/odbl/1-0/); retain attribution and applicable share-alike terms. The map links [OSM licensing](https://www.openstreetmap.org/copyright). Revision dates above are editing dates, not scientific publication/sampling dates. Search engines/Mapcarta/Wikipedia helped locate IDs; imported coordinates came from OSM. [Pagsanjan LGU](https://pagsanjan.gov.ph/) corroborates tourism context; [Proclamation 1551, 31 May 1976](https://lawphil.net/executive/proc/proc1976/proc_1551_1976.html) identifies the gorge park in Cavinti. [The falls article](https://en.wikipedia.org/wiki/Pagsanjan_Falls) corroborates aliases, which do not create duplicate records.
+
+### Resort verification and withheld candidates
+
+| Candidate | Reviewed evidence | Publication decision / gaps |
+| --- | --- | --- |
+| Al Fresco Springs | [Operator overview](https://alfrescosprings.com/) states natural hot spring water without heaters. Its location page publishes matching resort GeoCoordinates and a linked map marker. [Schema.org GeoCoordinates](https://schema.org/GeoCoordinates) specifies WGS84. | Imported as **one resort reference**, not a spring-source marker or three separate villa properties. Hot/geothermal water remains an operator claim, not independent hydrogeological testing. Source location, temperatures, chemistry and safety remain unestablished. The operator cautions about navigation accuracy. |
+| Hidden Valley Springs | [Operator](https://www.hiddenvalleyspringsresort.com/) describes a natural springs resort. [OSM way 273625694](https://www.openstreetmap.org/way/273625694) was inspected. | **Withheld:** object has `fixme=polygon shape` and `source=chatGPT;Web browsing`; it is not independent geographic confirmation. Need authoritative property/source coordinates and Alaminos/Calauan locality clarification. No temperature classification inferred. |
+| Dolcezza Hotspring Resort | [Operator](https://www.dolcezzahotspring.com/) describes natural hot spring water and an address in Lalakay, Los Baños. | **Withheld:** property/source WGS84 point, temperatures, chemistry and photo permission are unverified. |
+| Tirta Spring Villa | [Operator resorts](https://www.tirtaresorts.com/resorts) and [villa page](https://www.tirtaresorts.com/spring-villa) describe a natural hot spring pool and Los Baños address. | **Withheld:** embedded metadata contained coordinates outside Los Baños; the site also advertises Batangas properties. They were not used for this villa. Need property-specific geography and image permission. |
+| Stellaluna Private Resort | Supplied [booking page](https://stellaluna-altaluna.com/book) could not be retrieved by the research browser. | **Withheld:** natural/geothermal supply, location, classification and image permission remain unverified. A name or swimming pool is insufficient. |
+
+No operator health/therapeutic claims, temperatures, measurements, fish presence or current pollution findings were imported. Operator publication dates are unavailable; review date is not substituted. No proprietary map geometry was scraped. An independent visual Google Maps comparison was not completed.
+
+### Photographs and environmental limits
+
+The [Bunot Lake 20240512 photograph](https://commons.wikimedia.org/wiki/File:Bunot_Lake_20240512.jpg) was reviewed directly: **Ian Lopez (Ianlopez1115)**, own work, photographed **12 May 2024**, attribution-only reuse permission ([author's permission](https://commons.wikimedia.org/wiki/User:Ianlopez1115/License_AttributionOnly)). This is not labeled CC BY. Proposed local path/credit are recorded, but transfers timed out twice: **no photograph is bundled or displayed**. All profiles show placeholders. Resort website photos were not reused; visibility is not permission. A future import needs a permitted local JPEG/PNG/WebP asset, author, alt text, source and license link. Never use private report evidence as a public profile photograph.
+
+Only the original three historical aquaculture associations below are imported. No species were inferred for new locations. Waterfall/spring profiles without fish evidence show **Not Assessed**; compatibility remains `insufficient_data`. New river/waterfall classification is **Not assessed**, without invented salinity or statutory classification. The San Pablo crater lakes' freshwater label follows the existing literature context, not a safety finding.
+
+Public counts include only reports whose **current status is exactly `verified`**; pending, rejected and resolved records are excluded. Contents, dates, types, contacts, incident points, photos and audits remain private. These are reviewed observations, separate from scientific measurements. Zero does not mean clean/safe water. Every profile says **No verified water-quality assessment available**. See [RETENTION_POLICY.md](RETENTION_POLICY.md).
+
+### Requested inventory awaiting verification
+
+- Lakes: **Laguna de Bay, Calibato, Palakpakin, Caliraya and Lumot** need reviewed WGS84 geometry, locality/classification references and image permissions. Mohicap/Mojicap/Muhikap are aliases of one record. Pandin needs its complete polygon.
+- Rivers: **Santa Cruz, San Pedro and Tunasan** need named reaches/geometry and disambiguation. Balanac's Magdalena/upstream coverage and both imported rivers' complete courses remain outstanding.
+- Waterfalls: **Aliw, Taytay/Majayjay, Bukal, Bunga Twin, Buruwisan, Lanzones, Buntot Palos and Dampalit** need source-specific points, locality/alias checks and image permissions. Pagsanjan/Cavinti/Magdapio is one identity.
+- Springs/resorts: four withheld candidates above, independent source/hydrogeological verification for Al Fresco, and further natural/geothermal spring inventory. No ordinary pool was published as a natural spring source.
+
+Overpass returned 504 then 406; direct OSM retrieval later reached 429, at which point requests stopped. No access/rate limit was bypassed. NAMRIA/LGU survey geometry and legal boundaries were not obtained. These are research gaps, not evidence that locations do not exist.
 
 ## Geographic seed evidence
 
@@ -39,9 +92,9 @@ The LLDA [Seven Crater Lakes report](https://llda.gov.ph/wp-content/uploads/dox/
 - Define a transparent, reviewed comparison method only after the required evidence exists. Keep `compatibility_status = insufficient_data` when evidence is missing; do not create positive/negative habitat results to fill the database.
 - Keep pollution reports as actual submissions with pending review; historical findings are research references, not invented incident reports.
 
-Day 3 implements the limited historical fish records below. Pollution workflows, water-quality ingestion, and suitability calculations remain outside the implemented scope.
+Day 3 implements the historical fish records below. Days 4-5 added private reporting and administrator review. Scientific water-quality ingestion and suitability calculations remain unimplemented.
 
-## Day 2 map display
+## Original Day 2 map display (superseded by expansion geography)
 
 The map reads the existing database coordinates; no new coordinates or scientific findings were introduced. Leaflet 1.9.4 uses its standard map projection for display, with the unconfirmed WGS84 assumption noted above. Markers represent reference locations only; Yambo's full multi-locality description remains available.
 

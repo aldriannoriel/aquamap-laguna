@@ -31,7 +31,7 @@ try {
 const originalRecords = databaseSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = verifyFish ? 'day3-browser' : 'day2-browser';
+const artifactDirectory = 'expansion-browser';
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
@@ -104,7 +104,8 @@ try {
     };
     let mobile = false;
     async function click(selector) {
-        const point = await evaluate(`(() => { const element = document.querySelector(${JSON.stringify(selector)}); if (!element) throw new Error('Missing control'); element.scrollIntoView({block:'center'}); const r = element.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
+        const point = await evaluate(`(() => { const element = document.querySelector(${JSON.stringify(selector)}); if (!element) throw new Error('Missing control'); (element.closest('#lake-map') || element).scrollIntoView({block:'center'}); const r = element.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
+        await pause(100);
         if (mobile) {
             await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
             await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
@@ -127,12 +128,12 @@ try {
     await send('Page.enable');
     await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1100, deviceScaleFactor: 1, mobile: false });
     await send('Page.navigate', { url: `${base}/map` });
-    await waitFor(() => evaluate('document.querySelectorAll(".lake-marker").length === 3'), 'Expected three database-driven markers.');
+    await waitFor(() => evaluate('document.querySelectorAll(".lake-marker").length === JSON.parse(document.getElementById("lake-data").textContent).filter(item => item.geography).length && document.querySelectorAll(".lake-marker").length > 0'), 'Expected source-checked database-driven markers.');
     await waitFor(() => evaluate('document.querySelectorAll(".leaflet-tile-loaded").length > 0'), 'OpenStreetMap tiles did not load.', 20000);
     await waitFor(() => evaluate('[...document.querySelectorAll(".leaflet-tile")].every(tile => tile.complete)'), 'Map tiles did not finish loading.', 20000);
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'Desktop horizontal overflow.');
-    assert.equal(await evaluate('document.querySelectorAll("[data-lake-id]").length'), 3);
-    results.push('Desktop: three live database markers/cards, OpenStreetMap tiles and attribution, no horizontal overflow.');
+    assert.equal(await evaluate('document.querySelectorAll("[data-lake-id]").length'), 11);
+    results.push('Desktop: eleven source-checked database markers/profiles, OpenStreetMap tiles and attribution, no horizontal overflow.');
     await screenshot('desktop.png');
 
     const lakes = await evaluate('JSON.parse(document.getElementById("lake-data").textContent)');
@@ -142,8 +143,8 @@ try {
         assert.equal(await evaluate(`document.querySelector('[data-lake-id="${lake.id}"]').getAttribute('aria-pressed')`), 'true');
         assert.equal(await evaluate('document.querySelector(".leaflet-popup .lake-detail-title")?.textContent'), lake.name);
         assert.equal(await evaluate('document.querySelector("#selected-lake .lake-detail-description")?.textContent'), lake.description);
-        assert.equal(await evaluate('document.querySelector("#selected-lake .lake-detail-source")?.href'), lake.source_url);
-        if (verifyFish) {
+        assert.equal(await evaluate('[...document.querySelectorAll("#selected-lake a")].some(link => link.href === ' + JSON.stringify(lake.source_url) + ')'), true);
+        if (verifyFish && ['Sampaloc Lake', 'Pandin Lake', 'Yambo Lake'].includes(lake.name)) {
             assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-fish-card]").length'), 1);
             assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-card] h4").textContent'), 'Nile tilapia');
             assert.equal(await evaluate('document.querySelector("#selected-lake [data-sampling-period]").textContent'), 'July-September 2017');
@@ -154,14 +155,16 @@ try {
         }
         await click('#reset-map');
     }
-    results.push('All three sidebar selections: correct popup, selected state, description and safe research link; reset clears selection.');
+    results.push('All eleven sidebar selections: correct popup, selected state, description and safe research link; reset clears selection.');
     if (verifyFish) results.push('All three lakes show Nile tilapia, July-September 2017 sampling, historical aquaculture evidence, two references and insufficient_data compatibility.');
+    await click('[data-category=lake]');
     await click('.lake-marker[title="Sampaloc Lake"]');
     assert.equal(await evaluate('document.querySelector("#selected-lake h2")?.textContent'), 'Sampaloc Lake');
     if (verifyFish) assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-card] h4").textContent'), 'Nile tilapia');
     results.push('Marker pointer click updates the sidebar and lake detail panel.');
     await click('#reset-map');
 
+    await click('[data-category=lake]');
     const scale = await evaluate('document.querySelector(".leaflet-control-scale-line").textContent');
     await click('.leaflet-control-zoom-in');
     assert.notEqual(await evaluate('document.querySelector(".leaflet-control-scale-line").textContent'), scale);
@@ -175,16 +178,45 @@ try {
     await click('#reset-map');
     results.push('Zoom in/out, keyboard panning and reset work.');
 
+    async function setSearch(value) {
+        await evaluate('(() => { const input = document.getElementById("water-search"); input.value = ' + JSON.stringify(value) + '; input.dispatchEvent(new Event("input", {bubbles:true})); })()');
+        await pause(200);
+    }
+    for (const [category, expected] of [['lake', 5], ['river', 2], ['waterfall', 3], ['spring', 1]]) {
+        await click('[data-category="' + category + '"]');
+        assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), expected);
+        assert.equal(await evaluate('[...document.querySelectorAll("[data-water-row]")].filter(row => !row.hidden).length'), expected);
+        await click('#reset-map');
+    }
+    await setSearch('cavinti falls');
+    assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 1);
+    assert.equal(await evaluate('document.querySelector("[data-category=waterfall] [data-category-count]").textContent'), '1');
+    await setSearch('no matching place fixture');
+    assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 0);
+    assert.equal(await evaluate('document.getElementById("filter-empty").hidden'), false);
+    await click('#reset-map');
+    assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 11);
+    await click('[data-category=river]');
+    assert(await evaluate('document.querySelectorAll("path[role=button]").length > 0'), 'River reaches must render as selectable geometry.');
+    await evaluate('document.querySelector("path[role=button]").focus()');
+    await send('Input.dispatchKeyEvent', {type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+    await send('Input.dispatchKeyEvent', {type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+    assert.equal(await evaluate('document.getElementById("selected-lake").hidden'), false);
+    await click('#reset-map');
+    results.push('All category counts, search/alias search, empty state, layer removal, reset and keyboard shape selection pass.');
+
+
     await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
     await send('Emulation.setTouchEmulationEnabled', { enabled: true });
     mobile = true;
     await send('Page.reload');
-    await waitFor(() => evaluate('document.querySelectorAll(".lake-marker").length === 3'), 'Mobile map did not initialize.');
+    await waitFor(() => evaluate('document.querySelectorAll(".lake-marker").length === JSON.parse(document.getElementById("lake-data").textContent).filter(item => item.geography).length && document.querySelectorAll(".lake-marker").length > 0'), 'Mobile map did not initialize.');
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'Mobile horizontal overflow.');
     const layout = await evaluate('({map:document.getElementById("lake-map").getBoundingClientRect().y,sidebar:document.querySelector("aside").getBoundingClientRect().y})');
-    assert(layout.map < layout.sidebar, 'Mobile map should precede the sidebar.');
-    await click(`[data-lake-id="${lakes[0].id}"]`);
-    assert.equal(await evaluate('document.querySelector("#selected-lake h2")?.textContent'), lakes[0].name);
+    assert(layout.sidebar < layout.map, 'Mobile search and category controls should precede the map.');
+    const mobileLake = lakes.find(lake => lake.name === "Pandin Lake");
+    await click(`[data-lake-id="${mobileLake.id}"]`);
+    assert.equal(await evaluate('document.querySelector("#selected-lake h2")?.textContent'), mobileLake.name);
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'Mobile selection causes overflow.');
     const popupLayout = await evaluate('({popup:document.querySelector(".leaflet-popup").getBoundingClientRect().top,map:document.getElementById("lake-map").getBoundingClientRect().top})');
     assert(popupLayout.popup >= popupLayout.map, 'Mobile popup title must remain inside the map.');
@@ -196,8 +228,20 @@ try {
         results.push('Mobile fish card remains readable, distinguishes occurrence/compatibility and retains source links without overflow.');
     }
     await click('#reset-map');
-    assert.equal(await evaluate('document.querySelectorAll("[aria-pressed=true]").length'), 0);
-    results.push('390px mobile: map-first stacked layout, selection, popup and reset work without horizontal overflow.');
+    assert.equal(await evaluate('document.querySelectorAll("[data-lake-id][aria-pressed=true]").length'), 0);
+    await click('[data-category=spring]');
+    assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 1);
+    await setSearch('los banos');
+    assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 1);
+    await click('[data-lake-id="' + lakes.find(lake => lake.site_type === 'resort').id + '"]');
+    assert.match(await evaluate('document.getElementById("selected-lake").textContent'), /not a verified spring source/);
+    assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-photo-placeholder]").length'), 1);
+    assert.equal(await evaluate('document.querySelector("#selected-lake img")'), null);
+    assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
+    await screenshot('mobile-resort.png', true);
+    await click('#reset-map');
+    results.push('390px mobile: categories, accent-insensitive locality search, resort/source distinction and photo placeholder pass without overflow.');
+    results.push('390px mobile: filters-first stacked layout, selection, popup and reset work without horizontal overflow.');
     assert.deepEqual(failures, [], 'Browser JavaScript exceptions occurred.');
     assert.equal(databaseSnapshot(), originalRecords, 'Browser verification changed lake or fish records.');
     results.push('Live water body, species and association records unchanged after browser verification.');

@@ -1,0 +1,1882 @@
+[
+  {
+    "name": "Sampaloc Lake",
+    "municipality": "San Pablo City",
+    "water_type": "freshwater",
+    "latitude": "14.0745758",
+    "longitude": "121.3337233",
+    "description": "Sampaloc Lake is mapped in San Pablo City, Laguna. Community-mapped outline; positional accuracy is not surveyed or certified. This is not a legal boundary.",
+    "source_url": "https://www.openstreetmap.org/relation/1557746",
+    "category": "lake",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/relation/1557746",
+      "checked_on": "2026-10-17",
+      "note": "Community-mapped outline; positional accuracy is not surveyed or certified. This is not a legal boundary.",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.3337233,
+              14.0745758
+            ],
+            [
+              121.3335614,
+              14.0743479
+            ],
+            [
+              121.332997,
+              14.0739678
+            ],
+            [
+              121.3323573,
+              14.0735382
+            ],
+            [
+              121.3318439,
+              14.0731649
+            ],
+            [
+              121.3311481,
+              14.0730968
+            ],
+            [
+              121.3306402,
+              14.0731466
+            ],
+            [
+              121.3296899,
+              14.0736373
+            ],
+            [
+              121.3289895,
+              14.0736199
+            ],
+            [
+              121.328268,
+              14.0737096
+            ],
+            [
+              121.327762,
+              14.0739172
+            ],
+            [
+              121.3274453,
+              14.0740936
+            ],
+            [
+              121.3269791,
+              14.074489
+            ],
+            [
+              121.3264818,
+              14.0747056
+            ],
+            [
+              121.3265744,
+              14.0747942
+            ],
+            [
+              121.3263752,
+              14.075043
+            ],
+            [
+              121.326214,
+              14.0751944
+            ],
+            [
+              121.3259469,
+              14.0756432
+            ],
+            [
+              121.3259194,
+              14.0756941
+            ],
+            [
+              121.3259067,
+              14.0757177
+            ],
+            [
+              121.3258774,
+              14.0758162
+            ],
+            [
+              121.3258894,
+              14.0758599
+            ],
+            [
+              121.3258942,
+              14.0758792
+            ],
+            [
+              121.3258597,
+              14.0759005
+            ],
+            [
+              121.3258339,
+              14.0759109
+            ],
+            [
+              121.3258103,
+              14.0759334
+            ],
+            [
+              121.3257815,
+              14.0759719
+            ],
+            [
+              121.3257153,
+              14.0761121
+            ],
+            [
+              121.3256329,
+              14.076312
+            ],
+            [
+              121.3256045,
+              14.0763929
+            ],
+            [
+              121.3255924,
+              14.0764464
+            ],
+            [
+              121.3255498,
+              14.0765511
+            ],
+            [
+              121.3254954,
+              14.0767473
+            ],
+            [
+              121.3254346,
+              14.0769997
+            ],
+            [
+              121.325436,
+              14.0771464
+            ],
+            [
+              121.3254027,
+              14.077277
+            ],
+            [
+              121.3253916,
+              14.077377
+            ],
+            [
+              121.3253153,
+              14.0776262
+            ],
+            [
+              121.3252409,
+              14.0779856
+            ],
+            [
+              121.3251016,
+              14.0783103
+            ],
+            [
+              121.3250521,
+              14.0785464
+            ],
+            [
+              121.3249366,
+              14.0788209
+            ],
+            [
+              121.3249121,
+              14.0789581
+            ],
+            [
+              121.3248417,
+              14.0792505
+            ],
+            [
+              121.3248424,
+              14.0794977
+            ],
+            [
+              121.3248332,
+              14.0798404
+            ],
+            [
+              121.3248336,
+              14.080102
+            ],
+            [
+              121.3246316,
+              14.0802308
+            ],
+            [
+              121.3246423,
+              14.0802393
+            ],
+            [
+              121.3247246,
+              14.080244
+            ],
+            [
+              121.3248469,
+              14.0802164
+            ],
+            [
+              121.3248495,
+              14.0803429
+            ],
+            [
+              121.3249004,
+              14.0804869
+            ],
+            [
+              121.325019,
+              14.080646
+            ],
+            [
+              121.3251793,
+              14.0808985
+            ],
+            [
+              121.3253264,
+              14.0810792
+            ],
+            [
+              121.3254284,
+              14.0811803
+            ],
+            [
+              121.3255015,
+              14.0812398
+            ],
+            [
+              121.3255597,
+              14.081269
+            ],
+            [
+              121.3256269,
+              14.0812965
+            ],
+            [
+              121.3256736,
+              14.0813206
+            ],
+            [
+              121.3257421,
+              14.0813497
+            ],
+            [
+              121.3259508,
+              14.0812844
+            ],
+            [
+              121.3262491,
+              14.0812448
+            ],
+            [
+              121.3265634,
+              14.0811267
+            ],
+            [
+              121.3268819,
+              14.0811095
+            ],
+            [
+              121.3274491,
+              14.0810424
+            ],
+            [
+              121.3279424,
+              14.0812875
+            ],
+            [
+              121.328217,
+              14.081454
+            ],
+            [
+              121.3286225,
+              14.081727
+            ],
+            [
+              121.3287466,
+              14.0819762
+            ],
+            [
+              121.328876,
+              14.0822889
+            ],
+            [
+              121.3288916,
+              14.0826478
+            ],
+            [
+              121.3290349,
+              14.0830342
+            ],
+            [
+              121.3292731,
+              14.0832557
+            ],
+            [
+              121.3301396,
+              14.0835103
+            ],
+            [
+              121.3305626,
+              14.083399
+            ],
+            [
+              121.3308293,
+              14.0832882
+            ],
+            [
+              121.331548,
+              14.0831349
+            ],
+            [
+              121.3320416,
+              14.0830209
+            ],
+            [
+              121.3321977,
+              14.0828762
+            ],
+            [
+              121.3324056,
+              14.0827194
+            ],
+            [
+              121.3328761,
+              14.0823705
+            ],
+            [
+              121.3334613,
+              14.0820201
+            ],
+            [
+              121.3337609,
+              14.0814029
+            ],
+            [
+              121.3344483,
+              14.0810045
+            ],
+            [
+              121.3351865,
+              14.0798306
+            ],
+            [
+              121.3352809,
+              14.079123
+            ],
+            [
+              121.3353238,
+              14.0785569
+            ],
+            [
+              121.3352208,
+              14.0780324
+            ],
+            [
+              121.3351178,
+              14.0775745
+            ],
+            [
+              121.3351779,
+              14.0771915
+            ],
+            [
+              121.3352895,
+              14.0768169
+            ],
+            [
+              121.3352552,
+              14.0763423
+            ],
+            [
+              121.3348174,
+              14.0756763
+            ],
+            [
+              121.3337855,
+              14.0747264
+            ],
+            [
+              121.3337233,
+              14.0745758
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Sampaloc Lake: mapped relation 1557746",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/relation/1557746"
+      },
+      {
+        "title": "Phytoplankton Dynamics and Ecological Capacity of the Seven Crater Lakes of San Pablo City, Philippines",
+        "publisher": "The Philippine Journal of Fisheries / NFRDI",
+        "published_on": "2025",
+        "url": "https://nfrdi.da.gov.ph/tpjf/vol32_2/research_article_ortiz_et_al_32220240111.pdf"
+      },
+      {
+        "title": "A Preliminary Survey of Estrogenic Effects in Cultured Adult Male Nile Tilapia in the Seven Lakes of San Pablo City, Philippines",
+        "publisher": "Bulletin of Environmental Contamination and Toxicology",
+        "published_on": "2019-07-27",
+        "url": "https://link.springer.com/article/10.1007/s00128-019-02685-z"
+      }
+    ],
+    "image": null,
+    "aliases": []
+  },
+  {
+    "name": "Yambo Lake",
+    "municipality": "San Pablo City",
+    "water_type": "freshwater",
+    "latitude": "14.1190219",
+    "longitude": "121.3702096",
+    "description": "Yambo Lake is mapped in San Pablo City, Laguna. Community-mapped outline; positional accuracy is not surveyed or certified. This is not a legal boundary.",
+    "source_url": "https://www.openstreetmap.org/relation/6476645",
+    "category": "lake",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/relation/6476645",
+      "checked_on": "2026-10-17",
+      "note": "Community-mapped outline; positional accuracy is not surveyed or certified. This is not a legal boundary.",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.3702096,
+              14.1190219
+            ],
+            [
+              121.3699722,
+              14.1188129
+            ],
+            [
+              121.3695229,
+              14.1184835
+            ],
+            [
+              121.3691978,
+              14.1181398
+            ],
+            [
+              121.3688068,
+              14.1177141
+            ],
+            [
+              121.368701,
+              14.1174845
+            ],
+            [
+              121.3686133,
+              14.1173711
+            ],
+            [
+              121.3684234,
+              14.1172684
+            ],
+            [
+              121.3681969,
+              14.117279
+            ],
+            [
+              121.3680059,
+              14.1172394
+            ],
+            [
+              121.3676417,
+              14.1171231
+            ],
+            [
+              121.3671704,
+              14.1169672
+            ],
+            [
+              121.3667287,
+              14.1167919
+            ],
+            [
+              121.3663587,
+              14.1164019
+            ],
+            [
+              121.3661476,
+              14.1163012
+            ],
+            [
+              121.3660237,
+              14.116255
+            ],
+            [
+              121.3657012,
+              14.1164386
+            ],
+            [
+              121.3654656,
+              14.1164907
+            ],
+            [
+              121.36493,
+              14.1164067
+            ],
+            [
+              121.3642114,
+              14.1163836
+            ],
+            [
+              121.363902,
+              14.1163568
+            ],
+            [
+              121.3637197,
+              14.1166086
+            ],
+            [
+              121.3635207,
+              14.1167854
+            ],
+            [
+              121.3631782,
+              14.1171177
+            ],
+            [
+              121.3630466,
+              14.1175514
+            ],
+            [
+              121.3629903,
+              14.117975
+            ],
+            [
+              121.3629185,
+              14.1185484
+            ],
+            [
+              121.3629516,
+              14.1191056
+            ],
+            [
+              121.3630898,
+              14.119395
+            ],
+            [
+              121.3632208,
+              14.1195884
+            ],
+            [
+              121.3636257,
+              14.1199844
+            ],
+            [
+              121.3642883,
+              14.1203464
+            ],
+            [
+              121.3644877,
+              14.120622
+            ],
+            [
+              121.3647639,
+              14.1210293
+            ],
+            [
+              121.3649573,
+              14.121324
+            ],
+            [
+              121.3650899,
+              14.1215115
+            ],
+            [
+              121.3652888,
+              14.1216187
+            ],
+            [
+              121.3654933,
+              14.1216401
+            ],
+            [
+              121.3656204,
+              14.121549
+            ],
+            [
+              121.3657441,
+              14.1215274
+            ],
+            [
+              121.366195,
+              14.121533
+            ],
+            [
+              121.3665998,
+              14.1216376
+            ],
+            [
+              121.3668601,
+              14.1216437
+            ],
+            [
+              121.3672026,
+              14.1215977
+            ],
+            [
+              121.3674446,
+              14.1217128
+            ],
+            [
+              121.3676638,
+              14.1218014
+            ],
+            [
+              121.3678555,
+              14.1217793
+            ],
+            [
+              121.3679925,
+              14.1215933
+            ],
+            [
+              121.3680163,
+              14.1214577
+            ],
+            [
+              121.3681145,
+              14.1211842
+            ],
+            [
+              121.3682756,
+              14.1210752
+            ],
+            [
+              121.3685496,
+              14.1211372
+            ],
+            [
+              121.3687779,
+              14.1212036
+            ],
+            [
+              121.3689048,
+              14.1212559
+            ],
+            [
+              121.3690802,
+              14.1212502
+            ],
+            [
+              121.369273,
+              14.1212162
+            ],
+            [
+              121.3693636,
+              14.1211283
+            ],
+            [
+              121.36944,
+              14.1210221
+            ],
+            [
+              121.36944,
+              14.1208316
+            ],
+            [
+              121.3695039,
+              14.1206102
+            ],
+            [
+              121.3695987,
+              14.1203571
+            ],
+            [
+              121.3697523,
+              14.1202243
+            ],
+            [
+              121.3701234,
+              14.1197652
+            ],
+            [
+              121.3701762,
+              14.1195756
+            ],
+            [
+              121.3702644,
+              14.1193585
+            ],
+            [
+              121.3702096,
+              14.1190219
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Yambo Lake: mapped relation 6476645",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/relation/6476645"
+      },
+      {
+        "title": "Phytoplankton Dynamics and Ecological Capacity of the Seven Crater Lakes of San Pablo City, Philippines",
+        "publisher": "The Philippine Journal of Fisheries / NFRDI",
+        "published_on": "2025",
+        "url": "https://nfrdi.da.gov.ph/tpjf/vol32_2/research_article_ortiz_et_al_32220240111.pdf"
+      },
+      {
+        "title": "A Preliminary Survey of Estrogenic Effects in Cultured Adult Male Nile Tilapia in the Seven Lakes of San Pablo City, Philippines",
+        "publisher": "Bulletin of Environmental Contamination and Toxicology",
+        "published_on": "2019-07-27",
+        "url": "https://link.springer.com/article/10.1007/s00128-019-02685-z"
+      }
+    ],
+    "image": null,
+    "aliases": []
+  },
+  {
+    "name": "Pandin Lake",
+    "municipality": "San Pablo City",
+    "water_type": "freshwater",
+    "latitude": "14.113604",
+    "longitude": "121.3651948",
+    "description": "Pandin Lake is mapped in San Pablo City, Laguna. Shoreline reference point from a member of OSM relation 10521183, not a centroid or entrance. Complete polygon retrieval is outstanding.",
+    "source_url": "https://www.openstreetmap.org/way/24821810",
+    "category": "lake",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/24821810",
+      "checked_on": "2026-10-17",
+      "note": "Shoreline reference point from a member of OSM relation 10521183, not a centroid or entrance. Complete polygon retrieval is outstanding.",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.3651948,
+          14.113604
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Pandin Lake: mapped way 24821810",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/way/24821810"
+      },
+      {
+        "title": "Phytoplankton Dynamics and Ecological Capacity of the Seven Crater Lakes of San Pablo City, Philippines",
+        "publisher": "The Philippine Journal of Fisheries / NFRDI",
+        "published_on": "2025",
+        "url": "https://nfrdi.da.gov.ph/tpjf/vol32_2/research_article_ortiz_et_al_32220240111.pdf"
+      },
+      {
+        "title": "A Preliminary Survey of Estrogenic Effects in Cultured Adult Male Nile Tilapia in the Seven Lakes of San Pablo City, Philippines",
+        "publisher": "Bulletin of Environmental Contamination and Toxicology",
+        "published_on": "2019-07-27",
+        "url": "https://link.springer.com/article/10.1007/s00128-019-02685-z"
+      }
+    ],
+    "image": null,
+    "aliases": []
+  },
+  {
+    "name": "Mohicap Lake",
+    "municipality": "San Pablo City",
+    "water_type": "freshwater",
+    "latitude": "14.122524",
+    "longitude": "121.3320709",
+    "description": "Mohicap Lake is mapped in San Pablo City, Laguna. Community-mapped outline; positional accuracy is not surveyed or certified. This is not a legal boundary.",
+    "source_url": "https://www.openstreetmap.org/way/25032575",
+    "category": "lake",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/25032575",
+      "checked_on": "2026-10-17",
+      "note": "Community-mapped outline; positional accuracy is not surveyed or certified. This is not a legal boundary.",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.3320709,
+              14.122524
+            ],
+            [
+              121.332141,
+              14.1228094
+            ],
+            [
+              121.3321829,
+              14.1229476
+            ],
+            [
+              121.3323045,
+              14.1230126
+            ],
+            [
+              121.3323593,
+              14.1231567
+            ],
+            [
+              121.3323646,
+              14.1232295
+            ],
+            [
+              121.3323834,
+              14.1233023
+            ],
+            [
+              121.3324719,
+              14.1233517
+            ],
+            [
+              121.3325658,
+              14.1234792
+            ],
+            [
+              121.332606,
+              14.1235234
+            ],
+            [
+              121.3326087,
+              14.1235754
+            ],
+            [
+              121.3327214,
+              14.1236483
+            ],
+            [
+              121.332767,
+              14.1236483
+            ],
+            [
+              121.3328753,
+              14.1237804
+            ],
+            [
+              121.333003,
+              14.1239084
+            ],
+            [
+              121.3331398,
+              14.1239786
+            ],
+            [
+              121.3333705,
+              14.1240254
+            ],
+            [
+              121.3335378,
+              14.1240082
+            ],
+            [
+              121.3337024,
+              14.1240706
+            ],
+            [
+              121.3337411,
+              14.1241193
+            ],
+            [
+              121.3337394,
+              14.1241668
+            ],
+            [
+              121.3337669,
+              14.1241694
+            ],
+            [
+              121.3337902,
+              14.1241401
+            ],
+            [
+              121.3338218,
+              14.1241068
+            ],
+            [
+              121.3338671,
+              14.1241115
+            ],
+            [
+              121.33391,
+              14.1241323
+            ],
+            [
+              121.3339583,
+              14.1241583
+            ],
+            [
+              121.3339784,
+              14.1241907
+            ],
+            [
+              121.3340173,
+              14.1242052
+            ],
+            [
+              121.3341005,
+              14.124213
+            ],
+            [
+              121.3341729,
+              14.1241869
+            ],
+            [
+              121.3342721,
+              14.1241479
+            ],
+            [
+              121.3344108,
+              14.1241458
+            ],
+            [
+              121.3346183,
+              14.1240979
+            ],
+            [
+              121.3347936,
+              14.1241014
+            ],
+            [
+              121.3348679,
+              14.1241188
+            ],
+            [
+              121.3348884,
+              14.1241451
+            ],
+            [
+              121.33492,
+              14.1241565
+            ],
+            [
+              121.3349646,
+              14.1241326
+            ],
+            [
+              121.3349977,
+              14.1240809
+            ],
+            [
+              121.3350584,
+              14.1240147
+            ],
+            [
+              121.3351907,
+              14.1238794
+            ],
+            [
+              121.3354046,
+              14.1237123
+            ],
+            [
+              121.3355664,
+              14.123692
+            ],
+            [
+              121.3360387,
+              14.1234249
+            ],
+            [
+              121.3364918,
+              14.1230908
+            ],
+            [
+              121.3366541,
+              14.1226425
+            ],
+            [
+              121.3367773,
+              14.1221973
+            ],
+            [
+              121.3368615,
+              14.1220266
+            ],
+            [
+              121.3367734,
+              14.1217503
+            ],
+            [
+              121.3365968,
+              14.1214055
+            ],
+            [
+              121.3363717,
+              14.1211514
+            ],
+            [
+              121.3361031,
+              14.120958
+            ],
+            [
+              121.3357596,
+              14.1207775
+            ],
+            [
+              121.3353947,
+              14.1207255
+            ],
+            [
+              121.3351299,
+              14.1207706
+            ],
+            [
+              121.3349374,
+              14.1207578
+            ],
+            [
+              121.3348415,
+              14.1206898
+            ],
+            [
+              121.3347499,
+              14.1206765
+            ],
+            [
+              121.3347018,
+              14.1207364
+            ],
+            [
+              121.3346675,
+              14.1207742
+            ],
+            [
+              121.334569,
+              14.1207675
+            ],
+            [
+              121.3345599,
+              14.1206853
+            ],
+            [
+              121.3345702,
+              14.1206159
+            ],
+            [
+              121.3347169,
+              14.1205553
+            ],
+            [
+              121.3347638,
+              14.1204015
+            ],
+            [
+              121.3348139,
+              14.1201795
+            ],
+            [
+              121.3347853,
+              14.1199644
+            ],
+            [
+              121.334645,
+              14.1198559
+            ],
+            [
+              121.3344525,
+              14.1197596
+            ],
+            [
+              121.3344275,
+              14.1196313
+            ],
+            [
+              121.3342343,
+              14.1195411
+            ],
+            [
+              121.3340554,
+              14.1195098
+            ],
+            [
+              121.333737,
+              14.1197041
+            ],
+            [
+              121.333683,
+              14.1198973
+            ],
+            [
+              121.3336534,
+              14.1199374
+            ],
+            [
+              121.3335525,
+              14.119943
+            ],
+            [
+              121.3334592,
+              14.1199339
+            ],
+            [
+              121.3333808,
+              14.1200061
+            ],
+            [
+              121.3332826,
+              14.120176
+            ],
+            [
+              121.3331431,
+              14.1204119
+            ],
+            [
+              121.332926,
+              14.1205
+            ],
+            [
+              121.3327543,
+              14.1205208
+            ],
+            [
+              121.3326112,
+              14.1205416
+            ],
+            [
+              121.3325003,
+              14.1205902
+            ],
+            [
+              121.3323643,
+              14.1206561
+            ],
+            [
+              121.332238,
+              14.1208373
+            ],
+            [
+              121.3320729,
+              14.1211142
+            ],
+            [
+              121.33203,
+              14.1212607
+            ],
+            [
+              121.3320283,
+              14.1213539
+            ],
+            [
+              121.3319647,
+              14.1214093
+            ],
+            [
+              121.3318842,
+              14.1214678
+            ],
+            [
+              121.331854,
+              14.1215816
+            ],
+            [
+              121.3318976,
+              14.1217539
+            ],
+            [
+              121.3318741,
+              14.1218417
+            ],
+            [
+              121.3318272,
+              14.1218775
+            ],
+            [
+              121.331837,
+              14.1219382
+            ],
+            [
+              121.3319082,
+              14.1219649
+            ],
+            [
+              121.3319371,
+              14.1220183
+            ],
+            [
+              121.3320248,
+              14.1221254
+            ],
+            [
+              121.3320438,
+              14.1222961
+            ],
+            [
+              121.3319992,
+              14.1223536
+            ],
+            [
+              121.332007,
+              14.1224433
+            ],
+            [
+              121.3320709,
+              14.122524
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Mohicap Lake: mapped way 25032575",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/way/25032575"
+      }
+    ],
+    "image": null,
+    "aliases": [
+      "Mojicap Lake",
+      "Muhikap Lake"
+    ]
+  },
+  {
+    "name": "Bunot Lake",
+    "municipality": "San Pablo City",
+    "water_type": "freshwater",
+    "latitude": "14.078099",
+    "longitude": "121.343757",
+    "description": "Bunot Lake is mapped in San Pablo City, Laguna. Community-mapped outline; positional accuracy is not surveyed or certified. This is not a legal boundary.",
+    "source_url": "https://www.openstreetmap.org/way/24821711",
+    "category": "lake",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/24821711",
+      "checked_on": "2026-10-17",
+      "note": "Community-mapped outline; positional accuracy is not surveyed or certified. This is not a legal boundary.",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              121.343757,
+              14.078099
+            ],
+            [
+              121.3437839,
+              14.0780157
+            ],
+            [
+              121.3432842,
+              14.0779168
+            ],
+            [
+              121.342943,
+              14.0779382
+            ],
+            [
+              121.3425656,
+              14.0780628
+            ],
+            [
+              121.342527,
+              14.0779954
+            ],
+            [
+              121.3419078,
+              14.0783033
+            ],
+            [
+              121.3417644,
+              14.0785264
+            ],
+            [
+              121.3413267,
+              14.079379
+            ],
+            [
+              121.341055,
+              14.0798636
+            ],
+            [
+              121.340901,
+              14.0808512
+            ],
+            [
+              121.3406929,
+              14.0817255
+            ],
+            [
+              121.3407516,
+              14.0823225
+            ],
+            [
+              121.3409372,
+              14.0829398
+            ],
+            [
+              121.3411397,
+              14.0834011
+            ],
+            [
+              121.3414101,
+              14.0836355
+            ],
+            [
+              121.3417226,
+              14.0837655
+            ],
+            [
+              121.3423805,
+              14.0840252
+            ],
+            [
+              121.3429797,
+              14.0841167
+            ],
+            [
+              121.3431349,
+              14.0840891
+            ],
+            [
+              121.3432635,
+              14.0840332
+            ],
+            [
+              121.3436774,
+              14.0837286
+            ],
+            [
+              121.3438681,
+              14.0836443
+            ],
+            [
+              121.3440894,
+              14.0836932
+            ],
+            [
+              121.3445673,
+              14.0837445
+            ],
+            [
+              121.344926,
+              14.0838634
+            ],
+            [
+              121.3452736,
+              14.0839008
+            ],
+            [
+              121.3456324,
+              14.0837075
+            ],
+            [
+              121.3460847,
+              14.0834211
+            ],
+            [
+              121.3464902,
+              14.0832551
+            ],
+            [
+              121.3466839,
+              14.0830465
+            ],
+            [
+              121.3467659,
+              14.0827096
+            ],
+            [
+              121.3467617,
+              14.0824119
+            ],
+            [
+              121.3469127,
+              14.0819148
+            ],
+            [
+              121.3470326,
+              14.0814514
+            ],
+            [
+              121.346917,
+              14.0809862
+            ],
+            [
+              121.346686,
+              14.0802474
+            ],
+            [
+              121.3460882,
+              14.0795717
+            ],
+            [
+              121.3455952,
+              14.0789101
+            ],
+            [
+              121.3451877,
+              14.0784634
+            ],
+            [
+              121.3447645,
+              14.0782186
+            ],
+            [
+              121.3443957,
+              14.0781453
+            ],
+            [
+              121.3443659,
+              14.0782249
+            ],
+            [
+              121.343757,
+              14.078099
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Bunot Lake: mapped way 24821711",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/way/24821711"
+      }
+    ],
+    "image": {
+      "path": "/images/water-bodies/bunot-20240512.jpg",
+      "alt": "View of Bunot Lake photographed on 12 May 2024",
+      "author": "Ian Lopez (Ianlopez1115)",
+      "license": "Attribution only; unchanged photograph",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Bunot_Lake_20240512.jpg",
+      "license_url": "https://commons.wikimedia.org/wiki/User:Ianlopez1115/License_AttributionOnly"
+    },
+    "aliases": []
+  },
+  {
+    "name": "Pagsanjan Falls",
+    "municipality": "Cavinti",
+    "water_type": "Not assessed",
+    "latitude": "14.2625628",
+    "longitude": "121.4999861",
+    "description": "Pagsanjan Falls is mapped in Cavinti, Laguna. Community-mapped waterfall point; exact on-site accuracy is unconfirmed.",
+    "source_url": "https://www.openstreetmap.org/node/1332879056",
+    "category": "waterfall",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/node/1332879056",
+      "checked_on": "2026-10-17",
+      "note": "Community-mapped waterfall point; exact on-site accuracy is unconfirmed.",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.4999861,
+          14.2625628
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Pagsanjan Falls: mapped node 1332879056",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/node/1332879056"
+      }
+    ],
+    "image": null,
+    "aliases": [
+      "Cavinti Falls",
+      "Magdapio Falls"
+    ]
+  },
+  {
+    "name": "Hulugan Falls",
+    "municipality": "Luisiana",
+    "water_type": "Not assessed",
+    "latitude": "14.2107508",
+    "longitude": "121.4801151",
+    "description": "Hulugan Falls is mapped in Luisiana, Laguna. Community-mapped waterfall point; exact on-site accuracy is unconfirmed.",
+    "source_url": "https://www.openstreetmap.org/node/4418310415",
+    "category": "waterfall",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/node/4418310415",
+      "checked_on": "2026-10-17",
+      "note": "Community-mapped waterfall point; exact on-site accuracy is unconfirmed.",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.4801151,
+          14.2107508
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Hulugan Falls: mapped node 4418310415",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/node/4418310415"
+      }
+    ],
+    "image": null,
+    "aliases": []
+  },
+  {
+    "name": "Talay Falls",
+    "municipality": "Luisiana",
+    "water_type": "Not assessed",
+    "latitude": "14.2108556",
+    "longitude": "121.4823098",
+    "description": "Talay Falls is mapped in Luisiana, Laguna. Community-mapped waterfall point; exact on-site accuracy is unconfirmed.",
+    "source_url": "https://www.openstreetmap.org/node/5682123306",
+    "category": "waterfall",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/node/5682123306",
+      "checked_on": "2026-10-17",
+      "note": "Community-mapped waterfall point; exact on-site accuracy is unconfirmed.",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.4823098,
+          14.2108556
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Talay Falls: mapped node 5682123306",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/node/5682123306"
+      }
+    ],
+    "image": null,
+    "aliases": []
+  },
+  {
+    "name": "Bumbungan River",
+    "municipality": "Pagsanjan",
+    "water_type": "Not assessed",
+    "latitude": "14.2670365",
+    "longitude": "121.472677",
+    "description": "Bumbungan River is mapped in Pagsanjan, Laguna. Selected mapped reaches in Pagsanjan only; not the entire river, catchment, or an administrative boundary.",
+    "source_url": "https://www.openstreetmap.org/way/773118744",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/773118744",
+      "checked_on": "2026-10-17",
+      "note": "Selected mapped reaches in Pagsanjan only; not the entire river, catchment, or an administrative boundary.",
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              121.472677,
+              14.2670365
+            ],
+            [
+              121.4721926,
+              14.2670656
+            ],
+            [
+              121.4705289,
+              14.2654446
+            ],
+            [
+              121.4688774,
+              14.2655376
+            ],
+            [
+              121.4665616,
+              14.2656743
+            ],
+            [
+              121.4651076,
+              14.2661366
+            ],
+            [
+              121.4638598,
+              14.2667648
+            ],
+            [
+              121.4628323,
+              14.2671679
+            ],
+            [
+              121.4616585,
+              14.2675668
+            ],
+            [
+              121.4603158,
+              14.2684693
+            ],
+            [
+              121.4593947,
+              14.2695008
+            ],
+            [
+              121.458685,
+              14.2704449
+            ],
+            [
+              121.4581115,
+              14.2715094
+            ]
+          ],
+          [
+            [
+              121.4581115,
+              14.2715094
+            ],
+            [
+              121.4575316,
+              14.2729897
+            ],
+            [
+              121.4571934,
+              14.2743099
+            ],
+            [
+              121.45709,
+              14.2753843
+            ],
+            [
+              121.4574564,
+              14.2765042
+            ],
+            [
+              121.4575966,
+              14.2767466
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Bumbungan River: reach 773118744",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/way/773118744"
+      },
+      {
+        "title": "Bumbungan River: reach 1258614370",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/way/1258614370"
+      }
+    ],
+    "image": null,
+    "aliases": [
+      "Pagsanjan River"
+    ]
+  },
+  {
+    "name": "Balanac River",
+    "municipality": "Pagsanjan",
+    "water_type": "Not assessed",
+    "latitude": "14.2712476",
+    "longitude": "121.4570445",
+    "description": "Balanac River is mapped in Pagsanjan, Laguna. Selected mapped reaches in Pagsanjan only; not the entire river, catchment, or an administrative boundary.",
+    "source_url": "https://www.openstreetmap.org/way/146487700",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/146487700",
+      "checked_on": "2026-10-17",
+      "note": "Selected mapped reaches in Pagsanjan only; not the entire river, catchment, or an administrative boundary.",
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              121.4570445,
+              14.2712476
+            ],
+            [
+              121.4573076,
+              14.271246
+            ],
+            [
+              121.4577895,
+              14.2714039
+            ],
+            [
+              121.4581115,
+              14.2715094
+            ]
+          ],
+          [
+            [
+              121.451514,
+              14.2714643
+            ],
+            [
+              121.4528337,
+              14.2716827
+            ],
+            [
+              121.4535034,
+              14.2718566
+            ],
+            [
+              121.4539942,
+              14.2719787
+            ],
+            [
+              121.4546755,
+              14.2720177
+            ],
+            [
+              121.4547889,
+              14.2720134
+            ]
+          ],
+          [
+            [
+              121.4547889,
+              14.2720134
+            ],
+            [
+              121.4553604,
+              14.271992
+            ],
+            [
+              121.4562481,
+              14.2716229
+            ]
+          ],
+          [
+            [
+              121.4562481,
+              14.2716229
+            ],
+            [
+              121.4567642,
+              14.2713326
+            ],
+            [
+              121.4570445,
+              14.2712476
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Balanac River: reach 146487700",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/way/146487700"
+      },
+      {
+        "title": "Balanac River: reach 146487702",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/way/146487702"
+      },
+      {
+        "title": "Balanac River: reach 1258614372",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/way/1258614372"
+      },
+      {
+        "title": "Balanac River: reach 1258681190",
+        "publisher": "OpenStreetMap contributors",
+        "published_on": null,
+        "url": "https://www.openstreetmap.org/way/1258681190"
+      }
+    ],
+    "image": null,
+    "aliases": []
+  },
+  {
+    "name": "Al Fresco Springs Resort",
+    "municipality": "Los Baños",
+    "water_type": "Natural hot spring water (operator claim)",
+    "latitude": "14.176666",
+    "longitude": "121.209719",
+    "description": "Private resort in Los Baños. The operator states that its pools use natural hot spring water without heaters. This is a resort location, not the location of a spring source. No temperatures or water-quality results are established.",
+    "source_url": "https://alfrescosprings.com/location",
+    "category": "spring",
+    "site_type": "resort",
+    "spring_type": "geothermal_hot_spring",
+    "official_url": "https://alfrescosprings.com/",
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://alfrescosprings.com/location",
+      "checked_on": "2026-10-17",
+      "note": "Operator-published resort reference point. This locates the resort, not a spring source; positional accuracy and water chemistry are unconfirmed.",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.209719,
+          14.176666
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Al Fresco Springs: Location",
+        "publisher": "Al Fresco Springs (operator)",
+        "published_on": null,
+        "url": "https://alfrescosprings.com/location"
+      },
+      {
+        "title": "Al Fresco Springs: natural hot spring water",
+        "publisher": "Al Fresco Springs (operator)",
+        "published_on": null,
+        "url": "https://alfrescosprings.com/"
+      }
+    ],
+    "image": null,
+    "aliases": []
+  }
+]

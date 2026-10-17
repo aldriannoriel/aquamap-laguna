@@ -7,7 +7,7 @@
                     <span><span class="block text-xl font-semibold tracking-tight">AquaMap <span class="font-normal text-muted">Laguna</span></span><span class="block text-xs text-muted">A little closer to our waters</span></span>
                 </a>
                 <nav aria-label="Main navigation" class="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
-                    <a href="{{ route('map.index') }}" @if(request()->routeIs('map.index')) aria-current="page" @endif @class(['border-b-2 py-2 font-semibold text-estuary', 'border-estuary' => request()->routeIs('map.index'), 'border-transparent' => !request()->routeIs('map.index')])>Lake explorer</a>
+                    <a href="{{ route('map.index') }}" @if(request()->routeIs('map.index')) aria-current="page" @endif @class(['border-b-2 py-2 font-semibold text-estuary', 'border-estuary' => request()->routeIs('map.index'), 'border-transparent' => !request()->routeIs('map.index')])>Water explorer</a>
                     <a href="{{ route('reports.create') }}" @if(request()->routeIs('reports.*')) aria-current="page" @endif @class(['border-b-2 py-2 font-semibold text-estuary', 'border-estuary' => request()->routeIs('reports.*'), 'border-transparent' => !request()->routeIs('reports.*')])>Report a concern</a>
                     <a href="{{ route('map.index') }}#research-notes" class="py-2 text-muted hover:text-estuary">About the data</a>
                     <a href="{{ route('admin.dashboard') }}" class="py-2 text-muted hover:text-estuary">Administrator</a>

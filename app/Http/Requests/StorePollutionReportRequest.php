@@ -47,8 +47,8 @@ class StorePollutionReportRequest extends FormRequest
         return [
             'website.prohibited' => 'This submission could not be verified. Please review your entries below and try again.',
             'report_form_token.required' => 'Please open the reporting form before submitting. Your entries have been kept.',
-            'water_body_id.required' => 'Please choose a lake.',
-            'water_body_id.exists' => 'Please choose an existing lake.',
+            'water_body_id.required' => 'Please choose a water body.',
+            'water_body_id.exists' => 'Please choose an existing water body.',
             'pollution_type.required' => 'Please choose an observation type.',
             'pollution_type.in' => 'Please choose one of the listed observation types.',
             'description.required' => 'Please describe what you observed.',

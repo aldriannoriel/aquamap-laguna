@@ -40,12 +40,12 @@ class MapTest extends TestCase
         $response = $this->get(route('map.index'));
 
         $response->assertOk()->assertViewIs('map.index')
-            ->assertSee('San Pablo lake explorer')->assertDontSee('private-fixture@example.test')
+            ->assertSee("Explore Laguna's waters", false)->assertDontSee('private-fixture@example.test')
             ->assertDontSee('Private test-only report.');
         $payload = $this->lakePayload($response);
         $this->assertSame(['Pandin Lake', 'Sampaloc Lake', 'Yambo Lake'], array_column($payload, 'name'));
         foreach ($payload as $item) {
-            $this->assertSame(['id', 'name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url'], array_keys($item));
+            $this->assertSame(['id', 'name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url', 'category', 'aliases', 'site_type', 'spring_type', 'official_url', 'geography', 'verified_report_count'], array_keys($item));
         }
         $this->assertSame($lake->latitude, $payload[1]['latitude']);
         $this->assertSame($lake->longitude, $payload[1]['longitude']);
@@ -87,8 +87,8 @@ class MapTest extends TestCase
 
         $response = $this->get(route('map.index'));
 
-        $response->assertOk()->assertSee('No description is available for this lake.')
-            ->assertSee('No research source is available for this lake.');
+        $response->assertOk()->assertSee('No description is available for this water body.')
+            ->assertSee('No research source is available for this water body.');
         $payload = $this->lakePayload($response);
         $this->assertNull($payload[0]['description']);
         $this->assertNull($payload[0]['source_url']);
@@ -114,7 +114,7 @@ class MapTest extends TestCase
     {
         $response = $this->get(route('map.index'));
 
-        $response->assertOk()->assertSee('No lake records are available. Please check again later.');
+        $response->assertOk()->assertSee('No water body records are available. Please check again later.');
         $this->assertSame([], $this->lakePayload($response));
         $this->assertDatabaseCount('water_bodies', 0);
     }

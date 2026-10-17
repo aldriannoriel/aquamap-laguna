@@ -3,7 +3,7 @@
 @section('content')
     <div class="mb-7 max-w-2xl">
         <p class="text-sm font-medium text-water">Community observations</p>
-        <h1 class="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Help care for our lakes.</h1>
+        <h1 class="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Help care for our waters.</h1>
         <p class="mt-3 text-sm leading-6 text-muted">Share a pollution concern you have observed. Your report stays private and pending review; it is not a verified pollution finding.</p>
     </div>
 
@@ -14,10 +14,10 @@
             @if (session('possible_duplicate'))
                 <div id="duplicate-warning" class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
                     <h3 class="font-semibold">Possible repeat submission</h3>
-                    <p class="mt-1">You recently submitted a report for this lake and observation type in this browser session. This report has still been saved privately for administrator review. Different incidents can have similar details.</p>
+                    <p class="mt-1">You recently submitted a report for this water body and observation type in this browser session. This report has still been saved privately for administrator review. Different incidents can have similar details.</p>
                 </div>
             @endif
-            <a href="{{ route('map.index') }}" class="mt-3 inline-block font-semibold text-water underline underline-offset-4">Return to the lake explorer</a>
+            <a href="{{ route('map.index') }}" class="mt-3 inline-block font-semibold text-water underline underline-offset-4">Return to the water explorer</a>
         </section>
     @endif
 
@@ -45,15 +45,15 @@
                 <legend class="mb-5 text-xl font-semibold">What did you observe?</legend>
                 <p class="text-xs text-muted">Fields marked * are required.</p>
                 <div>
-                    <label for="water_body_id" class="form-label">Lake *</label>
+                    <label for="water_body_id" class="form-label">Water body *</label>
                     <select id="water_body_id" name="water_body_id" class="form-input" required aria-invalid="{{ $errors->has('water_body_id') ? 'true' : 'false' }}" aria-describedby="water_body_id-error">
-                        <option value="">Choose a lake</option>
+                        <option value="">Choose a water body</option>
                         @foreach ($lakes as $lake)
                             <option value="{{ $lake->id }}" @selected((string) old('water_body_id') === (string) $lake->id)>{{ $lake->name }}</option>
                         @endforeach
                     </select>
                     <p id="water_body_id-error" class="form-error">@error('water_body_id'){{ $message }}@enderror</p>
-                    @if ($lakes->isEmpty())<p class="mt-2 text-sm text-muted">No lake records are available. Please try again later.</p>@endif
+                    @if ($lakes->isEmpty())<p class="mt-2 text-sm text-muted">No water body records are available. Please try again later.</p>@endif
                 </div>
                 <div>
                     <label for="pollution_type" class="form-label">Observation type *</label>
@@ -75,7 +75,7 @@
 
             <fieldset class="border-t border-line pt-5">
                 <legend class="pr-3 text-lg font-semibold">Incident location <span class="text-sm font-normal text-muted">(optional)</span></legend>
-                <p id="incident-help" class="mt-2 text-xs leading-5 text-muted">Choose a lake to center the map, then tap or click where you observed the incident. Blue circles are lake references, not incident locations. Their geographic datum and precision remain unconfirmed. You can leave the incident point blank.</p>
+                <p id="incident-help" class="mt-2 text-xs leading-5 text-muted">Choose a water body to center the map, then tap or click where you observed the incident. Blue circles are water body references, not incident locations. They use source-checked WGS84 reference geometry; positional precision remains unconfirmed. They do not identify spring sources. You can leave the incident point blank.</p>
                 <div class="mt-3 overflow-hidden rounded-xl border border-line">
                     <div id="incident-map" class="h-72 w-full sm:h-80" role="region" aria-label="Choose incident location. Pan with arrow keys; use the button below to select the map center." aria-describedby="incident-help incident-status"></div>
                 </div>
@@ -118,7 +118,7 @@
         <aside class="space-y-5" aria-label="Reporting guidance">
             <section class="rounded-2xl bg-estuary p-6 text-white">
                 <h2 class="text-lg font-semibold">Observe. Share. Protect.</h2>
-                <p class="mt-3 text-sm leading-6 text-white/85">Small observations can help build a clearer picture of our lakes.</p>
+                <p class="mt-3 text-sm leading-6 text-white/85">Small observations can help build a clearer picture of our waters.</p>
                 <ol class="mt-5 space-y-4 text-sm leading-6">
                     <li><span class="font-semibold">01 / Share what you saw.</span><br><span class="text-white/85">Use clear details and a nearby landmark.</span></li>
                     <li><span class="font-semibold">02 / Keep a safe distance.</span><br><span class="text-white/85">Do not enter the water or touch suspected waste.</span></li>
@@ -128,7 +128,7 @@
             <section class="rounded-xl border border-line p-5 text-xs leading-6 text-muted">
                 <h2 class="font-semibold text-estuary">An observation, not a measurement</h2>
                 <p class="mt-2">A report does not establish water quality, pollution severity or fish suitability. Historical research stays separate from community reports.</p>
-                <a href="{{ route('map.index') }}" class="mt-3 inline-block font-semibold text-water underline underline-offset-4">Explore the lake research</a>
+                <a href="{{ route('map.index') }}" class="mt-3 inline-block font-semibold text-water underline underline-offset-4">Explore the water body research</a>
             </section>
         </aside>
     </div>

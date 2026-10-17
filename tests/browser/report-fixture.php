@@ -2,6 +2,7 @@
 
 // Test-only router/fixture. Never mounted by public/index.php or application routes.
 use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\ExplorerSeeder;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Http\Request;
@@ -53,9 +54,14 @@ if ($setup) {
     Artisan::call('migrate', ['--database' => 'sqlite', '--no-interaction' => true]);
     // Reuse verified seeder data in memory, then copy it to the disposable file.
     Artisan::call('db:seed', ['--class' => DatabaseSeeder::class, '--no-interaction' => true]);
+    Artisan::call('db:seed', ['--class' => ExplorerSeeder::class, '--no-interaction' => true]);
     $rows = [];
     foreach (['water_bodies', 'fish_species', 'water_body_fish'] as $table) {
-        $rows[$table] = DB::table($table)->get()->map(fn (object $row): array => (array) $row)->all();
+        $query = DB::table($table);
+        if ($table === 'water_bodies') {
+            $query->whereIn('name', ['Sampaloc Lake', 'Pandin Lake', 'Yambo Lake']);
+        }
+        $rows[$table] = $query->get()->map(fn (object $row): array => (array) $row)->all();
     }
     touch($directory.'/browser.sqlite');
     config(['database.connections.sqlite.database' => $directory.'/browser.sqlite']);

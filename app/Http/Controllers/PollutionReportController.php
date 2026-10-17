@@ -6,6 +6,7 @@ use App\Http\Requests\StorePollutionReportRequest;
 use App\Models\PollutionReport;
 use App\Models\WaterBody;
 use App\Rules\ReportFormToken;
+use App\Support\ExplorerProfile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -17,7 +18,11 @@ class PollutionReportController extends Controller
 {
     public function create(Request $request): Response
     {
-        $lakes = WaterBody::query()->orderBy('name')->get(['id', 'name', 'latitude', 'longitude']);
+        $lakes = WaterBody::query()->orderBy('name')->get(['id', 'name', 'geography'])
+            ->map(fn (WaterBody $water): object => (object) [
+                'id' => $water->id, 'name' => $water->name,
+                ...ExplorerProfile::referencePoint($water->geography) ?? ['latitude' => null, 'longitude' => null],
+            ]);
 
         return response()->view('reports.create', [
             'lakes' => $lakes,

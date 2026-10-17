@@ -233,7 +233,7 @@ try {
         await evaluate('document.getElementById("report-form").noValidate=true');
         await click('#submit-report');
         await waitFor(()=>evaluate('!!document.getElementById("form-errors")'),'Server validation summary did not appear.');
-        assert.match(await evaluate('document.getElementById("form-errors").textContent'),/Please choose a lake/);
+        assert.match(await evaluate('document.getElementById("form-errors").textContent'),/Please choose a water body/);
         await waitFor(()=>evaluate('document.activeElement.id==="form-errors"'),'Validation summary did not receive focus.');
         await screenshot('desktop-errors.png');
         const lakes=await evaluate('JSON.parse(document.getElementById("incident-lakes").textContent)');

@@ -10,11 +10,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url'])]
 class WaterBody extends Model
 {
+    public const CATEGORIES = [
+        'lake' => 'Lakes',
+        'river' => 'Rivers',
+        'waterfall' => 'Waterfalls',
+        'spring' => 'Hot Springs / Natural Springs',
+    ];
+
     protected function casts(): array
     {
         return [
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
+            'aliases' => 'array',
+            'geography' => 'array',
+            'research_references' => 'array',
+            'image' => 'array',
         ];
     }
 

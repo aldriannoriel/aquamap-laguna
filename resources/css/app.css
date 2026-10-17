@@ -51,3 +51,8 @@
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; }
 }
+
+.category-filter[aria-pressed="true"] { border-color: var(--color-estuary); background: var(--color-estuary); color: white; }
+.category-river { background: #376aa0; }
+.category-waterfall { background: #456845; }
+.category-spring { background: #8c5330; }

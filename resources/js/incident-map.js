@@ -58,7 +58,7 @@ if (element) {
         }
         new ResizeObserver(() => map.invalidateSize()).observe(element);
     } else {
-        status.textContent = 'Lake reference coordinates are unavailable. Submit without a point and describe nearby landmarks.';
+        status.textContent = 'Source-checked reference coordinates are unavailable. Submit without a point and describe nearby landmarks.';
     }
 }
 

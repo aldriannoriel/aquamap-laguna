@@ -4,7 +4,7 @@ Effective 2026-10-17 for the school prototype. These are project operating limit
 
 ## Purpose and access
 
-Reports support private review and necessary follow-up of community observations. Public users need no account. Only explicitly provisioned administrators can access reports, reporter details, evidence and review history. All statuses remain private. Administrative verification is not a scientific measurement or a public pollution determination.
+Reports support private review and necessary follow-up of community observations. Public users need no account. Only explicitly provisioned administrators can access individual reports, reporter details, evidence and review history. The GIS expansion publishes only a per-water-body aggregate count of reports currently in `verified` status, as explicitly requested. Pending, rejected and resolved records do not contribute. No contents, individual status, type, date, identity, incident point, evidence path or audit is published. Changes in counts may reveal that a reviewed observation exists; this narrow aggregate disclosure is intentional. Administrative verification is not a scientific measurement, pollution percentage or water-safety finding; zero is not evidence of safety.
 
 Collect only the optional contact details and photo the reporter chooses to provide. Do not copy contact information into review notes. Photos can contain embedded location/person information. Avoid downloads, screenshots, shared copies and exports unless necessary; those copies require the same access and retention controls as the application.
 

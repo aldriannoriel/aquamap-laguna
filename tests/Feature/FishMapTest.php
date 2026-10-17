@@ -91,7 +91,7 @@ class FishMapTest extends TestCase
 
         $response = $this->get(route('map.index'));
 
-        $response->assertOk()->assertSee('Lake-specific occurrence evidence is incomplete.')
+        $response->assertOk()->assertSee('Water-body-specific occurrence evidence is incomplete.')
             ->assertDontSee('Historical aquaculture')->assertSee('Insufficient data');
     }
 
@@ -114,7 +114,7 @@ class FishMapTest extends TestCase
 
         $response = $this->get(route('map.index'));
 
-        $response->assertOk()->assertSee('No verified fish records are available for this lake.')
+        $response->assertOk()->assertSee('No verified fish records are available for this water body.')
             ->assertSee('This does not establish that fish are absent.');
         foreach ($response->viewData('fishByLake') as $fish) {
             $this->assertSame([], $fish);
