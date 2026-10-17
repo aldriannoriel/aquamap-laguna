@@ -1,0 +1,45 @@
+@import 'tailwindcss';
+@import 'leaflet/dist/leaflet.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --color-estuary: #123f43;
+    --color-water: #277e96;
+    --color-mist: #f1f7f7;
+    --color-moss: #456845;
+    --color-ink: #213d40;
+    --color-muted: #526c70;
+    --color-line: #d8e5e5;
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer base {
+    :focus-visible { outline: 3px solid var(--color-water); outline-offset: 4px; }
+    button, a, summary { -webkit-tap-highlight-color: transparent; }
+    button { cursor: pointer; }
+    [hidden] { display: none !important; }
+}
+
+.skip-link { position: fixed; top: -5rem; left: 1rem; z-index: 2000; padding: 1rem; background: white; color: var(--color-estuary); }
+.skip-link:focus { top: 1rem; }
+.lake-card[aria-pressed='true'] { border-color: var(--color-estuary); background: var(--color-mist); box-shadow: inset 4px 0 var(--color-estuary); }
+.leaflet-container { background: #e4eeee; font-family: var(--font-sans); }
+.leaflet-container a { color: var(--color-estuary); }
+.leaflet-container .leaflet-control-attribution { padding: 3px 6px; background: rgba(255, 255, 255, .95); font-size: 11px; }
+.lake-marker { display: flex; align-items: center; justify-content: center; border: 3px solid white; border-radius: 50%; background: var(--color-water); color: white; box-shadow: 0 2px 7px #123f4340; }
+.lake-marker svg { width: 19px; height: 19px; }
+.lake-marker.is-selected { background: var(--color-estuary); outline: 3px solid #277e964d; outline-offset: 3px; }
+.leaflet-popup-content { margin: 16px; max-width: 300px; color: var(--color-ink); }
+.lake-detail-title { font-size: 1.25rem; font-weight: 600; letter-spacing: -.02em; }
+.lake-detail-meta { margin-top: .4rem; color: var(--color-muted); font-size: .875rem; }
+.lake-detail-description { margin-top: .75rem; max-width: 75ch; font-size: .875rem; line-height: 1.65; overflow-wrap: anywhere; }
+.lake-detail-source { display: inline-block; margin-top: .75rem; color: var(--color-water); font-size: .875rem; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+.lake-detail-fallback { margin-top: .75rem; font-size: .875rem; color: var(--color-muted); }
+.leaflet-popup-content p { margin: .6rem 0 0; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; }
+}
