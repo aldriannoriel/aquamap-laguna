@@ -4,9 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PollutionReport extends Model
 {
+    public const STATUSES = ['pending' => 'Pending', 'verified' => 'Verified', 'rejected' => 'Rejected', 'resolved' => 'Resolved'];
+
+    public const TRANSITIONS = ['pending' => ['verified', 'rejected'], 'verified' => ['resolved'], 'rejected' => [], 'resolved' => []];
+
     public const TYPES = [
         'solid_waste' => 'Litter or solid waste',
         'wastewater' => 'Suspected wastewater discharge',
@@ -26,5 +31,10 @@ class PollutionReport extends Model
     public function waterBody(): BelongsTo
     {
         return $this->belongsTo(WaterBody::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ReportReview::class)->orderBy('id');
     }
 }

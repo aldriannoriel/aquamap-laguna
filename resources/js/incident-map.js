@@ -62,5 +62,5 @@ if (element) {
     }
 }
 
-const feedback = document.getElementById('form-errors') || document.getElementById('report-success');
+const feedback = document.getElementById('form-errors') || document.getElementById('report-success') || document.getElementById('review-success');
 if (feedback) feedback.focus();
