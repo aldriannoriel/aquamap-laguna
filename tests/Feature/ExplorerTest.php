@@ -29,7 +29,7 @@ class ExplorerTest extends TestCase
         $this->seed(DatabaseSeeder::class);
         $original = WaterBody::orderBy('id')->get()->map(fn (WaterBody $lake): array => $lake->only(['id', 'name', 'municipality', 'latitude', 'longitude', 'description', 'source_url']) + ['created_at' => $lake->created_at->toISOString()])->all();
         $this->seed(ExplorerSeeder::class);
-        $this->assertDatabaseCount('water_bodies', 11);
+        $this->assertDatabaseCount('water_bodies', 28);
         $this->assertDatabaseCount('water_body_fish', 3);
         $this->assertSame($original, WaterBody::orderBy('id')->limit(3)->get()->map(fn (WaterBody $lake): array => $lake->only(['id', 'name', 'municipality', 'latitude', 'longitude', 'description', 'source_url']) + ['created_at' => $lake->created_at->toISOString()])->all());
         $before = WaterBody::orderBy('id')->get()->toArray();
@@ -47,7 +47,7 @@ class ExplorerTest extends TestCase
             ->assertSee('not a spring source')->assertSee('Not Assessed')->assertSee('No verified water-quality assessment available')
             ->assertSee('Publication date not provided')->assertSee('Source verification is not survey certification');
         $records = collect($response->viewData('lakes'))->keyBy('name');
-        $this->assertSame(['lake' => 5, 'river' => 2, 'spring' => 1, 'waterfall' => 3], collect($response->viewData('lakes'))->countBy('category')->sortKeys()->all());
+        $this->assertSame(['lake' => 10, 'river' => 5, 'spring' => 2, 'waterfall' => 11], collect($response->viewData('lakes'))->countBy('category')->sortKeys()->all());
         $this->assertSame('Polygon', $records['Sampaloc Lake']['geography']['geometry']['type']);
         $this->assertSame('MultiLineString', $records['Bumbungan River']['geography']['geometry']['type']);
         $this->assertSame([121.4999861, 14.2625628], $records['Pagsanjan Falls']['geography']['geometry']['coordinates']);

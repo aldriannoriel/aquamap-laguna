@@ -20,7 +20,10 @@ class ExplorerSeeder extends Seeder
             throw new RuntimeException('ExplorerSeeder requires aquamap_laguna or isolated in-memory tests.');
         }
 
-        $data = json_decode(file_get_contents(database_path('data/explorer.json')), true, flags: JSON_THROW_ON_ERROR);
+        $data = [
+            ...json_decode(file_get_contents(database_path('data/explorer.json')), true, flags: JSON_THROW_ON_ERROR),
+            ...json_decode(file_get_contents(database_path('data/missing-water-bodies.json')), true, flags: JSON_THROW_ON_ERROR),
+        ];
         $connection->useWriteConnectionWhenReading();
         $connection->transaction(function () use ($data, $connection): void {
             foreach ($data as $entry) {

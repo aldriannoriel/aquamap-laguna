@@ -18,7 +18,9 @@ class PollutionReportController extends Controller
 {
     public function create(Request $request): Response
     {
-        $lakes = WaterBody::query()->orderBy('name')->get(['id', 'name', 'geography'])
+        $lakes = WaterBody::query()->get(['id', 'name', 'geography'])
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values()
             ->map(fn (WaterBody $water): object => (object) [
                 'id' => $water->id, 'name' => $water->name,
                 ...ExplorerProfile::referencePoint($water->geography) ?? ['latitude' => null, 'longitude' => null],

@@ -433,7 +433,14 @@
         "url": "https://link.springer.com/article/10.1007/s00128-019-02685-z"
       }
     ],
-    "image": null,
+    "image": {
+      "path": "/images/water-bodies/sampaloc.jpg",
+      "alt": "Sampaloc Lake viewed from its public lakeside",
+      "author": "Judgefloro",
+      "license": "CC0; 960 px display thumbnail",
+      "source_url": "https://commons.wikimedia.org/wiki/File:7260San_Pablo_City_Barangays_Landmarks_20.jpg",
+      "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+    },
     "aliases": []
   },
   {
@@ -746,7 +753,14 @@
         "url": "https://link.springer.com/article/10.1007/s00128-019-02685-z"
       }
     ],
-    "image": null,
+    "image": {
+      "path": "/images/water-bodies/yambo.jpg",
+      "alt": "Yambo Lake viewed from the ridge beside Pandin",
+      "author": "Barrera marquez",
+      "license": "CC BY 3.0; 960 px display thumbnail",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Lake_Yambo.jpg",
+      "license_url": "https://creativecommons.org/licenses/by/3.0"
+    },
     "aliases": []
   },
   {
@@ -795,7 +809,14 @@
         "url": "https://link.springer.com/article/10.1007/s00128-019-02685-z"
       }
     ],
-    "image": null,
+    "image": {
+      "path": "/images/water-bodies/pandin.jpg",
+      "alt": "Panorama of Pandin Lake",
+      "author": "Barrera marquez",
+      "license": "CC BY 3.0; 960 px display thumbnail",
+      "source_url": "https://commons.wikimedia.org/wiki/File:Lake_Pandin.jpg",
+      "license_url": "https://creativecommons.org/licenses/by/3.0"
+    },
     "aliases": []
   },
   {

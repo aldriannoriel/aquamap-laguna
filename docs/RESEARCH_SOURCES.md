@@ -4,7 +4,7 @@ Reviewed on 2026-10-17 for Days 1-3 and the GIS expansion. The expansion adds so
 
 ## GIS expansion: imported inventory
 
-`database/data/explorer.json` is the reviewed import snapshot. `ExplorerSeeder` supplements the original three profiles and inserts eight more, preserving original IDs, coordinate columns, descriptions, source URLs and fish links. Run it serially and explicitly; the original `DatabaseSeeder` remains unchanged. This is a verified-first subset, **not the complete requested provincial catalogue**.
+`database/data/explorer.json` is the original eleven-profile snapshot. The recovered `database/data/missing-water-bodies.json` adds seventeen reviewed profiles. `ExplorerSeeder` reads both explicitly and serially, preserving existing IDs, coordinate columns, descriptions, source URLs and fish links. The original `DatabaseSeeder` remains unchanged. This remains **a subset, not a complete provincial inventory**. See [EXPANSION_PROGRESS.md](EXPANSION_PROGRESS.md) for execution status.
 
 `source_verified` means the named source object and coordinate representation were inspected. It does **not** mean surveyed, field-verified, current, legally authoritative or accurate to the stored decimal places. OSM uses [WGS84](https://wiki.openstreetmap.org/wiki/Converting_to_WGS84). GeoJSON stores longitude, latitude; Leaflet converts for display. The original journal points' datum/precision limitation below remains unresolved.
 
@@ -31,7 +31,7 @@ OSM-derived geographic data in the snapshot is available under the [Open Databas
 | Candidate | Reviewed evidence | Publication decision / gaps |
 | --- | --- | --- |
 | Al Fresco Springs | [Operator overview](https://alfrescosprings.com/) states natural hot spring water without heaters. Its location page publishes matching resort GeoCoordinates and a linked map marker. [Schema.org GeoCoordinates](https://schema.org/GeoCoordinates) specifies WGS84. | Imported as **one resort reference**, not a spring-source marker or three separate villa properties. Hot/geothermal water remains an operator claim, not independent hydrogeological testing. Source location, temperatures, chemistry and safety remain unestablished. The operator cautions about navigation accuracy. |
-| Hidden Valley Springs | [Operator](https://www.hiddenvalleyspringsresort.com/) describes a natural springs resort. [OSM way 273625694](https://www.openstreetmap.org/way/273625694) was inspected. | **Withheld:** object has `fixme=polygon shape` and `source=chatGPT;Web browsing`; it is not independent geographic confirmation. Need authoritative property/source coordinates and Alaminos/Calauan locality clarification. No temperature classification inferred. |
+| Hidden Valley Springs | [Operator](https://www.hiddenvalleyspringsresort.com/) describes a natural springs resort. Current [OSM way 273625694](https://www.openstreetmap.org/way/273625694) has `fixme=polygon shape` and `source=chatGPT;Web browsing`. Saved history shows the 2014 outline predates that source tag. [Node 2784637481](https://www.openstreetmap.org/node/2784637481), version 1, is unchanged since 2014-04-12 and belongs to that original outline. | Recovered catalogue uses only that historical **property-edge reference**, 14.0945693 N, 121.2597885 E. It is not an entrance or spring source; the outline is withheld. The polygon warning dates to 2015; the older point has no surveyed accuracy guarantee. Alaminos/Calauan locality remains qualified. Natural supply is an operator claim; temperature, chemistry and safety remain unknown. |
 | Dolcezza Hotspring Resort | [Operator](https://www.dolcezzahotspring.com/) describes natural hot spring water and an address in Lalakay, Los Baños. | **Withheld:** property/source WGS84 point, temperatures, chemistry and photo permission are unverified. |
 | Tirta Spring Villa | [Operator resorts](https://www.tirtaresorts.com/resorts) and [villa page](https://www.tirtaresorts.com/spring-villa) describe a natural hot spring pool and Los Baños address. | **Withheld:** embedded metadata contained coordinates outside Los Baños; the site also advertises Batangas properties. They were not used for this villa. Need property-specific geography and image permission. |
 | Stellaluna Private Resort | Supplied [booking page](https://stellaluna-altaluna.com/book) could not be retrieved by the research browser. | **Withheld:** natural/geothermal supply, location, classification and image permission remain unverified. A name or swimming pool is insufficient. |
@@ -40,18 +40,54 @@ No operator health/therapeutic claims, temperatures, measurements, fish presence
 
 ### Photographs and environmental limits
 
-The [Bunot Lake 20240512 photograph](https://commons.wikimedia.org/wiki/File:Bunot_Lake_20240512.jpg) was reviewed directly: **Ian Lopez (Ianlopez1115)**, own work, photographed **12 May 2024**, attribution-only reuse permission ([author's permission](https://commons.wikimedia.org/wiki/User:Ianlopez1115/License_AttributionOnly)). This is not labeled CC BY. Proposed local path/credit are recorded, but transfers timed out twice: **no photograph is bundled or displayed**. All profiles show placeholders. Resort website photos were not reused; visibility is not permission. A future import needs a permitted local JPEG/PNG/WebP asset, author, alt text, source and license link. Never use private report evidence as a public profile photograph.
+Eight downloaded JPEGs are preserved under `public/images/water-bodies/`. Complete credits, source-page and permission links are in the catalogue and displayed with each image. Saved Commons API metadata in `storage/app/inventory-photos.json` and `inventory-photo-candidates.json` corroborates the permissions below. Display may crop images; thumbnails are identified. Missing images retain a placeholder. Resort-site photographs and private report evidence are not reused.
+
+| Profile / filename | Source and author | Reuse permission |
+| --- | --- | --- |
+| Bunot / `bunot-20240512.jpg` | [Bunot Lake 20240512](https://commons.wikimedia.org/wiki/File:Bunot_Lake_20240512.jpg), Ian Lopez (Ianlopez1115), photographed 2024-05-12 | [Attribution only](https://commons.wikimedia.org/wiki/User:Ianlopez1115/License_AttributionOnly), not CC BY; original downloaded photograph |
+| Sampaloc / `sampaloc.jpg` | [7260San Pablo City Barangays Landmarks 20](https://commons.wikimedia.org/wiki/File:7260San_Pablo_City_Barangays_Landmarks_20.jpg), Judgefloro | CC0, 960 px thumbnail |
+| Pandin / `pandin.jpg` | [Lake Pandin](https://commons.wikimedia.org/wiki/File:Lake_Pandin.jpg), Barrera marquez | CC BY 3.0, 960 px thumbnail |
+| Yambo / `yambo.jpg` | [Lake Yambo](https://commons.wikimedia.org/wiki/File:Lake_Yambo.jpg), Barrera marquez | CC BY 3.0, 960 px thumbnail |
+| Calibato / `calibato.jpg` | [Lake Calibato](https://commons.wikimedia.org/wiki/File:Lake_Calibato.jpg), Barrera marquez | CC BY 3.0, 960 px thumbnail |
+| Caliraya / `caliraya.jpg` | [Caliraya Lake Spillway](https://commons.wikimedia.org/wiki/File:Caliraya_Lake_Spillway.JPG), Sonnyboylopez | CC BY-SA 3.0, 960 px thumbnail |
+| Laguna de Bay / `laguna-de-bay.jpg` | [Laguna de Bay zoom](https://commons.wikimedia.org/wiki/File:Laguna_de_Bay_zoom.jpg), individual creator not specified | Public domain according to source, 960 px thumbnail; false-color satellite image, explicitly not water-quality visualization |
+| Buruwisan / `buruwisan.jpg` | [Buruwisan Falls](https://commons.wikimedia.org/wiki/File:Buruwisan_Falls.jpg), Dionisia.besas | CC BY-SA 4.0, 960 px thumbnail |
 
 Only the original three historical aquaculture associations below are imported. No species were inferred for new locations. Waterfall/spring profiles without fish evidence show **Not Assessed**; compatibility remains `insufficient_data`. New river/waterfall classification is **Not assessed**, without invented salinity or statutory classification. The San Pablo crater lakes' freshwater label follows the existing literature context, not a safety finding.
 
 Public counts include only reports whose **current status is exactly `verified`**; pending, rejected and resolved records are excluded. Contents, dates, types, contacts, incident points, photos and audits remain private. These are reviewed observations, separate from scientific measurements. Zero does not mean clean/safe water. Every profile says **No verified water-quality assessment available**. See [RETENTION_POLICY.md](RETENTION_POLICY.md).
 
-### Requested inventory awaiting verification
+### Recovered inventory checks (2026-10-17)
 
-- Lakes: **Laguna de Bay, Calibato, Palakpakin, Caliraya and Lumot** need reviewed WGS84 geometry, locality/classification references and image permissions. Mohicap/Mojicap/Muhikap are aliases of one record. Pandin needs its complete polygon.
-- Rivers: **Santa Cruz, San Pedro and Tunasan** need named reaches/geometry and disambiguation. Balanac's Magdalena/upstream coverage and both imported rivers' complete courses remain outstanding.
-- Waterfalls: **Aliw, Taytay/Majayjay, Bukal, Bunga Twin, Buruwisan, Lanzones, Buntot Palos and Dampalit** need source-specific points, locality/alias checks and image permissions. Pagsanjan/Cavinti/Magdapio is one identity.
-- Springs/resorts: four withheld candidates above, independent source/hydrogeological verification for Al Fresco, and further natural/geothermal spring inventory. No ordinary pool was published as a natural spring source.
+All sixteen added lake/river/waterfall geometries were compared to saved OSM objects: exact node coordinates for points, and all original undirected way segments for lines/rings, with no missing or invented segments. Rings may start at a different vertex or run in reverse. Caliraya retains 61 island holes, Lumot 48 and Laguna de Bay 28. These checks preserve source geometry; they are not independent survey or topology certification. The historical resort node was checked against `storage/app/osm-hidden-valley.json` and the original outline in `inventory-hidden-history.json`.
+
+| Profile | OSM object | Revision inspected |
+| --- | --- | --- |
+| Calibato Lake | way 24821818 | v24, 2026-04-06 |
+| Palakpakin Lake | relation 6476644 | v7, 2026-04-06 |
+| Caliraya Lake | relation 1622400 | v48, 2024-08-20 |
+| Lumot Lake | relation 152819 | v23, 2024-08-20 |
+| Laguna de Bay | relation 79348 | v173, 2026-09-05 |
+| Santa Cruz River, selected reach | way 118768554 | v8, 2024-02-14 |
+| San Pedro River, selected reach | way 813191908 | v6, 2023-07-13 |
+| Tunasan River, selected boundary-area reach | way 416506946 | v5, 2025-05-01 |
+| Taytay / Majayjay Falls | node 317421214 | v6, 2025-07-18 |
+| Bunga Twin / Bunga Falls | node 351117095 | v5, 2022-06-19 |
+| Buntot Palos Falls | node 2288792649 | v3, 2026-01-16 |
+| Aliw / Dream Falls | node 2679392267 | v4, 2023-05-08 |
+| Buruwisan Falls | node 4031692862 | v1, 2016-02-28 |
+| Lanzones / Lanzonez Falls | node 4031692863 | v1, 2016-02-28 |
+| Bukal / Kilangin Falls | node 4229589489 | v4, 2026-05-20 |
+| Dampalit Falls | node 5397783523 | v1, 2018-02-08 |
+
+The source links and corresponding revision metadata are stored on every profile. Named river reaches were disambiguated with saved source tags and geocoding results, rather than nearby unnamed streams. Locality labels remain qualified where access and boundary context differ (Aliw, Bukal, Tunasan); Laguna de Bay extends beyond Laguna. Relation revision dates do not date every member node or establish scientific sampling dates. No additional fish evidence or water-quality measurements are inferred.
+
+### Remaining evidence gaps
+
+- Lakes: Pandin's complete polygon, surveyed accuracy, current classification evidence and additional permitted photographs remain incomplete. Mohicap/Mojicap/Muhikap remain aliases of one record.
+- Rivers: Santa Cruz, San Pedro and Tunasan now have selected reaches. Complete courses for all five rivers, including Balanac's Magdalena/upstream coverage, remain incomplete.
+- Waterfalls: eight additional points and source aliases are recovered; independent municipal boundaries, on-site accuracy and further photo permissions remain incomplete. Pagsanjan/Cavinti/Magdapio remains one identity.
+- Springs/resorts: Dolcezza, Tirta and Stellaluna remain withheld. Independent source/hydrogeological verification for both resort references and a wider spring inventory remain missing. No ordinary pool is published as a verified natural spring source.
 
 Overpass returned 504 then 406; direct OSM retrieval later reached 429, at which point requests stopped. No access/rate limit was bypassed. NAMRIA/LGU survey geometry and legal boundaries were not obtained. These are research gaps, not evidence that locations do not exist.
 

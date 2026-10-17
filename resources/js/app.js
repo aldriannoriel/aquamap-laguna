@@ -10,7 +10,7 @@ if (mapElement) {
     const status = document.getElementById('map-status');
     const reset = document.getElementById('reset-map');
     const selected = document.getElementById('selected-lake');
-    const placeholder = document.getElementById('selection-placeholder');
+    const dialog = document.getElementById('water-detail-dialog');
     const information = document.getElementById('lake-information');
     const features = new Map();
     const markers = new Map();
@@ -18,13 +18,12 @@ if (mapElement) {
     let map;
     const normalize = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
     const matchesSearch = (lake) => normalize([lake.name, lake.municipality, ...lake.aliases].join(' ')).includes(normalize(search.value.trim()));
-    const visible = () => lakes.filter((lake) => matchesSearch(lake) && (category === 'all' || lake.category === category));
+    const visible = () => lakes.filter((lake) => lake.geography && matchesSearch(lake) && (category === 'all' || lake.category === category));
 
     function clearSelection() {
-        map?.closePopup();
+        if (dialog.open) dialog.close();
         selected.hidden = true;
-        placeholder.hidden = false;
-        information.setAttribute('aria-labelledby', 'overview-heading');
+        dialog.removeAttribute('aria-labelledby');
         buttons.forEach((button) => {
             button.setAttribute('aria-pressed', 'false');
             button.querySelector('.selection-label').textContent = 'View details';
@@ -42,9 +41,8 @@ if (mapElement) {
         profile.removeAttribute('id');
         profile.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
         profile.querySelector('h2').id = 'selected-lake-heading';
-        information.setAttribute('aria-labelledby', 'selected-lake-heading');
+        dialog.setAttribute('aria-labelledby', 'selected-lake-heading');
         selected.replaceChildren(profile);
-        placeholder.hidden = true;
         selected.hidden = false;
         buttons.forEach((button) => {
             const active = Number(button.dataset.lakeId) === lake.id;
@@ -60,16 +58,13 @@ if (mapElement) {
                 if (geometry) map.fitBounds(geometry.getBounds(), { padding: [45, 65], maxZoom: 15, animate: false });
                 else map.setView(marker.getLatLng(), 15, { animate: false });
             }
-            marker.getPopup().options.maxWidth = Math.min(270, mapElement.clientWidth - 65);
-            marker.openPopup();
-            marker.getPopup().update();
+
             status.textContent = lake.name + ' selected. Source and accuracy limitations are in the details.';
         } else {
             status.textContent = lake.name + ' selected. Location awaiting verification; no marker is displayed.';
         }
-        if (moveMap && window.matchMedia('(max-width: 1023px)').matches) {
-            information.scrollIntoView({ behavior: 'instant', block: 'start' });
-        }
+        dialog.showModal();
+        information.scrollTop = 0;
     }
 
     function fitVisible() {
@@ -84,7 +79,7 @@ if (mapElement) {
         buttons.forEach((button) => { button.closest('[data-water-row]').hidden = !ids.has(Number(button.dataset.lakeId)); });
         filters.forEach((button) => {
             button.setAttribute('aria-pressed', String(button.dataset.category === category));
-            button.querySelector('[data-category-count]').textContent = lakes.filter((lake) => matchesSearch(lake)
+            button.querySelector('[data-category-count]').textContent = lakes.filter((lake) => lake.geography && matchesSearch(lake)
                 && (button.dataset.category === 'all' || lake.category === button.dataset.category)).length;
         });
         for (const [id, marker] of markers) {
@@ -136,22 +131,14 @@ if (mapElement) {
                 iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -18],
             });
             const marker = L.marker(center, { icon, title: lake.name, alt: lake.name, keyboard: true });
-            const popup = document.createElement('div');
-            const title = document.createElement('h3');
-            title.className = 'lake-detail-title';
-            title.textContent = lake.name;
-            const location = document.createElement('p');
-            location.textContent = lake.municipality + (lake.site_type === 'resort' ? ' / Resort location' : '');
-            const hint = document.createElement('p');
-            hint.textContent = 'Profile and sources are shown below the map.';
-            popup.append(title, location, hint);
-            marker.bindPopup(popup, { maxWidth: 270, autoPanPaddingTopLeft: [20, 65], autoPanPaddingBottomRight: [20, 20] });
             marker.on('click', () => selectLake(lake, false));
             marker.on('add', () => marker.getElement()?.setAttribute('aria-label', 'Select ' + lake.name));
             markers.set(lake.id, marker);
         }
         new ResizeObserver(() => map.invalidateSize({ pan: false })).observe(mapElement);
     }
+    document.getElementById('close-water-detail').addEventListener('click', () => dialog.close());
+    dialog.addEventListener('close', () => { if (!dialog.open) clearSelection(); });
     buttons.forEach((button) => button.addEventListener('click', () => selectLake(lakes.find((lake) => lake.id === Number(button.dataset.lakeId)))));
     filters.forEach((button) => button.addEventListener('click', () => { category = button.dataset.category; applyFilters(); }));
     search.addEventListener('input', applyFilters);

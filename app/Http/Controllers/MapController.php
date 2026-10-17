@@ -25,11 +25,12 @@ class MapController extends Controller
                 });
             })
             ->withCount(['pollutionReports as verified_report_count' => fn (Builder $query): Builder => $query->where('status', 'verified')])
-            ->orderBy('name')
             ->with(['fishSpecies' => fn (BelongsToMany $query): BelongsToMany => $query
                 ->select(['fish_species.id', 'common_name', 'scientific_name', 'water_type', 'habitat_requirements', 'fish_species.source_url'])
                 ->orderBy('common_name')])
-            ->get();
+            ->get()
+            ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
 
         $lakes = $records
             ->map(function (WaterBody $lake) use ($fields): array {
