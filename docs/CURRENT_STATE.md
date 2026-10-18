@@ -1,6 +1,6 @@
 # GIS expansion checkpoint
 
-**2026-10-18. Caption and candidate follow-up built on `c074025` on `main`.** See [EXPANSION_PROGRESS.md](EXPANSION_PROGRESS.md) for recovery history and [IMAGE_INVENTORY.md](IMAGE_INVENTORY.md) for all 28 photo outcomes. No push.
+**2026-10-19. Source saved to [GitHub](https://github.com/aldriannoriel/aquamap-laguna) on `main`.** Caption and candidate follow-up is committed as `1957467`, built on `c074025`. See [EXPANSION_PROGRESS.md](EXPANSION_PROGRESS.md) for recovery history and [IMAGE_INVENTORY.md](IMAGE_INVENTORY.md) for all 28 photo outcomes. The GitHub copy includes source, migrations, reviewed catalogue data and licensed public images; it excludes `.env`, live database contents, private uploads, logs and local recovery artifacts. It is a source backup, not a runtime-data backup or deployment.
 
 ## Complete
 
