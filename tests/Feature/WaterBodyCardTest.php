@@ -27,7 +27,7 @@ class WaterBodyCardTest extends TestCase
             ->assertSee('Close profile')->assertSee('Scientific water-quality assessment: Not Assessed.')
             ->assertSee('Historical aquaculture')->assertSee('Potential habitat compatibility')->assertSee('Insufficient data')
             ->assertSee('Research &amp; sources', false)->assertSee('Not Assessed')->assertSee('Spring type:')
-            ->assertSee('Barrera marquez')->assertSee('Dionisia.besas')->assertSee('Permission');
+            ->assertSee('Barrera marquez')->assertSee('Dionisia.besas')->assertSee('Photo by');
         $this->assertDatabaseCount('water_bodies', 28);
         $this->assertCount(28, $response->viewData('lakes'));
         $images = array_filter(array_column($response->viewData('profiles'), 'image'));

@@ -1,5 +1,15 @@
 # GIS expansion recovery checkpoint
 
+## Caption and candidate follow-up: 2026-10-18
+
+Baseline: `c074025` on `main`; initial worktree clean. Fresh image searches covered the eight remaining names, alongside the previously verified Commons/Flickr/Openverse evidence. Additional photographer, tourism-publisher and official resort pages yielded no new photograph with both confirmed identity and compatible permission. **Coverage remains 20/28; all eight placeholders remain.** Candidate creators/publishers, exact URLs and exclusion reasons are in [IMAGE_INVENTORY.md](IMAGE_INVENTORY.md).
+
+- Overview captions now display **Photo by [Creator] · Source · License.** Both links retain their original destinations. Existing complete attribution/license text, titles, historical dates and optimization/cropping notices remain visible below. Image files, associations, GIS/scientific/fish data, schema, privacy and map functionality are unchanged.
+- Google Images direct retrieval did not yield usable parsed results; available image-search results were checked against original publishers. Pala-lagaw returned 429 and was not retried. No messages, payments, permission inference, unlicensed downloads to public assets or remote embedding occurred.
+- Focused profile tests: **7 / 424 assertions**. Full SQLite `:memory:` suite: **174 / 1,828 assertions**. Production build, Pint, JavaScript syntax, Composer validation and Git whitespace checks pass. Scoped code review found no actionable defects in the escaped credit text, unchanged URL destinations/metadata and caption checks.
+- Final Edge run passed for all 28 desktop/mobile profiles: twenty images with exact credit lines, clickable Source/License labels and original destinations, preserved license/modification text and eight placeholders. Existing tabs/accessibility roles, keyboard/focus/scroll, filters/geometry/fish/reporting GET and responsive 1024/1440/1920px desktop plus 320/390px portrait and 640px landscape checks pass. Screenshots were inspected. Zero JavaScript exceptions; no reports submitted. All twenty image hashes, three catalogue/association files, real domain records/accounts/reviews/migrations and shared database/file cache remain unchanged. Physical-device and actual screen-reader testing remain unperformed. Current artifacts use ignored `storage/app/photo-credits/`.
+- Verified for a local Git checkpoint; identify the resulting commit with `git log -1 --oneline`. No push.
+
 ## Remaining-photo continuation: 2026-10-18
 
 Baseline: `f97f2f8` on `main`; initial working tree clean. Researched all ten remaining profiles across Commons, original Flickr pages, official government/tourism publications and resort websites. Only licenses permitting commercial reuse are authorized; CC BY-NC candidates and copyrighted operator photographs are excluded.

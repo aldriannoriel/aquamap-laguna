@@ -43,7 +43,7 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'remaining-photos/browser';
+const artifactDirectory = 'photo-credits/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const output = path.join(root, 'storage/app', artifactDirectory);
@@ -209,13 +209,17 @@ try {
                 const caption = document.querySelector('#selected-lake figcaption');
                 return {path:img.getAttribute('src'), alt:img.alt, fit:getComputedStyle(img).objectFit,
                     width:img.getBoundingClientRect().width, content:document.getElementById('lake-information').clientWidth,
-                    caption:caption.textContent, links:[...caption.querySelectorAll('a')].map(link => link.href)};
+                    caption:caption.textContent, credit:caption.querySelector('[data-photo-credit]').textContent.trim(),
+                    labels:[...caption.querySelectorAll('a')].map(link => link.textContent),
+                    links:[...caption.querySelectorAll('a')].map(link => link.href)};
             })()`);
             assert.equal(rendered.path, expected.path);
             assert.equal(rendered.alt, expected.alt);
             assert.equal(rendered.fit, expected.fit ?? 'cover');
             assert(rendered.width > 0 && rendered.width <= rendered.content, `${lake.name}: image sizing overflow`);
             assert(rendered.caption.includes(expected.author) && rendered.caption.includes(expected.license), `${lake.name}: missing attribution`);
+            assert.equal(rendered.credit, `Photo by ${expected.author} · Source · License.`);
+            assert.deepEqual(rendered.labels, ['Source', 'License']);
             assert.deepEqual(rendered.links, [expected.source_url, expected.license_url].map(url => new URL(url).href));
         }
         if (['Bunga Twin Falls', 'Hidden Valley Springs', 'Hulugan Falls', 'Bumbungan River', 'Al Fresco Springs Resort'].includes(lake.name)) {
