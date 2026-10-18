@@ -43,7 +43,7 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'photo-completion/browser';
+const artifactDirectory = 'remaining-photos/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const output = path.join(root, 'storage/app', artifactDirectory);
@@ -218,7 +218,7 @@ try {
             assert(rendered.caption.includes(expected.author) && rendered.caption.includes(expected.license), `${lake.name}: missing attribution`);
             assert.deepEqual(rendered.links, [expected.source_url, expected.license_url].map(url => new URL(url).href));
         }
-        if (['Hulugan Falls', 'Bumbungan River', 'Al Fresco Springs Resort'].includes(lake.name)) {
+        if (['Bunga Twin Falls', 'Hidden Valley Springs', 'Hulugan Falls', 'Bumbungan River', 'Al Fresco Springs Resort'].includes(lake.name)) {
             await screenshot(`${viewport}-${lake.name.toLowerCase().replaceAll(' ', '-')}.png`);
         }
     }
@@ -324,7 +324,7 @@ try {
         await click('#reset-map');
     }
     results.push('All 28 sidebar profiles: modal heading, initial focus, close/focus restoration, description, sources and authorized image loading pass.');
-    results.push('Desktop: all 28 profiles match the image inventory; 18 local photographs load with exact authors, licenses, source links and responsive sizing; 10 explicit placeholders; both portraits use contain.');
+    results.push('Desktop: all 28 profiles match the image inventory; 20 local photographs load with exact authors, licenses, source links and responsive sizing; 8 explicit placeholders; fitted images use contain.');
     if (verifyFish) results.push('All three lakes show Nile tilapia, July-September 2017 sampling, historical aquaculture evidence, two references and insufficient_data compatibility.');
     await click('[data-category=lake]');
     await click('.lake-marker[title="Sampaloc Lake"]');
@@ -395,7 +395,7 @@ try {
         await closeProfile();
         await click('#reset-map');
     }
-    results.push('390px mobile: all 28 profiles match the inventory, all 18 images load with exact attribution and responsive sizing, 10 placeholders remain, no horizontal overflow.');
+    results.push('390px mobile: all 28 profiles match the inventory, all 20 images load with exact attribution and responsive sizing, 8 placeholders remain, no horizontal overflow.');
     const mobileLake = lakes.find(lake => lake.name === "Pandin Lake");
     await click(`[data-lake-id="${mobileLake.id}"]`);
     assert.equal(await evaluate('document.querySelector("#selected-lake-heading")?.textContent'), mobileLake.name);

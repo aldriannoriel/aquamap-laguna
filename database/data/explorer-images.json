@@ -100,6 +100,30 @@
             "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
         }
     },
+    "Bunga Twin Falls": {
+        "municipality": "Nagcarlan",
+        "image": {
+            "path": "/images/water-bodies/bunga-twin-falls.jpg",
+            "alt": "Black-and-white photograph of the two cascades of Bunga Falls in Nagcarlan, photographed in 2012",
+            "author": "Jose Nicdao",
+            "license": "CC BY 2.0; title: 20120324-DSC_4477-136.jpg; photographed 2012-03-24; resized/re-encoded JPEG",
+            "source_url": "https://www.flickr.com/photos/jonicdao/6869770066/",
+            "license_url": "https://creativecommons.org/licenses/by/2.0/",
+            "fit": "contain"
+        }
+    },
+    "Hidden Valley Springs": {
+        "municipality": "Alaminos / Calauan area",
+        "image": {
+            "path": "/images/water-bodies/hidden-valley-springs.jpg",
+            "alt": "Pool spillway and wooded resort grounds at Hidden Valley Springs, photographed in 2005; not a verified spring-source location",
+            "author": "eric molina",
+            "license": "CC BY 2.0; title: so this is why you come to hidden valley springs; photographed 2005-04-02; resized/re-encoded JPEG",
+            "source_url": "https://www.flickr.com/photos/iamagenious/415373574/",
+            "license_url": "https://creativecommons.org/licenses/by/2.0/",
+            "fit": "contain"
+        }
+    },
     "Santa Cruz River": {
         "municipality": "Santa Cruz",
         "image": {

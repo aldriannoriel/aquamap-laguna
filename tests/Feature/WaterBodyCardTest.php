@@ -31,7 +31,7 @@ class WaterBodyCardTest extends TestCase
         $this->assertDatabaseCount('water_bodies', 28);
         $this->assertCount(28, $response->viewData('lakes'));
         $images = array_filter(array_column($response->viewData('profiles'), 'image'));
-        $this->assertCount(18, $images);
+        $this->assertCount(20, $images);
         foreach ($images as $image) {
             $this->assertFileExists(public_path($image['path']));
             $this->assertSame('image/jpeg', getimagesize(public_path($image['path']))['mime']);
@@ -53,7 +53,7 @@ class WaterBodyCardTest extends TestCase
         $response = $this->get(route('map.index'))->assertOk();
         $profiles = $response->viewData('profiles');
         $supplement = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR);
-        $this->assertCount(10, $supplement);
+        $this->assertCount(12, $supplement);
         $originals = 0;
         foreach (WaterBody::all() as $lake) {
             if ($lake->image !== null) {
@@ -107,8 +107,8 @@ class WaterBodyCardTest extends TestCase
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         $xpath = new DOMXPath($document);
-        $this->assertSame(10, $xpath->query('//article[starts-with(@id,"profile-")]//div[@data-photo-placeholder]')->length);
-        foreach (['Hulugan Falls', 'Bukal Falls'] as $name) {
+        $this->assertSame(8, $xpath->query('//article[starts-with(@id,"profile-")]//div[@data-photo-placeholder]')->length);
+        foreach (['Hulugan Falls', 'Bukal Falls', 'Bunga Twin Falls', 'Hidden Valley Springs'] as $name) {
             $lake = WaterBody::where('name', $name)->sole();
             $this->assertStringContainsString('object-contain', $xpath->evaluate('string(//article[@id="profile-'.$lake->id.'"]//img/@class)'));
         }

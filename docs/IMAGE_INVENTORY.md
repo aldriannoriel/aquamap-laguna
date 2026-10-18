@@ -1,6 +1,6 @@
 # Water body image inventory
 
-Reviewed 2026-10-18 against baseline `dc8366a`: **28 profiles, eight original images preserved, ten new images, ten placeholders**. No database import, migration, coordinate or scientific-data change. Existing metadata takes precedence; `database/data/explorer-images.json` supplies only previously empty images, matching exact canonical name and municipality.
+Reviewed 2026-10-18 against baseline `f97f2f8`: **28 profiles, 18 existing images preserved, two further photographs added, eight placeholders**. Only licenses permitting commercial reuse are accepted for this continuation; NonCommercial candidates are excluded. No database import, migration, coordinate or scientific-data change. Existing metadata takes precedence; `database/data/explorer-images.json` supplies only previously empty images, matching exact canonical name and municipality.
 
 ## Original eight preserved
 
@@ -30,7 +30,7 @@ Original SHA-256 checksums (rechecked before commit):
 | sampaloc.jpg | `a56468721dd460e8766138becb2c64fcc5c5be12c345c2eef031aa07f2e49a7c` |
 | yambo.jpg | `d0cce4e6ff49e63b632a09ae2ab93c482df32b0af85a02f5327cfe9af0999814` |
 
-## Ten new local photographs
+## First ten additions (preserved)
 
 All are from Wikimedia Commons file pages with explicit licenses; author, original-page and license links appear in both Overview and Research & Sources. Required credit is the named author plus linked license/source and the recorded modification notice. ShareAlike photographs retain their source license. Photograph dates are historical capture dates, not present-condition assessments. Review date is not substituted for capture date.
 
@@ -62,27 +62,48 @@ Optimization: downloaded source thumbnails, resampled only when needed to a maxi
 | Bumbungan River | Description identifies Pagsanjan River continuing below the falls; Bumbungan category and existing profile alias corroborate identity. |
 | Santa Cruz River | File description identifies the river beside Pagsawitan Bridge in Santa Cruz, Laguna. Do not rely on a generic river category whose infobox refers to Marinduque. |
 
-## Ten missing photographs
+## Two further photographs: 2026-10-18
+
+These additions use the existing read-only supplement. Both original photographer pages explicitly link the photograph to **CC BY 2.0**, which permits commercial reuse and adaptation with attribution. The displayed credits retain the supplied title, photographer, source and license links, historical capture date, and modification notice. No ShareAlike license or obligation on the existing photographs is changed.
+
+| Profile | Photographer / supplied title | Capture date | Exact source | License | Local asset |
+| --- | --- | --- | --- | --- | --- |
+| Bunga Twin Falls | Jose Nicdao / `20120324-DSC_4477-136.jpg` | 2012-03-24 | [Original Flickr photograph](https://www.flickr.com/photos/jonicdao/6869770066/) | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | `bunga-twin-falls.jpg`; 960 x 636; 87,429 bytes |
+| Hidden Valley Springs | eric molina / `so this is why you come to hidden valley springs` | 2005-04-02 | [Original Flickr photograph](https://www.flickr.com/photos/iamagenious/415373574/) | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | `hidden-valley-springs.jpg`; 724 x 960; 224,329 bytes |
+
+Verification evidence:
+
+- **Bunga:** the original page's description explicitly says "Bunga Falls Nagcarlan Philippines"; its ImageObject metadata identifies Jose Nicdao, the exact image URL and CC BY 2.0 link. Capture date is 2012-03-24. Visual inspection confirms paired cascades and a shared basin. The [municipal Bunga Twin Falls listing](https://nagcarlan.gov.ph/places-of-interest/) and the [Laguna tourism brochure](https://www.philembassymadrid.com/wordpress/wp-content/uploads/Forms/Laguna.pdf) also identify the attraction by name; their photographs are not used. The authored black-and-white appearance is preserved. Generic town photographs were not substituted.
+- **Hidden Valley:** the photographer's title names Hidden Valley Springs and the description identifies the resort in Calauan, Laguna. The original page's photo-specific license link and ImageObject metadata both specify CC BY 2.0, and capture date is 2005-04-02. Visual inspection shows a constructed pool spillway in wooded resort grounds. The property also has an [official gallery](https://www.hiddenvalleyspringsresort.com/gallery). This is a historical **property photograph**, not a verified natural spring-source location or current condition assessment. No geological or water-quality assertions from the photographer's prose are imported. The official resort gallery itself does not supply a reuse grant and was not downloaded for integration.
+
+Optimization: downscaled without upscaling to a maximum 960-pixel edge, PHP GD progressive JPEG quality 82, metadata stripped, no subject replacement or semantic editing. Both use the existing `contain` presentation to preserve the full composition; no map UI or layout code changed. New files total 311,758 bytes.
+
+| Filename | SHA-256 |
+| --- | --- |
+| bunga-twin-falls.jpg | `bd8d3143a455115e029e87453275d2951dcbbe96ffeea4791a02b28072563549` |
+| hidden-valley-springs.jpg | `de971b0445847f5bf022953728014742bc5a283ed80cfa40ebbf461b4aba5d7f` |
+
+## Eight missing photographs
 
 These profiles retain "No authorized photograph available." No randomly similar, private report or unlicensed operator photograph is substituted. Missing permission means authorization was not established in the reviewed sources, not that no photograph exists anywhere.
 
 | Profile | Result / next evidence needed |
 | --- | --- |
-| Palakpakin Lake | No correctly identified reusable Commons image found. General San Pablo/Seven Lakes descriptions do not establish the pictured lake; city/social-media photographs lack established reuse permission. |
-| San Pedro River | A San Antonio bridge candidate mentions both San Pedro and Tunasan in a general description. The depicted reach could not be established, so it was excluded. |
-| Talay Falls | A specifically named Flickr photograph was found, but a compatible reuse license could not be established. |
-| Bunga Twin Falls | The [municipal tourism page](https://nagcarlan.gov.ph/places-of-interest/) identifies the site but retrieval was forbidden (403). No photo-specific permission established. A licensed research article alone does not establish permission for embedded third-party photos. |
-| Buntot Palos Falls | No correctly identified image with documented compatible reuse permission found in the reviewed sources. |
-| Aliw Falls | Travel images lack established permission. Similarly named Aliwagwag Falls is in Davao and was rejected. |
-| Lanzones Falls | No correctly identified reusable photograph found. Commons fruit photographs are unrelated. |
-| Dampalit Falls | A [2011 Philippine Journal of Science cover](https://philjournalsci.dost.gov.ph/philippine-journal-of-science-vol-140-no-2-december-2011/) names photographer Bonifacio V. Labatos, but photo-specific permission was not established and the page returned 403. Government hosting alone does not establish reuse rights. Malabon subjects were excluded. |
-| Al Fresco Springs Resort | [Official operator photographs](https://alfrescosprings.com/) are marked All Rights Reserved; no reuse grant found. |
-| Hidden Valley Springs | [Official resort photographs](https://www.hiddenvalleyspringsresort.com/) have no documented reuse grant. Unrelated overseas springs were excluded. |
+| Palakpakin Lake | [Tony Hidalgo's correctly named photograph](https://www.flickr.com/photos/ton70/4873624700/) is All rights reserved. Openverse also lists ReverendMungo's location-specific photos (e.g. [4342118297](https://www.flickr.com/photos/61068860@N00/4342118297)) as CC BY-NC 2.0; excluded under the commercial-reuse requirement. Palacpaquin/Palacpaquen alternate names and Commons were searched; general city/Seven Lakes descriptions do not identify the pictured lake. Government scientific publications do not establish photo-specific unrestricted permission. |
+| San Pedro River | [Commons' river category](https://commons.wikimedia.org/wiki/Category:San_Pedro_River,_Laguna) includes [Judgefloro's 4847...03](https://commons.wikimedia.org/wiki/File:4847San_Antonio_San_Pedro,_Laguna_03.jpg), a CC0 river photograph. However, its batch description also names the San Antonio bridge/Muntinlupa boundary, and its generic camera point does not coincide with the profile's selected reach. Subject identity relative to Tunasan remains unresolved; a category and generic locality point alone are insufficient. No GIS data was changed to make it fit. |
+| Talay Falls | [Kostas Trovas's Talay Falls HDR](https://www.flickr.com/photos/kostastrovas/24468820694/) names Talay near Hulugan but the current original page has Flickr license 0 (All rights reserved). Compatible-license searches did not establish another authorized Talay photograph. |
+| Buntot Palos Falls | [Jerwin Lim's photograph](https://www.flickr.com/photos/jerwin_lim/7271502834) explicitly names Buntot Palos / Hidden Falls, Panguil, but is All rights reserved. Buntot Palos, Buntotpalos and Hidden Falls/Pangil variants were checked. Tourism/brochure visibility is not a photo-specific reuse grant; unrelated fish-tail images were excluded. |
+| Aliw Falls | [Francis Fontanilla's correctly named Luisiana photograph](https://www.flickr.com/photos/francisfontanilla/49457952598/) is All rights reserved. Free-license search results include [jopetsy's Cavinti photograph](https://www.flickr.com/photos/28077178@N04/35463288402), with shared itinerary tags including Aliw and another waterfall, but its displayed tall cascade does not establish the Aliw subject. Other inspected candidates showed another cascade or a lake. No ambiguous tagged image, Aliwagwag image or unlicensed travel photograph is substituted. |
+| Lanzones Falls | [RJ Sta Maria's Lanzones Falls photograph](https://www.flickr.com/photos/157766133@N02/36854014354/) explicitly identifies Siniloan, Laguna, but the current original page has Flickr license 0 (All rights reserved). Lanzones/Lansones Falls compatible-license searches found no verified alternative; fruit images are unrelated. |
+| Dampalit Falls | [Bok Pua's Los Baños photograph](https://www.flickr.com/photos/bokyopie/4472703832/) and [Oliver Bautista's photograph](https://www.flickr.com/photos/oliverbautista/9564495776) are All rights reserved. The earlier [2011 Philippine Journal of Science cover](https://philjournalsci.dost.gov.ph/philippine-journal-of-science-vol-140-no-2-december-2011/) names Bonifacio V. Labatos, but photo-specific permission remains unestablished. Government hosting alone is not a grant; Malabon river/plant subjects are excluded. |
+| Al Fresco Springs Resort | The [official operator website](https://alfrescosprings.com/) explicitly says All Rights Reserved. Its individual villa galleries establish identity but supply no photo-specific reuse grant. Independent compatible-license searches returned unrelated subjects; no copyrighted operator photograph was used. |
 
 ## Research and recovery evidence
 
 Pre-research checkpoint is in [EXPANSION_PROGRESS.md](EXPANSION_PROGRESS.md). Ignored `storage/app/photo-completion/` retains the original 28-profile inventory, original-file hashes, source metadata/page captures, downloaded thumbnails and optimization manifest. These local captures are recovery aids; durable credit/source/license records are committed in the supplement and this inventory.
 
-The Commons search API returned a rate limit (429); API research stopped immediately. Public source pages and static files were reviewed separately at a measured pace. Forbidden government pages were not retried or bypassed. No paid services, contact requests, database imports or migrations were used. Official-site copyright is not inferred from a government or tourism domain.
+During the first ten-photo completion, the Commons search API returned a rate limit (429); API research stopped immediately. Public source pages and static files were reviewed separately at a measured pace. Forbidden government pages were not retried or bypassed. No paid services, contact requests, database imports or migrations were used. Official-site copyright is not inferred from a government or tourism domain.
 
-Browser and automated verification results are recorded in [CURRENT_STATE.md](CURRENT_STATE.md); browser artifacts use ignored `storage/app/photo-completion/browser/`.
+Continuation evidence is under ignored `storage/app/remaining-photos/`: original 18-photo hashes, public source-page captures, licensed originals, rejected candidates (kept outside public assets), Openverse discovery results and the optimization manifest. Openverse is used for discovery only; the two accepted licenses and identities were checked on the original photographer pages. The Bunga research-paper PDF returned 403 and was not bypassed. Some searches timed out; no completeness claim is made about all photographs on the internet. No owner was contacted or permission inferred from silence.
+
+Browser and automated verification results are recorded in [CURRENT_STATE.md](CURRENT_STATE.md); current browser artifacts use ignored `storage/app/remaining-photos/browser/`, preserving earlier photo-completion/recovery artifacts.

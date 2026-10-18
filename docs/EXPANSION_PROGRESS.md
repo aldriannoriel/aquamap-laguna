@@ -1,5 +1,17 @@
 # GIS expansion recovery checkpoint
 
+## Remaining-photo continuation: 2026-10-18
+
+Baseline: `f97f2f8` on `main`; initial working tree clean. Researched all ten remaining profiles across Commons, original Flickr pages, official government/tourism publications and resort websites. Only licenses permitting commercial reuse are authorized; CC BY-NC candidates and copyrighted operator photographs are excluded.
+
+- Added two original-page-verified CC BY 2.0 photographs: **Bunga Twin Falls** (Jose Nicdao, 2012-03-24) and **Hidden Valley Springs** (eric molina, 2005-04-02). Coverage is **20/28**, with **eight explicit placeholders**. Full original titles, source/license links, photographers and identity evidence are in [IMAGE_INVENTORY.md](IMAGE_INVENTORY.md).
+- New optimized JPEGs: 960 x 636 / 87,429 bytes and 724 x 960 / 224,329 bytes. Progressive quality 82, no upscaling, no semantic edits, full compositions fitted with the existing contain option. Historical dates are visible; the resort image is not a verified spring-source photograph.
+- All 18 existing photographs and ten previous supplement records checked unchanged. Only the existing read-only supplement gains two identity-matched entries. No GIS coordinates, scientific/fish data, schema, catalogue, database records or map implementation changed. Configured and connected database both verified as `aquamap_laguna`; no seeder or migration run.
+- Focused tests: **7 / 424 assertions**. Full isolated SQLite `:memory:` suite: **174 / 1,828 assertions**. Production Vite build, Pint, JavaScript syntax, Composer validation and Git whitespace checks pass. Final code-reviewer review found no actionable defects in the scoped image associations, attribution, existing metadata precedence, image confinement or test changes.
+- Final Edge run passed for **all 28 profiles on desktop and 390px mobile**: all 20 images load with exact paths/alt/author/license/source links and correct fit; eight placeholders remain. Both additions' desktop/mobile screenshots were visually inspected. Existing tabs/accessibility-tree roles, keyboard/focus/scroll, categories/search/geometry, fish, reporting GET and 1024/1440/1920px desktop plus 320/390px portrait and 640px landscape checks pass with zero JavaScript exceptions. No reports submitted; real domain records, users, audits, migrations and shared database/file cache verified unchanged. Physical-device and actual screen-reader testing remain unperformed.
+- Implementation is verified for a local Git checkpoint; identify the resulting commit with `git log -1 --oneline`. No push is authorized or performed.
+- Recovery artifacts: ignored `storage/app/remaining-photos/` retains public source captures, original 18-photo hashes, discovery responses, rejected nonpublic candidates and optimization manifest. Existing recovery artifacts remain intact. Forbidden research-paper retrieval was not bypassed; original sources determine permission, not search-index labels. No messages or permission requests were sent to owners.
+
 ## Photo completion checkpoint: 2026-10-18
 
 Baseline: `dc8366a` on `main`; initial worktree clean. All 28 catalogue profiles inspected: eight photographs/credits exist and twenty profiles have placeholders. Existing images and metadata are preserved. Pre-research inventory and SHA-256 hashes are saved in ignored `storage/app/photo-completion/`.
