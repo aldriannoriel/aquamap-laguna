@@ -43,7 +43,7 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'expansion-recovery/browser';
+const artifactDirectory = 'tabbed-profile-browser';
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
@@ -155,6 +155,92 @@ try {
         await waitFor(() => evaluate('!document.getElementById("water-detail-dialog").open && document.getElementById("selected-lake").hidden'), 'Profile did not close and clear selection.');
         assert.equal(await evaluate('document.querySelectorAll("[data-lake-id][aria-pressed=true]").length'), 0);
     }
+    async function assertTabState(key) {
+        const state = await evaluate(`(() => {
+            const tabs = [...document.querySelectorAll('#profile-tabs [role=tab]')];
+            const panels = [...document.querySelectorAll('#selected-lake [role=tabpanel]')];
+            const tab = tabs.find(item => item.getAttribute('aria-selected') === 'true');
+            const visible = panels.filter(item => !item.hidden);
+            return {tabs:tabs.length, panels:panels.length, active:tab?.dataset.profileTab,
+                selected:tabs.filter(item => item.getAttribute('aria-selected') === 'true').length,
+                stops:tabs.filter(item => item.tabIndex === 0).length,
+                visible:visible.map(item => item.dataset.profileSection),
+                linked:visible.length === 1 && tab.getAttribute('aria-controls') === visible[0].id && visible[0].getAttribute('aria-labelledby') === tab.id};
+        })()`);
+        assert.deepEqual(state, { tabs: 5, panels: 5, active: key, selected: 1, stops: 1, visible: [key], linked: true });
+    }
+    async function selectTab(key) {
+        await click(`[data-profile-tab="${key}"]`);
+        await assertTabState(key);
+    }
+    async function assertDialogBounds(desktop = false) {
+        const layout = await evaluate(`(() => {
+            const dialog = document.getElementById('water-detail-dialog');
+            const r = dialog.getBoundingClientRect(), m = document.getElementById('lake-map').getBoundingClientRect();
+            return {x:r.x, y:r.y, width:r.width, height:r.height, viewport:innerWidth, available:document.documentElement.clientWidth,
+                viewportHeight:innerHeight, mapX:m.x, mapWidth:m.width, overflow:dialog.scrollWidth > dialog.clientWidth,
+                close:document.getElementById('close-water-detail').getBoundingClientRect().bottom <= r.bottom};
+        })()`);
+        assert(layout.x >= 7 && layout.y >= 7 && layout.x + layout.width <= layout.available - 7 && layout.y + layout.height <= layout.viewportHeight - 7, 'Profile must stay within viewport margins.');
+        assert.equal(layout.overflow, false, 'Dialog horizontal overflow.');
+        assert.equal(layout.close, true, 'Close control must stay visible.');
+        if (desktop) {
+            assert(Math.abs(layout.width - Math.min(608, Math.max(352, layout.mapWidth / 2))) <= 2, 'Desktop width must be half the map with sensible limits.');
+            assert(Math.abs(layout.x + layout.width / 2 - layout.mapX - layout.mapWidth / 2) <= 2, 'Desktop profile must be centered over the map.');
+        } else {
+            assert(Math.abs(layout.width - (layout.viewport - 16)) <= 2, 'Mobile profile must retain 8px screen margins.');
+        }
+        return layout;
+    }
+    async function keypress(key, code, windowsVirtualKeyCode, modifiers = 0) {
+        await send('Input.dispatchKeyEvent', { type: 'keyDown', key, code, windowsVirtualKeyCode, modifiers });
+        await send('Input.dispatchKeyEvent', { type: 'keyUp', key, code, windowsVirtualKeyCode, modifiers });
+        await pause(80);
+    }
+    async function verifyTabbedProfile(lake, prefix) {
+        await assertTabState('overview');
+        const token = await evaluate('(window.profileDocumentToken ??= crypto.randomUUID())');
+        for (const [key, text] of [['overview', lake.description], ['classification', 'drinking-water safety'], ['fish', 'Insufficient data'], ['pollution', 'Community Pollution Reports'], ['research', 'Geographic reference and limitations']]) {
+            await selectTab(key);
+            assert.equal((await evaluate('document.querySelector("#selected-lake [role=tabpanel]:not([hidden])").textContent')).includes(text), true);
+            assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), lake.name);
+            assert.equal(await evaluate('window.profileDocumentToken'), token, 'Tab switching reloaded the page.');
+            assert.equal(await evaluate(`document.querySelector('[data-lake-id="${lake.id}"]').getAttribute('aria-pressed')`), 'true');
+            await screenshot(`${prefix}-${key}.png`);
+        }
+        assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-research-card]").length > 0'), true);
+        await send('Accessibility.enable');
+        const tree = await send('Accessibility.getFullAXTree');
+        assert.equal(tree.nodes.filter(node => !node.ignored && node.role?.value === 'tab').length, 5);
+        assert.equal(tree.nodes.filter(node => !node.ignored && node.role?.value === 'tabpanel').length, 1);
+        assert.equal(tree.nodes.find(node => !node.ignored && node.role?.value === 'dialog')?.name?.value, lake.name);
+        await evaluate('document.getElementById("profile-tab-research").focus()');
+        await keypress('ArrowRight', 'ArrowRight', 39);
+        await assertTabState('overview');
+        await keypress('ArrowLeft', 'ArrowLeft', 37);
+        await assertTabState('research');
+        await keypress('Home', 'Home', 36);
+        await assertTabState('overview');
+        await keypress('End', 'End', 35);
+        await assertTabState('research');
+        await keypress('Tab', 'Tab', 9);
+        assert.equal(await evaluate('document.activeElement.id'), 'profile-panel-research');
+        const before = await evaluate('document.getElementById("close-water-detail").getBoundingClientRect().top');
+        if (prefix === 'desktop') {
+            const point = await evaluate('(() => { const r = document.getElementById("lake-information").getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()');
+            await send('Input.dispatchMouseEvent', { type: 'mouseWheel', ...point, deltaX: 0, deltaY: 400 });
+            await pause(200);
+            assert(await evaluate('document.getElementById("lake-information").scrollTop > 0'), 'Mouse wheel must scroll profile content.');
+        }
+        await evaluate('document.getElementById("lake-information").scrollTop = 10000');
+        assert(await evaluate('document.getElementById("lake-information").scrollTop > 0'), 'Research content must scroll within the profile.');
+        assert.equal(await evaluate('document.getElementById("close-water-detail").getBoundingClientRect().top'), before);
+        assert.equal(await evaluate('document.getElementById("profile-tabs").getBoundingClientRect().bottom < document.getElementById("water-detail-dialog").getBoundingClientRect().bottom'), true);
+        assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
+        await selectTab('overview');
+        assert.equal(await evaluate('document.getElementById("lake-information").scrollTop'), 0);
+        results.push(`${prefix}: all five tabs, default Overview, stable selection/document, linked accessibility roles, arrow/Home/End navigation, focusable panels and content-only scroll pass.`);
+    }
     await send('Runtime.enable');
     await send('Page.enable');
     await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1100, deviceScaleFactor: 1, mobile: false });
@@ -170,7 +256,8 @@ try {
     const lakes = await evaluate('JSON.parse(document.getElementById("lake-data").textContent)');
     for (const lake of lakes) {
         await click(`[data-lake-id="${lake.id}"]`);
-        assert.equal(await evaluate('document.querySelector("#selected-lake h2")?.textContent'), lake.name);
+        assert.equal(await evaluate('document.querySelector("#selected-lake-heading")?.textContent'), lake.name);
+        await assertTabState('overview');
         assert.equal(await evaluate(`document.querySelector('[data-lake-id="${lake.id}"]').getAttribute('aria-pressed')`), 'true');
         assert.equal(await evaluate('document.getElementById("water-detail-dialog").open'), true);
         assert.equal(await evaluate('document.activeElement.id'), 'close-water-detail');
@@ -178,13 +265,28 @@ try {
         assert.equal(await evaluate('document.querySelector("#selected-lake .lake-detail-description")?.textContent'), lake.description);
         assert.equal(await evaluate('[...document.querySelectorAll("#selected-lake a")].some(link => link.href === ' + JSON.stringify(lake.source_url) + ')'), true);
         if (verifyFish && ['Sampaloc Lake', 'Pandin Lake', 'Yambo Lake'].includes(lake.name)) {
+            await selectTab('fish');
             assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-fish-card]").length'), 1);
             assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-card] h4").textContent'), 'Nile tilapia');
             assert.equal(await evaluate('document.querySelector("#selected-lake [data-sampling-period]").textContent'), 'July-September 2017');
             assert.equal(await evaluate('document.querySelector("#selected-lake [data-compatibility-status]").dataset.compatibilityStatus'), 'insufficient_data');
             assert.match(await evaluate('document.querySelector("#selected-lake [data-evidence-badge]").textContent'), /Historical aquaculture/);
             assert.equal(await evaluate('[...document.querySelectorAll("#selected-lake [data-fish-card] a")].filter(link => link.rel === "noopener noreferrer").length'), 2);
-            if (lake.name === 'Sampaloc Lake') await screenshot('desktop-fish.png', true);
+            if (lake.name === 'Sampaloc Lake') {
+                await selectTab('overview');
+                const dimensions = await assertDialogBounds(true);
+                results.push(`Desktop dimensions: ${dimensions.width}px wide over a ${dimensions.mapWidth}px map; ${dimensions.height}px tall.`);
+                await verifyTabbedProfile(lake, 'desktop');
+                for (const width of [1024, 1920]) {
+                    await send('Emulation.setDeviceMetricsOverride', { width, height: 1100, deviceScaleFactor: 1, mobile: false });
+                    await pause(250);
+                    await assertDialogBounds(true);
+                    await screenshot(`desktop-${width}.png`);
+                }
+                await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1100, deviceScaleFactor: 1, mobile: false });
+                await pause(250);
+            }
+            await selectTab('overview');
         }
         const hasImage = await evaluate('!!document.querySelector("#selected-lake img")');
         if (hasImage) {
@@ -199,7 +301,8 @@ try {
     if (verifyFish) results.push('All three lakes show Nile tilapia, July-September 2017 sampling, historical aquaculture evidence, two references and insufficient_data compatibility.');
     await click('[data-category=lake]');
     await click('.lake-marker[title="Sampaloc Lake"]');
-    assert.equal(await evaluate('document.querySelector("#selected-lake h2")?.textContent'), 'Sampaloc Lake');
+    assert.equal(await evaluate('document.querySelector("#selected-lake-heading")?.textContent'), 'Sampaloc Lake');
+    await assertTabState('overview');
     if (verifyFish) assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-card] h4").textContent'), 'Nile tilapia');
     results.push('Marker pointer click opens the complete profile dialog.');
     await closeProfile(true);
@@ -243,6 +346,7 @@ try {
     await send('Input.dispatchKeyEvent', {type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
     await send('Input.dispatchKeyEvent', {type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
     assert.equal(await evaluate('document.getElementById("selected-lake").hidden'), false);
+    await assertTabState('overview');
     await closeProfile(true);
     await click('#reset-map');
     results.push('All category counts, search/alias search, empty state, layer removal, reset and keyboard shape selection pass.');
@@ -258,17 +362,27 @@ try {
     assert(layout.sidebar < layout.map, 'Mobile search and category controls should precede the map.');
     const mobileLake = lakes.find(lake => lake.name === "Pandin Lake");
     await click(`[data-lake-id="${mobileLake.id}"]`);
-    assert.equal(await evaluate('document.querySelector("#selected-lake h2")?.textContent'), mobileLake.name);
+    assert.equal(await evaluate('document.querySelector("#selected-lake-heading")?.textContent'), mobileLake.name);
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'Mobile selection causes overflow.');
-    const dialogLayout = await evaluate('(() => { const r = document.getElementById("water-detail-dialog").getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height}; })()');
-    assert.deepEqual(dialogLayout, { x: 0, y: 0, width: 390, height: 844 }, 'Mobile dialog must fit the viewport.');
+    await assertDialogBounds();
+    await verifyTabbedProfile(mobileLake, 'mobile');
     await screenshot('mobile.png');
     if (verifyFish) {
         assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-card] h4").textContent'), 'Nile tilapia');
         assert.equal(await evaluate('document.querySelector("#selected-lake [data-compatibility-status]").dataset.compatibilityStatus'), 'insufficient_data');
-        await screenshot('mobile-fish.png', true);
+        await selectTab('fish');
+        await screenshot('mobile-fish.png');
         results.push('Mobile fish card remains readable, distinguishes occurrence/compatibility and retains source links without overflow.');
     }
+    for (const [width, height] of [[320, 568], [640, 360]]) {
+        await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: true });
+        await pause(250);
+        await assertDialogBounds();
+        await selectTab('research');
+        await screenshot(`mobile-${width}.png`);
+    }
+    await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await pause(250);
     await closeProfile();
     await click('#reset-map');
     assert.equal(await evaluate('document.querySelectorAll("[data-lake-id][aria-pressed=true]").length'), 0);
@@ -277,15 +391,24 @@ try {
     await setSearch('los banos');
     assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 1);
     await click('[data-lake-id="' + lakes.find(lake => lake.name === 'Al Fresco Springs Resort').id + '"]');
+    await assertTabState('overview');
     assert.match(await evaluate('document.getElementById("selected-lake").textContent'), /not a verified spring source/);
     assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-photo-placeholder]").length'), 1);
     assert.equal(await evaluate('document.querySelector("#selected-lake img")'), null);
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
     await screenshot('mobile-resort.png', true);
+    await selectTab('classification');
+    assert.match(await evaluate('document.querySelector("#profile-panel-classification").textContent'), /operator claim/);
+    await selectTab('fish');
+    assert.match(await evaluate('document.querySelector("#profile-panel-fish").textContent'), /Fish habitat: Not Assessed/);
+    assert.equal(await evaluate('document.querySelectorAll("#profile-panel-fish [data-fish-card]").length'), 0);
+    await selectTab('pollution');
+    assert.match(await evaluate('document.querySelector("#profile-panel-pollution").textContent'), /0 currently verified community reports/);
+    results.push('Opening a different resort resets Overview; classification retains operator limitations, missing fish stays Not Assessed, and Pollution contains only verified counts and unknown science.');
     await closeProfile();
     await click('#reset-map');
     results.push('390px mobile: categories, accent-insensitive locality search, resort/source distinction and photo placeholder pass without overflow.');
-    results.push('390px mobile: filters-first layout, full-screen dialog, selection and reset work without horizontal overflow.');
+    results.push('320px/390px portrait and 640px landscape: compact viewport-bounded dialog, horizontally scrolling tabs, selection and reset without horizontal overflow.');
     await navigate('/reports/create');
     await waitFor(() => evaluate('!!document.querySelector("select[name=water_body_id]")'), 'Public reporting form failed to load with the expanded catalogue.');
     assert.equal(await evaluate('[...document.querySelectorAll("select[name=water_body_id] option")].filter(option => option.value).length'), 28);

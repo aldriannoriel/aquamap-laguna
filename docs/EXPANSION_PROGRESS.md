@@ -1,5 +1,22 @@
 # GIS expansion recovery checkpoint
 
+## Latest UI checkpoint: 2026-10-18
+
+Baseline: `cd14ba2` on `main`. Compact tabbed profile implementation and verification are complete. The resulting local commit is identified by `git log -1 --oneline`; no push.
+
+- Desktop width: `clamp(22rem, map width / 2, 38rem)` (352-608 px with the default font), centered over the map and clamped within 16 px viewport margins. Maximum height: 640 px or viewport minus 32 px. Measured at 1440 px desktop: 512 px profile over a 1024 px map.
+- Mobile/tablet below 1024 px: viewport width minus 16 px, with 8 px margins; height at most 640 px or viewport minus 16 px. Only panel content scrolls vertically; the segmented tabs scroll horizontally when necessary. The title/close control and tab bar stay visible.
+- Tabs: Overview, Water Classification, Fish & Habitat, Pollution, Research & Sources. Each opening resets Overview. Switching tabs changes neither the selected water body nor the document; all content is preloaded from existing safe Blade output.
+- Reuses existing fish cards, image credits, metadata and sanitized references. Classification retains safety caveats. Pollution separates currently verified community counts from scientific assessment; no individual summaries, measurements, species, scores or reports are invented. References use individual cards, publisher/date fields, image permissions and geographic limitations.
+- Progressive enhancement preserves every section in the plain research profiles. The cloned modal adds linked tab/tabpanel IDs and hides inactive panels. Keyboard behavior follows the [W3C tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/): roving tab stop, wrapping Left/Right, Home/End and focusable panels. Native modal focus, close/Escape and focus return are preserved.
+- Changed implementation: map index/profile Blade, map JavaScript and CSS. Tests extend `WaterBodyCardTest` and the existing local Edge runner. No schema, seeders, catalogue, coordinates, research records, photographs, dependencies or citizen/admin handlers changed. No database migrations or imports were run.
+- Final full suite passed: **171 / 1,672 assertions**; focused map/catalogue tests passed: 35 / 570. Production build, Pint, JavaScript syntax and Git whitespace checks passed. Tests run serially to avoid overlapping compiled-Blade writes on Windows.
+- Final Edge run passed with zero JavaScript exceptions: all 28 profiles, five tabs, accessible names/relationships, wrapping arrow/Home/End navigation, content-only wheel/scroll behavior, focus/Escape/return, stable selection/document, image credits/loading, map interactions and reporting GET. Resizing passed at 1024/1440/1920 px desktop and 320/390 px portrait plus 640 px landscape. Opening a different resort reset Overview and retained operator/unknown-fish/scientific limitations. Real domain records, users, audits, migration history and shared database/file cache remained unchanged; no reports were submitted.
+- Final code-reviewer review found no remaining actionable defects in the changed scope after tracing progressive enhancement, cloned IDs/ARIA relationships, focus/state transitions, resizing/overflow, safe escaped sources, privacy and existing integrations. No functional issue remains known; absent measurement evidence and prior research gaps remain explicit.
+- Browser artifacts: ignored `storage/app/tabbed-profile-browser/`; earlier recovery/research artifacts remain preserved. The supplied reference screenshots were not attached in this chat, so visual choices follow the written brief and existing AquaMap palette. Physical-device and actual screen-reader testing have not been performed.
+
+## Original recovery
+
 Recovered 2026-10-17. Baseline commit: `5c3d69e` (`main`). No reset, checkout, migration, import, commit or push was performed during initial inspection.
 
 ## Preserved work

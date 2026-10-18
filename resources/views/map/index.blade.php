@@ -77,12 +77,19 @@
             </details>
             <footer class="flex flex-wrap justify-between gap-3 pt-6 text-xs leading-5 text-muted"><p>AquaMap Laguna. Know the place. Respect the water.</p><p>Geography is a reference, not a safety assessment.</p></footer>
         </main>
-        <dialog id="water-detail-dialog" class="water-detail-dialog text-ink" aria-label="Water body information card">
-            <div class="flex shrink-0 items-center justify-between gap-4 border-b border-line bg-white px-5 py-3">
-                <p class="text-sm font-semibold text-estuary">Water body profile</p>
+        <dialog id="water-detail-dialog" class="water-detail-dialog text-ink" aria-labelledby="selected-lake-heading">
+            <div class="flex shrink-0 items-center justify-between gap-3 border-b border-line bg-white px-4 py-3">
+                <h2 id="selected-lake-heading" class="min-w-0 text-base font-semibold text-estuary">Water body profile</h2>
                 <button id="close-water-detail" type="button" class="secondary-button" autofocus>Close profile</button>
             </div>
-            <div id="lake-information" class="min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-7">
+            <div class="shrink-0 border-b border-line px-3 py-2">
+                <div id="profile-tabs" class="profile-tabs" role="tablist" aria-label="Water body profile sections">
+                    @foreach (['overview' => 'Overview', 'classification' => 'Water Classification', 'fish' => 'Fish & Habitat', 'pollution' => 'Pollution', 'research' => 'Research & Sources'] as $tab => $label)
+                        <button id="profile-tab-{{ $tab }}" type="button" role="tab" data-profile-tab="{{ $tab }}" aria-controls="profile-panel-{{ $tab }}" aria-selected="{{ $tab === 'overview' ? 'true' : 'false' }}" tabindex="{{ $tab === 'overview' ? '0' : '-1' }}">{{ $label }}</button>
+                    @endforeach
+                </div>
+            </div>
+            <div id="lake-information" class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain p-4">
                 <div id="selected-lake" hidden></div>
             </div>
         </dialog>

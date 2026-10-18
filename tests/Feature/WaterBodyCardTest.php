@@ -64,6 +64,41 @@ class WaterBodyCardTest extends TestCase
         $this->assertSame(1, $xpath->query('//li[@data-water-row="'.$lake->id.'"][@hidden]')->length);
     }
 
+    public function test_profile_sections_keep_classification_fish_reports_and_scientific_evidence_distinct(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $this->seed(ExplorerSeeder::class);
+        $lake = WaterBody::where('name', 'Sampaloc Lake')->sole();
+
+        $response = $this->get(route('map.index'))->assertOk();
+
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        $document->loadHTML($response->getContent());
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        $xpath = new DOMXPath($document);
+        $root = '//article[@id="profile-'.$lake->id.'"]';
+        foreach ([
+            'overview' => ['Sampaloc Lake', 'San Pablo City', 'Judgefloro'],
+            'classification' => ['freshwater', 'drinking-water safety'],
+            'fish' => ['Nile tilapia', 'Oreochromis niloticus', 'July-September 2017', 'Insufficient data'],
+            'pollution' => ['Community Pollution Reports', '0 currently verified community reports.', 'Scientific Water Quality Assessment', 'Not Assessed', 'No published measurement values'],
+            'research' => ['Research & sources', 'OpenStreetMap contributors', 'Geographic reference and limitations', 'Image attribution', 'Judgefloro'],
+        ] as $section => $expectedText) {
+            $panels = $xpath->query($root.'//section[@data-profile-section="'.$section.'"]');
+            $this->assertSame(1, $panels->length);
+            $this->assertFalse($panels->item(0)->hasAttribute('hidden'), 'Non-JavaScript research profiles retain every section.');
+            foreach ($expectedText as $text) {
+                $this->assertStringContainsString($text, $panels->item(0)->textContent);
+            }
+        }
+        $this->assertSame(5, $xpath->query('//div[@id="profile-tabs"]/button[@role="tab"]')->length);
+        $this->assertSame(1, $xpath->query('//button[@data-profile-tab="overview"][@aria-selected="true"][@tabindex="0"]')->length);
+        $this->assertGreaterThan(0, $xpath->query($root.'//section[@data-profile-section="research"]//article[@data-research-card]')->length);
+        $this->assertSame(2, $xpath->query($root.'//section[@data-profile-section="pollution"]/section')->length);
+    }
+
     public function test_new_geometries_preserve_island_holes_and_existing_lake_coordinates(): void
     {
         $this->seed(DatabaseSeeder::class);

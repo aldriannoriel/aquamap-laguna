@@ -12,6 +12,7 @@ if (mapElement) {
     const selected = document.getElementById('selected-lake');
     const dialog = document.getElementById('water-detail-dialog');
     const information = document.getElementById('lake-information');
+    const profileTabs = [...dialog.querySelectorAll('[data-profile-tab]')];
     const features = new Map();
     const markers = new Map();
     let category = 'all';
@@ -20,10 +21,33 @@ if (mapElement) {
     const matchesSearch = (lake) => normalize([lake.name, lake.municipality, ...lake.aliases].join(' ')).includes(normalize(search.value.trim()));
     const visible = () => lakes.filter((lake) => lake.geography && matchesSearch(lake) && (category === 'all' || lake.category === category));
 
+    function positionDialog() {
+        if (!dialog.open) return;
+        const bounds = mapElement.getBoundingClientRect();
+        dialog.style.setProperty('--profile-map-half', bounds.width / 2 + 'px');
+        const frame = dialog.getBoundingClientRect();
+        dialog.style.setProperty('--profile-left', Math.max(16, Math.min(bounds.left + (bounds.width - frame.width) / 2, document.documentElement.clientWidth - frame.width - 16)) + 'px');
+        dialog.style.setProperty('--profile-top', Math.max(16, Math.min(bounds.top + (bounds.height - frame.height) / 2, window.innerHeight - frame.height - 16)) + 'px');
+    }
+
+    function activateProfileTab(key, moveFocus = false) {
+        profileTabs.forEach((tab) => {
+            const active = tab.dataset.profileTab === key;
+            tab.setAttribute('aria-selected', String(active));
+            tab.tabIndex = active ? 0 : -1;
+            if (active && moveFocus) {
+                tab.focus({ preventScroll: true });
+                tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+            }
+        });
+        selected.querySelectorAll('[data-profile-section]').forEach((panel) => { panel.hidden = panel.dataset.profileSection !== key; });
+        information.scrollTop = 0;
+    }
+
     function clearSelection() {
         if (dialog.open) dialog.close();
+        document.documentElement.classList.remove('profile-open');
         selected.hidden = true;
-        dialog.removeAttribute('aria-labelledby');
         buttons.forEach((button) => {
             button.setAttribute('aria-pressed', 'false');
             button.querySelector('.selection-label').textContent = 'View details';
@@ -40,10 +64,21 @@ if (mapElement) {
         const profile = source.cloneNode(true);
         profile.removeAttribute('id');
         profile.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
-        profile.querySelector('h2').id = 'selected-lake-heading';
-        dialog.setAttribute('aria-labelledby', 'selected-lake-heading');
+        profile.querySelector('h2').remove();
+        document.getElementById('selected-lake-heading').textContent = lake.name;
+        profile.querySelectorAll('[data-profile-section]').forEach((panel) => {
+            const key = panel.dataset.profileSection;
+            panel.id = 'profile-panel-' + key;
+            panel.setAttribute('role', 'tabpanel');
+            panel.removeAttribute('aria-label');
+            panel.setAttribute('aria-labelledby', 'profile-tab-' + key);
+            panel.tabIndex = 0;
+            panel.classList.remove('mt-5');
+        });
         selected.replaceChildren(profile);
         selected.hidden = false;
+        activateProfileTab('overview');
+        document.getElementById('profile-tabs').scrollLeft = 0;
         buttons.forEach((button) => {
             const active = Number(button.dataset.lakeId) === lake.id;
             button.setAttribute('aria-pressed', String(active));
@@ -64,6 +99,8 @@ if (mapElement) {
             status.textContent = lake.name + ' selected. Location awaiting verification; no marker is displayed.';
         }
         dialog.showModal();
+        document.documentElement.classList.add('profile-open');
+        positionDialog();
         information.scrollTop = 0;
     }
 
@@ -139,6 +176,18 @@ if (mapElement) {
     }
     document.getElementById('close-water-detail').addEventListener('click', () => dialog.close());
     dialog.addEventListener('close', () => { if (!dialog.open) clearSelection(); });
+    profileTabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activateProfileTab(tab.dataset.profileTab));
+        tab.addEventListener('keydown', (event) => {
+            const next = { ArrowRight: (index + 1) % profileTabs.length, ArrowLeft: (index + profileTabs.length - 1) % profileTabs.length, Home: 0, End: profileTabs.length - 1 }[event.key];
+            if (next === undefined) return;
+            event.preventDefault();
+            activateProfileTab(profileTabs[next].dataset.profileTab, true);
+        });
+    });
+    new ResizeObserver(positionDialog).observe(mapElement);
+    window.addEventListener('resize', positionDialog);
+    window.addEventListener('scroll', positionDialog, { passive: true });
     buttons.forEach((button) => button.addEventListener('click', () => selectLake(lakes.find((lake) => lake.id === Number(button.dataset.lakeId)))));
     filters.forEach((button) => button.addEventListener('click', () => { category = button.dataset.category; applyFilters(); }));
     search.addEventListener('input', applyFilters);
