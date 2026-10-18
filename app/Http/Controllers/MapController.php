@@ -66,10 +66,19 @@ class MapController extends Controller
             return [$lake->id => $fish];
         })->all();
 
-        $profiles = $records->mapWithKeys(fn (WaterBody $lake): array => [$lake->id => [
-            'references' => ExplorerProfile::references($lake->research_references),
-            'image' => ExplorerProfile::image($lake->image),
-        ]])->all();
+        $images = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR);
+        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images): array {
+            $supplement = $images[$lake->name] ?? null;
+            $image = $lake->image;
+            if ($image === null && is_array($supplement) && ($supplement['municipality'] ?? null) === $lake->municipality) {
+                $image = $supplement['image'] ?? null;
+            }
+
+            return [$lake->id => [
+                'references' => ExplorerProfile::references($lake->research_references),
+                'image' => ExplorerProfile::image($image),
+            ]];
+        })->all();
 
         return view('map.index', ['lakes' => $lakes, 'fishByLake' => $fishByLake, 'profiles' => $profiles, 'categories' => WaterBody::CATEGORIES]);
     }

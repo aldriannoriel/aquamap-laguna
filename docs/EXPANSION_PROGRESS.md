@@ -1,8 +1,19 @@
 # GIS expansion recovery checkpoint
 
+## Photo completion checkpoint: 2026-10-18
+
+Baseline: `dc8366a` on `main`; initial worktree clean. All 28 catalogue profiles inspected: eight photographs/credits exist and twenty profiles have placeholders. Existing images and metadata are preserved. Pre-research inventory and SHA-256 hashes are saved in ignored `storage/app/photo-completion/`.
+
+This checkpoint was saved before extended research. Research and implementation are now complete: **ten new photographs, eight originals preserved, ten placeholders**. Full source/author/license/capture-date and missing-image outcomes are in [IMAGE_INVENTORY.md](IMAGE_INVENTORY.md). No migration or database import was run. A read-only image supplement supplies only null images with exact canonical-name/locality matching, preserving existing database images and all scientific/geographic records. Existing modal, tabs and reporting remain intact.
+
+- Ten new progressive JPEGs use a maximum 960-pixel long edge and quality 82; resizing/re-encoding is disclosed. Hulugan and Bukal fit without cropping; originals retain their existing presentation. All eight original SHA-256 hashes and credit records are unchanged.
+- Commons API research stopped on a 429 rate limit; forbidden government pages were not bypassed. Official resort images without a reuse grant and ambiguous/unrelated subjects were excluded. No paid services or private report photos used.
+- Focused photo/profile tests pass: **7 tests / 404 assertions**. Final full isolated suite: **174 tests / 1,808 assertions**. Production build, JavaScript syntax, Pint and Git whitespace checks pass. Final code-reviewer review found no remaining actionable defects in the changed scope: supplement precedence/identity, path/URL/fit sanitization, escaped credits, image permissions, read-only data flow and existing integrations were reviewed. The local commit can be identified with `git log -1 --oneline`; never push automatically.
+- Edge verification passed for all 28 profiles at desktop and 390px mobile: 18 images load with exact attribution/source/license links, proper fitting and no overflow; ten placeholders. Existing five-tab, keyboard/accessibility-tree, focus/Escape, scroll, category/search, marker/geometry, fish and reporting-GET regressions pass, including desktop 1024/1440/1920px and mobile 320/390px portrait plus 640px landscape. No reports submitted; real records, migration history and shared cache remain unchanged. Browser artifacts are in ignored `storage/app/photo-completion/browser/`; source captures and optimization evidence remain alongside them.
+
 ## Latest UI checkpoint: 2026-10-18
 
-Baseline: `cd14ba2` on `main`. Compact tabbed profile implementation and verification are complete. The resulting local commit is identified by `git log -1 --oneline`; no push.
+Baseline: `cd14ba2` on `main`. Compact tabbed profile implementation and verification are complete in local commit `dc8366a`; no push.
 
 - Desktop width: `clamp(22rem, map width / 2, 38rem)` (352-608 px with the default font), centered over the map and clamped within 16 px viewport margins. Maximum height: 640 px or viewport minus 32 px. Measured at 1440 px desktop: 512 px profile over a 1024 px map.
 - Mobile/tablet below 1024 px: viewport width minus 16 px, with 8 px margins; height at most 640 px or viewport minus 16 px. Only panel content scrolls vertically; the segmented tabs scroll horizontally when necessary. The title/close control and tab bar stay visible.

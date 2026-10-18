@@ -31,7 +31,7 @@ class WaterBodyCardTest extends TestCase
         $this->assertDatabaseCount('water_bodies', 28);
         $this->assertCount(28, $response->viewData('lakes'));
         $images = array_filter(array_column($response->viewData('profiles'), 'image'));
-        $this->assertCount(8, $images);
+        $this->assertCount(18, $images);
         foreach ($images as $image) {
             $this->assertFileExists(public_path($image['path']));
             $this->assertSame('image/jpeg', getimagesize(public_path($image['path']))['mime']);
@@ -42,6 +42,75 @@ class WaterBodyCardTest extends TestCase
         }
         foreach (['Dolcezza Hotspring Resort', 'Tirta Spring Villa', 'Stellaluna Private Resort'] as $name) {
             $this->assertDatabaseMissing('water_bodies', ['name' => $name]);
+        }
+    }
+
+    public function test_photo_supplement_preserves_existing_metadata_and_never_changes_stored_records(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $this->seed(ExplorerSeeder::class);
+        $before = WaterBody::orderBy('id')->get()->toArray();
+        $response = $this->get(route('map.index'))->assertOk();
+        $profiles = $response->viewData('profiles');
+        $supplement = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertCount(10, $supplement);
+        $originals = 0;
+        foreach (WaterBody::all() as $lake) {
+            if ($lake->image !== null) {
+                $this->assertSame($lake->image, $profiles[$lake->id]['image']);
+                $originals++;
+            } elseif (isset($supplement[$lake->name])) {
+                $this->assertSame($supplement[$lake->name]['image'], $profiles[$lake->id]['image']);
+                $size = getimagesize(public_path($profiles[$lake->id]['image']['path']));
+                $this->assertLessThanOrEqual(960, max($size[0], $size[1]));
+                $this->assertLessThan(250000, filesize(public_path($profiles[$lake->id]['image']['path'])));
+            } else {
+                $this->assertNull($profiles[$lake->id]['image']);
+            }
+        }
+        $this->assertSame(8, $originals);
+        $this->assertSame($before, WaterBody::orderBy('id')->get()->toArray());
+    }
+
+    public function test_supplement_requires_exact_profile_identity_and_existing_image_takes_precedence(): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $this->seed(ExplorerSeeder::class);
+        $lake = WaterBody::where('name', 'Mohicap Lake')->sole();
+        $original = WaterBody::where('name', 'Sampaloc Lake')->sole()->image;
+        $lake->forceFill(['image' => $original])->save();
+        $this->assertSame($original, $this->get(route('map.index'))->viewData('profiles')[$lake->id]['image']);
+
+        $lake->forceFill(['image' => ['path' => '/images/water-bodies/missing-file.jpg']])->save();
+        $this->assertNull($this->get(route('map.index'))->viewData('profiles')[$lake->id]['image']);
+
+        $lake->forceFill(['image' => null, 'municipality' => 'Different locality'])->save();
+        $this->assertNull($this->get(route('map.index'))->viewData('profiles')[$lake->id]['image']);
+
+        $lake->update(['municipality' => 'San Pablo City', 'name' => 'Different lake']);
+        $this->assertNull($this->get(route('map.index'))->viewData('profiles')[$lake->id]['image']);
+    }
+
+    public function test_portrait_presentation_is_allowlisted_and_missing_assets_remain_placeholders(): void
+    {
+        $image = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR)['Hulugan Falls']['image'];
+        $this->assertSame('contain', ExplorerProfile::image($image)['fit']);
+        $this->assertArrayNotHasKey('fit', ExplorerProfile::image([...$image, 'fit' => 'arbitrary-css']));
+        $this->assertNull(ExplorerProfile::image([...$image, 'path' => '/images/water-bodies/nonexistent-photo.jpg']));
+
+        $this->seed(DatabaseSeeder::class);
+        $this->seed(ExplorerSeeder::class);
+        $response = $this->get(route('map.index'))->assertOk();
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        $document->loadHTML($response->getContent());
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        $xpath = new DOMXPath($document);
+        $this->assertSame(10, $xpath->query('//article[starts-with(@id,"profile-")]//div[@data-photo-placeholder]')->length);
+        foreach (['Hulugan Falls', 'Bukal Falls'] as $name) {
+            $lake = WaterBody::where('name', $name)->sole();
+            $this->assertStringContainsString('object-contain', $xpath->evaluate('string(//article[@id="profile-'.$lake->id.'"]//img/@class)'));
         }
     }
 

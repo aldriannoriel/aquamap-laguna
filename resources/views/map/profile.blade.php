@@ -3,8 +3,8 @@
 <p class="lake-detail-meta">{{ $lake['municipality'] }} / {{ $lake['site_type'] === 'resort' ? 'Spring-associated resort' : $categories[$lake['category']] }}</p>
 @if ($profile['image'])
     <figure class="mt-4">
-        <img src="{{ $profile['image']['path'] }}" alt="{{ $profile['image']['alt'] }}" loading="lazy" class="aspect-[16/7] w-full rounded-lg object-cover">
-        <figcaption class="mt-2 text-xs leading-5 text-muted">Image: {{ $profile['image']['author'] }}. {{ $profile['image']['license'] }}. Display may be cropped to fit. <a href="{{ $profile['image']['source_url'] }}" rel="noopener noreferrer" target="_blank" class="underline">Original</a> / <a href="{{ $profile['image']['license_url'] }}" rel="noopener noreferrer" target="_blank" class="underline">Permission</a>.</figcaption>
+        <img src="{{ $profile['image']['path'] }}" alt="{{ $profile['image']['alt'] }}" loading="lazy" @class(['aspect-[16/7] w-full rounded-lg', 'object-contain bg-mist' => ($profile['image']['fit'] ?? 'cover') === 'contain', 'object-cover' => ($profile['image']['fit'] ?? 'cover') !== 'contain'])>
+        <figcaption class="mt-2 text-xs leading-5 text-muted">Image: {{ $profile['image']['author'] }}. {{ $profile['image']['license'] }}. {{ ($profile['image']['fit'] ?? 'cover') === 'contain' ? 'Full image fitted without cropping.' : 'Display may be cropped to fit.' }} <a href="{{ $profile['image']['source_url'] }}" rel="noopener noreferrer" target="_blank" class="underline">Original</a> / <a href="{{ $profile['image']['license_url'] }}" rel="noopener noreferrer" target="_blank" class="underline">Permission</a>.</figcaption>
     </figure>
 @else
     <div data-photo-placeholder class="mt-4 flex min-h-24 items-center justify-center rounded-lg border border-dashed border-line bg-mist p-5 text-center text-xs text-muted">No authorized photograph available.</div>

@@ -43,7 +43,9 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'tabbed-profile-browser';
+const artifactDirectory = 'photo-completion/browser';
+const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
+const imageCatalogue = ['explorer.json', 'missing-water-bodies.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
@@ -192,6 +194,34 @@ try {
         }
         return layout;
     }
+    async function verifyPhoto(lake, viewport) {
+        await assertTabState('overview');
+        await assertDialogBounds(viewport === 'desktop');
+        const original = imageCatalogue.find(item => item.name === lake.name && item.municipality === lake.municipality);
+        assert(original, `Missing catalogue identity for ${lake.name}`);
+        const expected = original.image ?? imageSupplement[lake.name]?.image;
+        assert.equal(await evaluate('!!document.querySelector("#selected-lake img")'), !!expected, `${lake.name}: image coverage mismatch`);
+        assert.equal(await evaluate('!!document.querySelector("#selected-lake [data-photo-placeholder]")'), !expected);
+        if (expected) {
+            await waitFor(() => evaluate('document.querySelector("#selected-lake img").complete && document.querySelector("#selected-lake img").naturalWidth > 0'), `${lake.name}: photograph did not load`);
+            const rendered = await evaluate(`(() => {
+                const img = document.querySelector('#selected-lake img');
+                const caption = document.querySelector('#selected-lake figcaption');
+                return {path:img.getAttribute('src'), alt:img.alt, fit:getComputedStyle(img).objectFit,
+                    width:img.getBoundingClientRect().width, content:document.getElementById('lake-information').clientWidth,
+                    caption:caption.textContent, links:[...caption.querySelectorAll('a')].map(link => link.href)};
+            })()`);
+            assert.equal(rendered.path, expected.path);
+            assert.equal(rendered.alt, expected.alt);
+            assert.equal(rendered.fit, expected.fit ?? 'cover');
+            assert(rendered.width > 0 && rendered.width <= rendered.content, `${lake.name}: image sizing overflow`);
+            assert(rendered.caption.includes(expected.author) && rendered.caption.includes(expected.license), `${lake.name}: missing attribution`);
+            assert.deepEqual(rendered.links, [expected.source_url, expected.license_url].map(url => new URL(url).href));
+        }
+        if (['Hulugan Falls', 'Bumbungan River', 'Al Fresco Springs Resort'].includes(lake.name)) {
+            await screenshot(`${viewport}-${lake.name.toLowerCase().replaceAll(' ', '-')}.png`);
+        }
+    }
     async function keypress(key, code, windowsVirtualKeyCode, modifiers = 0) {
         await send('Input.dispatchKeyEvent', { type: 'keyDown', key, code, windowsVirtualKeyCode, modifiers });
         await send('Input.dispatchKeyEvent', { type: 'keyUp', key, code, windowsVirtualKeyCode, modifiers });
@@ -288,16 +318,13 @@ try {
             }
             await selectTab('overview');
         }
-        const hasImage = await evaluate('!!document.querySelector("#selected-lake img")');
-        if (hasImage) {
-            await waitFor(() => evaluate('document.querySelector("#selected-lake img").complete && document.querySelector("#selected-lake img").naturalWidth > 0'), 'Profile photograph did not load.');
-            assert.match(await evaluate('document.querySelector("#selected-lake figcaption").textContent'), /Permission/);
-        }
+        await verifyPhoto(lake, 'desktop');
         await closeProfile();
         assert.equal(await evaluate('document.activeElement.dataset.lakeId'), String(lake.id), 'Closing must restore focus to the selected sidebar control.');
         await click('#reset-map');
     }
     results.push('All 28 sidebar profiles: modal heading, initial focus, close/focus restoration, description, sources and authorized image loading pass.');
+    results.push('Desktop: all 28 profiles match the image inventory; 18 local photographs load with exact authors, licenses, source links and responsive sizing; 10 explicit placeholders; both portraits use contain.');
     if (verifyFish) results.push('All three lakes show Nile tilapia, July-September 2017 sampling, historical aquaculture evidence, two references and insufficient_data compatibility.');
     await click('[data-category=lake]');
     await click('.lake-marker[title="Sampaloc Lake"]');
@@ -360,6 +387,15 @@ try {
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'Mobile horizontal overflow.');
     const layout = await evaluate('({map:document.getElementById("lake-map").getBoundingClientRect().y,sidebar:document.querySelector("aside").getBoundingClientRect().y})');
     assert(layout.sidebar < layout.map, 'Mobile search and category controls should precede the map.');
+    for (const lake of lakes) {
+        await click(`[data-lake-id="${lake.id}"]`);
+        assert.equal(await evaluate('document.querySelector("#selected-lake-heading").textContent'), lake.name);
+        await verifyPhoto(lake, 'mobile');
+        assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
+        await closeProfile();
+        await click('#reset-map');
+    }
+    results.push('390px mobile: all 28 profiles match the inventory, all 18 images load with exact attribution and responsive sizing, 10 placeholders remain, no horizontal overflow.');
     const mobileLake = lakes.find(lake => lake.name === "Pandin Lake");
     await click(`[data-lake-id="${mobileLake.id}"]`);
     assert.equal(await evaluate('document.querySelector("#selected-lake-heading")?.textContent'), mobileLake.name);

@@ -1,0 +1,114 @@
+{
+    "Mohicap Lake": {
+        "municipality": "San Pablo City",
+        "image": {
+            "path": "/images/water-bodies/mohicap.jpg",
+            "alt": "Mohicap Lake and its surrounding hills, photographed in 2019",
+            "author": "Johnpaulo5860",
+            "license": "CC BY 4.0; photographed 2019-07-21; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Mohicap_lake_environs.jpg",
+            "license_url": "https://creativecommons.org/licenses/by/4.0"
+        }
+    },
+    "Pagsanjan Falls": {
+        "municipality": "Cavinti",
+        "image": {
+            "path": "/images/water-bodies/pagsanjan-falls.jpg",
+            "alt": "Pagsanjan Falls and its plunge pool in Cavinti, photographed in 2008",
+            "author": "Andrew Martin",
+            "license": "CC BY 3.0; photographed 2008-02-18; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Pagsanjan_Falls,_Laguna,_Philippines_-_panoramio.jpg",
+            "license_url": "https://creativecommons.org/licenses/by/3.0"
+        }
+    },
+    "Hulugan Falls": {
+        "municipality": "Luisiana",
+        "image": {
+            "path": "/images/water-bodies/hulugan-falls.jpg",
+            "alt": "Full cascade of Hulugan Falls in Luisiana, photographed in 2023",
+            "author": "Michael Angelo Luna",
+            "license": "CC BY-SA 4.0; photographed 2023-08-31; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Hulugan_Falls.jpg",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "fit": "contain"
+        }
+    },
+    "Taytay Falls": {
+        "municipality": "Majayjay",
+        "image": {
+            "path": "/images/water-bodies/taytay-falls.jpg",
+            "alt": "Taytay Falls surrounded by forest in Majayjay, photographed in 2009",
+            "author": "mollyboy",
+            "license": "CC BY 2.0; photographed 2009-05-29; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Taytay_falls_Majayjay.jpg",
+            "license_url": "https://creativecommons.org/licenses/by/2.0"
+        }
+    },
+    "Bukal Falls": {
+        "municipality": "Majayjay / Liliw access area",
+        "image": {
+            "path": "/images/water-bodies/bukal-falls.jpg",
+            "alt": "Rocky watercourse at Bukal Falls, Majayjay, photographed in 2019",
+            "author": "Calbon69",
+            "license": "CC BY-SA 4.0; photographed 2019-10-06; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Bukal_falls_majayjay_laguna.jpg",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+            "fit": "contain"
+        }
+    },
+    "Lumot Lake": {
+        "municipality": "Cavinti",
+        "image": {
+            "path": "/images/water-bodies/lumot.jpg",
+            "alt": "Lumot Lake and boats beside its wooded shore in Cavinti, photographed in 2019",
+            "author": "Judgefloro",
+            "license": "CC0; photographed 2019-06-18; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:188Lumot,_Cavinti,_Laguna_11.jpg",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        }
+    },
+    "Balanac River": {
+        "municipality": "Pagsanjan",
+        "image": {
+            "path": "/images/water-bodies/balanac-river.jpg",
+            "alt": "Balanac River by Balanac Bridge in Pagsanjan, photographed in 2013",
+            "author": "Ramon FVelasquez",
+            "license": "CC BY-SA 3.0; photographed 2013-08-29; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Pagsanjan,LagunaRiverjf4388_05.JPG",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+        }
+    },
+    "Tunasan River": {
+        "municipality": "San Pedro / Muntinlupa boundary area",
+        "image": {
+            "path": "/images/water-bodies/tunasan-river.jpg",
+            "alt": "Historical view of the Tunasan River channel in 2013; not a current condition assessment",
+            "author": "Ramon FVelasquez",
+            "license": "CC BY-SA 3.0; photographed 2013-07-27; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:TunasanRiverjf2203_01.JPG",
+            "license_url": "https://creativecommons.org/licenses/by-sa/3.0"
+        }
+    },
+    "Bumbungan River": {
+        "municipality": "Pagsanjan",
+        "image": {
+            "path": "/images/water-bodies/bumbungan-river.jpg",
+            "alt": "Bumbungan (Pagsanjan) River and its forested banks, photographed in 2021",
+            "author": "Sheila mae Pelausa",
+            "license": "CC BY-SA 4.0; photographed 2021-05-26; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:Breathtaking_view_of_Pagsanjan_River.jpg",
+            "license_url": "https://creativecommons.org/licenses/by-sa/4.0"
+        }
+    },
+    "Santa Cruz River": {
+        "municipality": "Santa Cruz",
+        "image": {
+            "path": "/images/water-bodies/santa-cruz-river.jpg",
+            "alt": "Santa Cruz River beside Pagsawitan Bridge in Santa Cruz, Laguna, photographed in 2019",
+            "author": "Judgefloro",
+            "license": "CC0; photographed 2019-06-05; resized/re-encoded JPEG",
+            "source_url": "https://commons.wikimedia.org/wiki/File:159Santa_Cruz,_Laguna_National_Highway_35.jpg",
+            "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en"
+        }
+    }
+}

@@ -74,6 +74,9 @@ class ExplorerProfile
         return ['latitude' => $point[1], 'longitude' => $point[0]];
     }
 
+    /**
+     * @return array{path: string, alt: string, author: string, license: string, source_url: string, license_url: string, fit?: 'contain'|'cover'}|null
+     */
     public static function image(mixed $value): ?array
     {
         if (! is_array($value) || ! is_string($value['path'] ?? null)
@@ -88,7 +91,12 @@ class ExplorerProfile
             }
         }
 
-        return array_intersect_key($value, array_flip(['path', 'alt', 'author', 'license', 'source_url', 'license_url']));
+        $image = array_intersect_key($value, array_flip(['path', 'alt', 'author', 'license', 'source_url', 'license_url']));
+        if (in_array($value['fit'] ?? null, ['contain', 'cover'], true)) {
+            $image['fit'] = $value['fit'];
+        }
+
+        return $image;
     }
 
     private static function point(mixed $point): bool

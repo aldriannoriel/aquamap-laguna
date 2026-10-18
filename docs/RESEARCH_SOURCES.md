@@ -40,7 +40,9 @@ No operator health/therapeutic claims, temperatures, measurements, fish presence
 
 ### Photographs and environmental limits
 
-Eight downloaded JPEGs are preserved under `public/images/water-bodies/`. Complete credits, source-page and permission links are in the catalogue and displayed with each image. Saved Commons API metadata in `storage/app/inventory-photos.json` and `inventory-photo-candidates.json` corroborates the permissions below. Display may crop images; thumbnails are identified. Missing images retain a placeholder. Resort-site photographs and private report evidence are not reused.
+The original eight downloaded JPEGs are preserved under `public/images/water-bodies/`. Complete credits, source-page and permission links are in the catalogue and displayed with each image. Saved Commons API metadata in `storage/app/inventory-photos.json` and `inventory-photo-candidates.json` corroborates the permissions below. Display may crop images; thumbnails are identified. Resort-site photographs and private report evidence are not reused.
+
+Photo completion on 2026-10-18 added ten reusable Commons photographs through the read-only `database/data/explorer-images.json` supplement, preserving these eight original files/credits and every geographic/scientific record. There are now 18 images and ten placeholders. [IMAGE_INVENTORY.md](IMAGE_INVENTORY.md) records all sources, authors, linked licenses, capture dates, subject checks, optimization and missing-permission/identity outcomes. Portrait Hulugan/Bukal images are fitted without cropping; historical photographs do not establish current conditions.
 
 | Profile / filename | Source and author | Reuse permission |
 | --- | --- | --- |
