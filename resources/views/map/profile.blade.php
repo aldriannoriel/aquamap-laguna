@@ -13,7 +13,6 @@
 <p class="mt-3 text-xs leading-5 text-muted">Community-reported observations, not scientific measurements. Unresolved means verified and not marked resolved by an administrator; pending reports are excluded.</p>
 <a href="{{ route('reports.create') }}" class="lake-detail-source">Report a visible environmental concern</a>
 <p class="lake-detail-description">{{ $lake['description'] ?? 'No description is available for this water body.' }}</p>
-@if ($lake['aliases'])<p class="mt-2 text-xs text-muted">Also known as {{ implode(', ', $lake['aliases']) }}.</p>@endif
 <p class="mt-5 text-xs font-semibold text-muted">Reference photograph · does not show current environmental conditions</p>
 @if ($profile['image'])
     <figure class="mt-4">
@@ -71,6 +70,7 @@
 </section>
 <section data-profile-section="research" class="mt-5 space-y-3" aria-label="Research and geographic references">
     <h3 class="font-semibold text-estuary">Research &amp; sources</h3>
+    @if ($lake['aliases'])<p data-alternative-names class="text-xs text-muted">Alternative names: {{ implode(', ', $lake['aliases']) }}.</p>@endif
     @if ($lake['official_url'])<a href="{{ $lake['official_url'] }}" class="lake-detail-source" rel="noopener noreferrer" target="_blank">Official reference</a>@endif
     @forelse ($profile['references'] as $reference)
         <article data-research-card class="rounded-lg border border-line bg-white p-4 text-xs leading-5">

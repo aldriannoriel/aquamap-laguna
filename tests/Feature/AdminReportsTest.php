@@ -6,6 +6,7 @@ use App\Models\PollutionReport;
 use App\Models\ReportReview;
 use App\Models\User;
 use App\Models\WaterBody;
+use Database\Seeders\ExplorerSeeder;
 use Database\Seeders\WaterBodySeeder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -61,6 +62,29 @@ class AdminReportsTest extends TestCase
         $this->assertSame('resolved', $report->fresh()->status);
         $this->assertSame(['verified', 'resolved'], $report->reviews()->pluck('new_status')->all());
         $this->assertDatabaseCount('pollution_reports', 1);
+    }
+
+    #[TestWith(['Pagsanjan Falls'])]
+    #[TestWith(['Taytay Falls'])]
+    public function test_waterfall_report_search_filters_and_details_use_the_preserved_primary_name(string $name): void
+    {
+        $this->seed(WaterBodySeeder::class);
+        $this->seed(ExplorerSeeder::class);
+        $lake = WaterBody::where('name', $name)->sole();
+        $report = $this->report(['water_body_id' => $lake->id]);
+        $before = $lake->toArray();
+        $this->actingAs($this->admin());
+
+        $this->get(route('admin.reports.index', ['q' => $name]))->assertOk()
+            ->assertViewHas('reports', fn ($reports) => $reports->pluck('id')->all() === [$report->id])
+            ->assertSee('Report #'.$report->id.' &middot; '.$name, false)
+            ->assertSee('>'.$name.'</option>', false);
+        $this->get(route('admin.reports.show', $report))->assertOk()->assertSee('<h2 class="text-xl font-semibold">'.$name.'</h2>', false);
+        $this->get(route('admin.dashboard'))->assertOk()->assertViewHas('counts.total', 1);
+
+        $this->assertSame($before, $lake->fresh()->toArray());
+        $this->assertSame($lake->id, $report->fresh()->water_body_id);
+        $this->assertDatabaseCount('water_bodies', 30);
     }
 
     public function test_dashboard_counts_each_status_and_includes_unknown_legacy_rows_only_in_total(): void

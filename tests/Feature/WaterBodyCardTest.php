@@ -8,6 +8,7 @@ use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\ExplorerSeeder;
 use DOMDocument;
 use DOMXPath;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 class WaterBodyCardTest extends TestCase
@@ -186,6 +187,46 @@ class WaterBodyCardTest extends TestCase
         }
         $this->assertSame(26, $xpath->query('//article[starts-with(@id,"profile-")]//figure/img')->length);
         $this->assertSame(2, $xpath->query('//article[starts-with(@id,"profile-")]//div[@data-photo-placeholder]')->length);
+    }
+
+    #[TestWith(['Pagsanjan Falls', ['Cavinti Falls', 'Magdapio Falls']])]
+    #[TestWith(['Taytay Falls', ['Majayjay Falls']])]
+    public function test_waterfall_primary_names_remain_distinct_from_research_aliases(string $name, array $aliases): void
+    {
+        $this->seed(DatabaseSeeder::class);
+        $this->seed(ExplorerSeeder::class);
+        $before = WaterBody::orderBy('id')->get()->toArray();
+        $lake = WaterBody::where('name', $name)->sole();
+
+        $response = $this->get(route('map.index'))->assertOk();
+
+        $record = collect($response->viewData('lakes'))->sole('id', $lake->id);
+        $this->assertSame($name, $record['name']);
+        $this->assertSame($aliases, $record['aliases']);
+        $document = new DOMDocument;
+        $previous = libxml_use_internal_errors(true);
+        $document->loadHTML($response->getContent());
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        $xpath = new DOMXPath($document);
+        $root = '//article[@id="profile-'.$lake->id.'"]';
+        $this->assertSame($name, trim($xpath->evaluate('string('.$root.'//h2)')));
+        $researchNames = $xpath->evaluate('string('.$root.'//section[@data-profile-section="research"]//*[@data-alternative-names])');
+        foreach ($aliases as $alias) {
+            $this->assertStringContainsString($alias, $researchNames);
+            $this->assertStringNotContainsString($alias, $xpath->evaluate('string('.$root.'//section[@data-profile-section="overview"])'));
+            $this->assertDatabaseMissing('water_bodies', ['name' => $alias]);
+        }
+
+        $form = $this->get(route('reports.create'))->assertOk();
+        libxml_use_internal_errors(true);
+        $document->loadHTML($form->getContent());
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        $xpath = new DOMXPath($document);
+        $this->assertSame($name, trim($xpath->evaluate('string(//select[@id="water_body_id"]//option[@value="'.$lake->id.'"])')));
+        $this->assertSame($before, WaterBody::orderBy('id')->get()->toArray());
+        $this->assertDatabaseCount('water_bodies', 30);
     }
 
     public function test_new_geometries_preserve_island_holes_and_existing_lake_coordinates(): void

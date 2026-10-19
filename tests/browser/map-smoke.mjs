@@ -43,7 +43,7 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'waterfall-update/browser';
+const artifactDirectory = 'naming-check/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json', 'waterfall-expansion.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const imageReplacements = JSON.parse(readFileSync(path.join(root, 'database/data/waterfall-photos.json'), 'utf8'));
@@ -384,9 +384,29 @@ try {
         assert.equal(await evaluate('[...document.querySelectorAll("[data-water-row]")].filter(row => !row.hidden).length'), expected);
         await click('#reset-map');
     }
-    await setSearch('cavinti falls');
-    assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 1);
-    assert.equal(await evaluate('document.querySelector("[data-category=waterfall] [data-category-count]").textContent'), '1');
+    async function verifyWaterfallNames(viewport) {
+        for (const [name, alias] of [['Pagsanjan Falls', 'Cavinti Falls'], ['Taytay Falls', 'Majayjay Falls']]) {
+            await click('#reset-map');
+            await click('[data-category=waterfall]');
+            await setSearch(alias);
+            assert.deepEqual(await evaluate('[...document.querySelectorAll(".lake-marker")].map(marker => marker.title)'), [name]);
+            assert.equal(await evaluate('document.querySelector("[data-category=waterfall] [data-category-count]").textContent'), '1');
+            const lake = lakes.find(item => item.name === name);
+            const card = await evaluate(`document.querySelector('[data-lake-id="${lake.id}"]').textContent`);
+            assert(card.includes(name));
+            assert(!card.includes(alias));
+            await click(`.lake-marker[title="${name}"]`);
+            assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), name);
+            assert.equal(await evaluate(`document.querySelector('#selected-lake [data-profile-section="overview"]').textContent.includes(${JSON.stringify(alias)})`), false);
+            await selectTab('research');
+            assert.equal(await evaluate(`document.querySelector('#selected-lake [data-profile-section="research"] [data-alternative-names]').textContent.includes(${JSON.stringify(alias)})`), true);
+            await screenshot(`${viewport}-${name.toLowerCase().replaceAll(' ', '-')}-research.png`);
+            await closeProfile();
+        }
+        await click('#reset-map');
+        results.push(`${viewport}: Pagsanjan Falls and Taytay Falls keep canonical marker/card/dialog names; alternate-name searches find the same record and aliases appear in Research & Sources.`);
+    }
+    await verifyWaterfallNames('desktop');
     await setSearch('no matching place fixture');
     assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 0);
     assert.equal(await evaluate('document.getElementById("filter-empty").hidden'), false);
@@ -412,6 +432,7 @@ try {
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'Mobile horizontal overflow.');
     const layout = await evaluate('({map:document.getElementById("lake-map").getBoundingClientRect().y,sidebar:document.querySelector("aside").getBoundingClientRect().y})');
     assert(layout.sidebar < layout.map, 'Mobile search and category controls should precede the map.');
+    await verifyWaterfallNames('mobile');
     for (const lake of lakes) {
         await click(`[data-lake-id="${lake.id}"]`);
         assert.equal(await evaluate('document.querySelector("#selected-lake-heading").textContent'), lake.name);
@@ -478,6 +499,13 @@ try {
         assert.equal(await evaluate('[...document.querySelectorAll("select[name=water_body_id] option")].filter(option => option.value).length'), expected);
         assert.equal(await evaluate(`Array.from(document.querySelectorAll('#water_body_id option[data-category]')).every(option => option.dataset.category === ${JSON.stringify(category)})`), true);
     }
+    await evaluate("(() => { const category = document.getElementById('water_body_category'); category.value = 'waterfall'; category.dispatchEvent(new Event('change', { bubbles: true })); })()");
+    for (const [name, alias] of [['Pagsanjan Falls', 'Cavinti Falls'], ['Taytay Falls', 'Majayjay Falls']]) {
+        const lake = lakes.find(item => item.name === name);
+        assert.equal(await evaluate(`document.querySelector('#water_body_id option[value="${lake.id}"]').textContent.trim()`), name);
+        assert.equal(await evaluate(`[...document.querySelectorAll('#water_body_id option')].some(option => option.textContent.includes(${JSON.stringify(alias)}))`), false);
+    }
+    results.push('Report a Concern waterfall options use Pagsanjan Falls and Taytay Falls with their existing IDs and no alternative-name duplicates.');
     await screenshot('mobile-report-categories.png', true);
     const permission = await fetch(`${base}/images/water-bodies/document-photo-permission.html`);
     assert.equal(permission.status, 200);
