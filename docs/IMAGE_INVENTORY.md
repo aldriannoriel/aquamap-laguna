@@ -1,5 +1,29 @@
 # Water body image inventory
 
+## 2026-10-20: supplied Google document photographs
+
+The [source document](https://docs.google.com/document/d/1VgCM4bkVq816ffaz2uT_k31JQ_yfdOCLvnCl5veOmc4/edit) was downloaded through its public DOCX export and all ten embedded photographs were inspected in heading/paragraph order. Nine match the requested waterfall inventory; the Hidden Falls photograph is outside that inventory and is not published. Balisong Falls has a heading but no embedded image. Hulugan, Buruwisan, Taytay and Pagsanjan Falls have no replacement in the document and retain their existing photographs. Existing canonical names are preserved.
+
+Permission was not inferred from Google Docs, Pinterest or third-party publication. When asked about ownership/permission covering local web display, resizing and attribution, the project owner confirmed **all supplied photographs**. This is a project-owner declaration, not independently audited photographer paperwork or a Creative Commons license. No unrestricted redistribution license is asserted. Known source credits and visible watermarks are retained. Unidentified photographers are explicitly marked, not invented. Further creator identification remains open for the Bunga, Lanzones and Ambon-Ambon source records. See the [public permission record](../public/images/water-bodies/document-photo-permission.html).
+
+Nine optimized copies use JPEG quality 75, maximum 960-pixel edge, no enlargement and contain display. The old Bunga/Bukal files and credits remain intact. A read-only, exact-name/municipality waterfall replacement manifest takes precedence for these nine associations only; stored image metadata is unchanged. Existing image/catalogue files are preserved. Full document/source/optimized SHA-256 provenance is in `database/data/waterfall-photos.json`; downloaded source artifacts and the inspection sheet remain in ignored `storage/app/waterfall-update/`.
+
+| Waterfall | Document image | Local replacement | Credit | Linked source | Size |
+| --- | --- | --- | --- | --- | --- |
+| Bunga Twin Falls | image3.jpg | `/images/water-bodies/document-bunga-twin-falls.jpg` | Photographer unidentified (Pinterest source supplied by project owner) | [Source](https://www.pinterest.com/pin/519813981970870126/) | 512 x 384; 59878 bytes |
+| Buntot Palos Falls | image4.jpg | `/images/water-bodies/document-buntot-palos-falls.jpg` | Dharzie / A Traveller from Romblon (source credit) | [Source](https://atravellerfromromblon.wordpress.com/2025/08/06/mt-buntot-palos-and-hidden-falls-lagunas-finest-gem/) | 638 x 480; 77260 bytes |
+| Lanzones Falls | image9.jpg | `/images/water-bodies/document-lanzones-falls.jpg` | AllTrails contributor (photographer unidentified in supplied document) | [Source](https://www.alltrails.com/poi/philippines/laguna/famy/lanzonez-falls) | 556 x 359; 52521 bytes |
+| Talay Falls | image5.jpg | `/images/water-bodies/document-talay-falls.jpg` | Neil Alvin Nicerio / The Backpack Adventures | [Source](https://www.thebackpackadventures.com/2021/04/talay-falls-laguna.html) | 547 x 365; 45657 bytes |
+| Aliw Falls | image10.jpg | `/images/water-bodies/document-aliw-falls.jpg` | Leo Castillo / The Shoestring Diaries | [Source](https://shoestringdiary.wordpress.com/2025/03/07/aliw-falls-luisiana-third-times-the-charm/) | 960 x 640; 90890 bytes |
+| Bukal Falls | image8.jpg | `/images/water-bodies/document-bukal-falls.jpg` | Hart / Tsetseflying (source credit) | [Source](https://tsetseflying.wordpress.com/2016/01/20/bukal-falls-the-enchanted-spring-waterfalls-of-luzon/) | 736 x 490; 79926 bytes |
+| Dampalit Falls | image7.jpg | `/images/water-bodies/document-dampalit-falls.jpg` | Leo Castillo / The Shoestring Diaries | [Source](https://shoestringdiary.wordpress.com/2017/10/28/los-banos-dampalit-falls-and-dining-places/) | 728 x 420; 79909 bytes |
+| Balon-Balon Falls | image6.jpg | `/images/water-bodies/document-balon-balon-falls.jpg` | Leo Castillo / The Shoestring Diaries | [Source](https://shoestringdiary.wordpress.com/2024/08/18/the-tri-falls-of-tibatib-part-1-balon-balon-falls/) | 640 x 370; 50538 bytes |
+| Ambon-Ambon Falls | image2.jpg | `/images/water-bodies/document-ambon-ambon-falls.jpg` | Panguil River Eco Park (source publisher; photographer unidentified) | [Source](https://www.facebook.com/panguilriver/posts/ambon-ambon-falls-panguil-river-eco-park-natividad-pangil-laguna-philippines-dis/1241196598042819/) | 715 x 481; 52181 bytes |
+
+Total optimized bytes: **588760**. Two existing waterfall photographs are replaced (Bunga Twin and Bukal), five former waterfall placeholders are filled (Buntot Palos, Lanzones, Talay, Aliw, Dampalit), and two newly added waterfalls receive photographs (Balon-Balon, Ambon-Ambon). Across the 28 public profiles, 26 photographs and two explicit placeholders remain (Palakpakin Lake and San Pedro River). Two spring-associated records remain outside the public map. All twenty prior photo assets remain unchanged; there are 29 local JPEG assets including preserved alternatives.
+
+The earlier inventory below records the preceding catalogue/permission history.
+
 Reviewed 2026-10-18 against baseline `f97f2f8`: **28 profiles, 18 existing images preserved, two further photographs added, eight placeholders**. Only licenses permitting commercial reuse are accepted for this continuation; NonCommercial candidates are excluded. No database import, migration, coordinate or scientific-data change. Existing metadata takes precedence; `database/data/explorer-images.json` supplies only previously empty images, matching exact canonical name and municipality.
 
 ## Original eight preserved

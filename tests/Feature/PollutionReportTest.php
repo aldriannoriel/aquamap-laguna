@@ -39,6 +39,30 @@ class PollutionReportTest extends TestCase
         $this->get(route('map.index'))->assertOk()->assertSee(route('reports.create'));
     }
 
+    #[TestWith(['plastic_waste'])]
+    #[TestWith(['floating_garbage'])]
+    #[TestWith(['illegal_dumping'])]
+    #[TestWith(['solid_waste'])]
+    #[TestWith(['wastewater'])]
+    #[TestWith(['oil_chemical'])]
+    #[TestWith(['fish_death'])]
+    #[TestWith(['water_change'])]
+    #[TestWith(['other'])]
+    public function test_visible_and_existing_categories_are_saved_unchanged_as_pending(string $type): void
+    {
+        $payload = array_replace($this->payload(), ['pollution_type' => $type, 'status' => 'verified']);
+
+        $this->post(route('reports.store'), $payload)->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
+
+        $report = PollutionReport::sole();
+        $this->assertSame($type, $report->pollution_type);
+        $this->assertSame('pending', $report->status);
+        $this->assertSame($payload['description'], $report->description);
+        $this->assertDatabaseCount('report_reviews', 0);
+        $response = $this->get(route('map.index'))->assertOk();
+        $this->assertSame(0, collect($response->viewData('lakes'))->firstWhere('id', $report->water_body_id)['verified_report_count']);
+    }
+
     public function test_anonymous_report_is_pending_without_automatically_assigning_lake_coordinates(): void
     {
         $payload = $this->payload();
@@ -100,7 +124,7 @@ class PollutionReportTest extends TestCase
         $this->get(route('reports.create'))->assertOk()->assertSee('No water body records are available.')
             ->assertSee('id="submit-report"', false)->assertSee('disabled', false);
         $this->post(route('reports.store'), ['water_body_id' => 1, 'pollution_type' => 'other', 'description' => 'Isolated fixture.'])
-            ->assertSessionHasErrors(['water_body_id' => 'Please choose an existing water body.']);
+            ->assertSessionHasErrors(['water_body_id' => 'Please choose a listed water body in the selected category.']);
         $this->assertDatabaseCount('pollution_reports', 0);
     }
 

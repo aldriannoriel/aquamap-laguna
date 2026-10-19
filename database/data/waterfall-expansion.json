@@ -1,0 +1,57 @@
+[
+    {
+        "name": "Balon-Balon Falls",
+        "municipality": "Cavinti",
+        "water_type": "Not assessed",
+        "latitude": "14.264828",
+        "longitude": "121.518805",
+        "description": "Waterfall in Barangay Tibatib, Cavinti, identified in Laguna University's community field visit and firsthand accounts. The mapped point is the photographer-published reference location near the falls, not a surveyed waterfall centroid or an incident location. Current water conditions and fish presence are unknown.",
+        "source_url": "https://lu.edu.ph/lu-partners-with-cavinti-community-for-eco-friendly-tourism-training/",
+        "category": "waterfall",
+        "site_type": "water_body",
+        "spring_type": null,
+        "official_url": null,
+        "geography": {
+            "status": "source_verified",
+            "crs": "EPSG:4326",
+            "source_url": "https://www.flickr.com/photos/jpleo/53951884343",
+            "checked_on": "2026-10-20",
+            "note": "Photographer-published map reference for Balon-Balon Falls, Left Section (photo taken 2024-08-12). This is an approximate photo-location reference near the waterfall, not a surveyed waterfall centroid, legal boundary or exact incident location. Source coordinate precision does not establish positional accuracy. Identity and Cavinti locality are corroborated by Laguna University's Tibatib field visit.",
+            "geometry": {"type": "Point", "coordinates": [121.518805, 14.264828]}
+        },
+        "research_references": [
+            {"title": "Tibatib community field visit: Balon-Balon, Kipot and Porosa Falls", "publisher": "Laguna University", "published_on": null, "url": "https://lu.edu.ph/lu-partners-with-cavinti-community-for-eco-friendly-tourism-training/"},
+            {"title": "Balon-Balon Falls, Left Section: photographer-published map reference; taken 2024-08-12", "publisher": "J. P. Leo Castillo (engrjpleo), Flickr", "published_on": "2024-08-27", "url": "https://www.flickr.com/photos/jpleo/53951884343"},
+            {"title": "The Tri-Falls of Tibatib, Part 1: Balon-Balon Falls", "publisher": "The Shoestring Diaries", "published_on": "2024-08-18", "url": "https://shoestringdiary.wordpress.com/2024/08/18/the-tri-falls-of-tibatib-part-1-balon-balon-falls/"}
+        ],
+        "image": null,
+        "aliases": ["Balon Balon Falls"]
+    },
+    {
+        "name": "Ambon-Ambon Falls",
+        "municipality": "Pangil",
+        "water_type": "Not assessed",
+        "latitude": "14.412799",
+        "longitude": "121.484128",
+        "description": "Waterfall associated with Panguil River Eco Park in Pangil, Laguna. The community-listed map reference is not surveyed; positional accuracy remains unconfirmed. This is not the identically named waterfall in Bagac, Bataan or Laurel, Batangas. No fish occurrence, water-quality result or pollution condition is established.",
+        "source_url": "https://issuances-library.senate.gov.ph/bills/house-bill-no-2749-15th-congress-republic",
+        "category": "waterfall",
+        "site_type": "water_body",
+        "spring_type": null,
+        "official_url": null,
+        "geography": {
+            "status": "source_verified",
+            "crs": "EPSG:4326",
+            "source_url": "https://en.wikivoyage.org/w/index.php?title=Pangil&oldid=5322962",
+            "checked_on": "2026-10-20",
+            "note": "Community-listed Ambon-Ambon Falls map reference in Pangil, checked against the Pangil article's falls listing and the Senate's historical identification of the Pangil waterfall. Listed coordinate precision is not surveyed positional accuracy. Municipal locality is not a certified boundary; this point is not a water-safety finding or an exact incident location.",
+            "geometry": {"type": "Point", "coordinates": [121.484128, 14.412799]}
+        },
+        "research_references": [
+            {"title": "House Bill No. 2749: historical identification of Ambon-Ambon Falls in Pangil (proposal, not evidence of enactment)", "publisher": "Senate of the Philippines Legislative Reference Bureau", "published_on": "2010-08-24", "url": "https://issuances-library.senate.gov.ph/bills/house-bill-no-2749-15th-congress-republic"},
+            {"title": "Pangil: Ambon-Ambon Falls community map listing (CC BY-SA)", "publisher": "Wikivoyage contributors", "published_on": null, "url": "https://en.wikivoyage.org/w/index.php?title=Pangil&oldid=5322962"}
+        ],
+        "image": null,
+        "aliases": ["Ambon Ambon Falls"]
+    }
+]

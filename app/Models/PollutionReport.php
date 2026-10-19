@@ -13,12 +13,15 @@ class PollutionReport extends Model
     public const TRANSITIONS = ['pending' => ['verified', 'rejected'], 'verified' => ['resolved'], 'rejected' => [], 'resolved' => []];
 
     public const TYPES = [
+        'plastic_waste' => 'Plastic waste',
+        'floating_garbage' => 'Floating garbage',
+        'illegal_dumping' => 'Suspected illegal dumping',
         'solid_waste' => 'Litter or solid waste',
         'wastewater' => 'Suspected wastewater discharge',
         'oil_chemical' => 'Oil or suspected chemical spill',
         'fish_death' => 'Dead or distressed fish',
         'water_change' => 'Unusual water color or odor',
-        'other' => 'Other observation',
+        'other' => 'Other visible environmental concern',
     ];
 
     protected $hidden = ['reporter_name', 'reporter_email', 'photo_path'];

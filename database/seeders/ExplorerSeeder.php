@@ -10,6 +10,18 @@ class ExplorerSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->import([
+            ...json_decode(file_get_contents(database_path('data/explorer.json')), true, flags: JSON_THROW_ON_ERROR),
+            ...json_decode(file_get_contents(database_path('data/missing-water-bodies.json')), true, flags: JSON_THROW_ON_ERROR),
+            ...json_decode(file_get_contents(database_path('data/waterfall-expansion.json')), true, flags: JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $data
+     */
+    public function import(array $data): void
+    {
         $connection = (new WaterBody)->getConnection();
         $isolated = app()->runningUnitTests() && $connection->getDriverName() === 'sqlite'
             && $connection->getDatabaseName() === ':memory:';
@@ -20,15 +32,15 @@ class ExplorerSeeder extends Seeder
             throw new RuntimeException('ExplorerSeeder requires aquamap_laguna or isolated in-memory tests.');
         }
 
-        $data = [
-            ...json_decode(file_get_contents(database_path('data/explorer.json')), true, flags: JSON_THROW_ON_ERROR),
-            ...json_decode(file_get_contents(database_path('data/missing-water-bodies.json')), true, flags: JSON_THROW_ON_ERROR),
-        ];
         $connection->useWriteConnectionWhenReading();
-        $connection->transaction(function () use ($data, $connection): void {
+        $connection->transaction(function () use ($data): void {
             foreach ($data as $entry) {
                 $names = array_map(mb_strtolower(...), [$entry['name'], ...$entry['aliases']]);
-                $matches = WaterBody::query()->whereIn($connection->raw('LOWER(name)'), $names)->lockForUpdate()->get();
+                $matches = WaterBody::query()->lockForUpdate()->get()->filter(function (WaterBody $record) use ($names): bool {
+                    $existingNames = array_map(mb_strtolower(...), [$record->name, ...($record->aliases ?? [])]);
+
+                    return array_intersect($names, $existingNames) !== [];
+                })->values();
                 if ($matches->count() > 1 || ($matches->isNotEmpty()
                     && ($matches->first()->municipality !== $entry['municipality'] || $matches->first()->name !== $entry['name']))) {
                     throw new RuntimeException('Ambiguous explorer identity: '.$entry['name']);

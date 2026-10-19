@@ -3,9 +3,9 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Explore Laguna's waters with sourced geography and research context.">
+        <meta name="description" content="Community environmental awareness for Laguna's waters: aquatic species, water body classification and verified visible pollution observations.">
         <meta name="referrer" content="strict-origin-when-cross-origin">
-        <title>Water explorer | AquaMap Laguna</title>
+        <title>Environmental water map | AquaMap Laguna</title>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-mist font-sans text-ink antialiased">
@@ -14,8 +14,8 @@
         <main id="main" class="mx-auto max-w-[1600px] px-4 py-6 sm:px-8 sm:py-8">
             <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Explore Laguna's waters</h1>
-                    <p class="mt-2 max-w-2xl text-sm leading-6 text-muted">From crater lakes to river reaches. Find a place and follow the evidence behind it.</p>
+                    <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Understand Laguna's aquatic environments</h1>
+                    <p class="mt-2 max-w-2xl text-sm leading-6 text-muted">Learn about Laguna's lakes, rivers and waterfalls through documented species records, water body classification and community-reported visible pollution.</p>
                 </div>
                 <p class="text-sm text-muted">Laguna, Philippines</p>
             </div>
@@ -37,7 +37,7 @@
                             <li data-water-row="{{ $lake['id'] }}" @if (!$lake['geography']) hidden @endif>
                                 <button type="button" data-lake-id="{{ $lake['id'] }}" aria-pressed="false" aria-haspopup="dialog" aria-controls="water-detail-dialog" class="lake-card w-full rounded-xl border border-line p-4 text-left hover:border-water hover:bg-mist">
                                     <span class="block text-lg font-semibold">{{ $lake['name'] }}</span><span class="mt-1 block text-sm text-muted">{{ $lake['municipality'] }}</span>
-                                    <span class="mt-3 flex flex-wrap justify-between gap-2 text-xs"><span class="font-semibold text-water">{{ $lake['site_type'] === 'resort' ? 'Spring-associated resort' : $categories[$lake['category']] }}</span><span class="selection-label text-muted">View details</span></span>
+                                    <span class="mt-3 flex flex-wrap justify-between gap-2 text-xs"><span class="font-semibold text-water">{{ $categories[$lake['category']] }}</span><span class="selection-label text-muted">View details</span></span>
                                     @unless ($lake['geography'])<span class="mt-2 block text-xs text-muted">Location awaiting verification; not mapped.</span>@endunless
                                 </button>
                             </li>
@@ -49,7 +49,7 @@
                     <details id="research-notes" class="mx-5 mb-5 scroll-mt-5 rounded-xl border border-line bg-mist p-4" open>
                         <summary class="cursor-pointer text-sm font-semibold text-estuary">A map with context</summary>
                         <p class="mt-3 text-xs leading-5 text-muted">Mapped features use source-checked WGS84 geography. Source verification is not survey certification: positional precision remains unconfirmed. Original published lake points retain their unconfirmed datum and are not used as verified geometry.</p>
-                        <p class="mt-2 text-xs leading-5 text-muted">River lines may cover selected reaches. Resort points locate properties, not spring sources. These features do not define legal boundaries or exact incident locations.</p>
+                        <p class="mt-2 text-xs leading-5 text-muted">River lines may cover selected reaches. Lake, river and waterfall features do not define legal boundaries or exact incident locations.</p>
                     </details>
                 </aside>
                 <section class="min-w-0" aria-labelledby="map-heading">
@@ -60,7 +60,7 @@
                     <div id="lake-map" class="h-[380px] w-full bg-mist sm:h-[500px] lg:h-[540px]" role="region" aria-label="Interactive water body map. Use arrow keys to pan and plus or minus to zoom." aria-describedby="map-status"></div>
                     <p id="tile-status" role="status" class="border-t border-line bg-mist px-5 py-3 text-xs leading-5 text-estuary" hidden>Some map tiles could not load. Check your connection. Water body details remain available.</p>
                     <p id="map-status" role="status" class="border-t border-line px-5 py-3 text-xs leading-5 text-muted">Loading the map. Profiles are also available in the references below.</p>
-                    <p class="border-t border-line p-5 text-sm leading-6 text-muted">Select a marker, shape or sidebar item to open its complete profile, photograph and research.</p>
+                    <p class="border-t border-line p-5 text-sm leading-6 text-muted">Select a marker, shape or sidebar item for environmental context, historical species records and verified community observations.</p>
                 </section>
             </div>
             <p class="mt-5 text-sm text-muted">Observed a pollution concern? <a href="{{ route('reports.create') }}" class="font-semibold text-water underline underline-offset-4">Submit a private report</a>.</p>
@@ -75,7 +75,7 @@
                     @endforeach
                 </div>
             </details>
-            <footer class="flex flex-wrap justify-between gap-3 pt-6 text-xs leading-5 text-muted"><p>AquaMap Laguna. Know the place. Respect the water.</p><p>Geography is a reference, not a safety assessment.</p></footer>
+            <footer class="flex flex-wrap justify-between gap-3 pt-6 text-xs leading-5 text-muted"><p>AquaMap Laguna. Community awareness for our aquatic environments.</p><p>No reports does not mean clean water. Geography is a reference, not a safety assessment.</p></footer>
         </main>
         <dialog id="water-detail-dialog" class="water-detail-dialog text-ink" aria-labelledby="selected-lake-heading">
             <div class="flex shrink-0 items-center justify-between gap-3 border-b border-line bg-white px-4 py-3">
@@ -84,7 +84,7 @@
             </div>
             <div class="shrink-0 border-b border-line px-3 py-2">
                 <div id="profile-tabs" class="profile-tabs" role="tablist" aria-label="Water body profile sections">
-                    @foreach (['overview' => 'Overview', 'classification' => 'Water Classification', 'fish' => 'Fish & Habitat', 'pollution' => 'Pollution', 'research' => 'Research & Sources'] as $tab => $label)
+                    @foreach (['overview' => 'Environmental Overview', 'classification' => 'Water Classification', 'fish' => 'Fish & Habitat', 'pollution' => 'Visible Pollution Reports', 'research' => 'Research & Sources'] as $tab => $label)
                         <button id="profile-tab-{{ $tab }}" type="button" role="tab" data-profile-tab="{{ $tab }}" aria-controls="profile-panel-{{ $tab }}" aria-selected="{{ $tab === 'overview' ? 'true' : 'false' }}" tabindex="{{ $tab === 'overview' ? '0' : '-1' }}">{{ $label }}</button>
                     @endforeach
                 </div>

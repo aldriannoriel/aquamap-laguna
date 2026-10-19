@@ -28,10 +28,15 @@ class StorePollutionReportRequest extends FormRequest
      */
     public function rules(): array
     {
+        $category = $this->input('water_body_category');
+        $categories = is_string($category) && array_key_exists($category, WaterBody::REPORT_CATEGORIES)
+            ? [$category] : array_keys(WaterBody::REPORT_CATEGORIES);
+
         return [
             'website' => ['nullable', 'string', 'max:2048', 'prohibited'],
             'report_form_token' => ['bail', 'required', 'string', 'max:2048', new ReportFormToken($this)],
-            'water_body_id' => ['bail', 'required', 'integer', Rule::exists(WaterBody::class, 'id')],
+            'water_body_category' => ['nullable', 'string', Rule::in(array_keys(WaterBody::REPORT_CATEGORIES))],
+            'water_body_id' => ['bail', 'required', 'integer', Rule::exists(WaterBody::class, 'id')->whereIn('category', $categories)],
             'pollution_type' => ['required', 'string', Rule::in(array_keys(PollutionReport::TYPES))],
             'description' => ['required', 'string', 'max:5000'],
             'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:-90,90'],
@@ -48,7 +53,8 @@ class StorePollutionReportRequest extends FormRequest
             'website.prohibited' => 'This submission could not be verified. Please review your entries below and try again.',
             'report_form_token.required' => 'Please open the reporting form before submitting. Your entries have been kept.',
             'water_body_id.required' => 'Please choose a water body.',
-            'water_body_id.exists' => 'Please choose an existing water body.',
+            'water_body_id.exists' => 'Please choose a listed water body in the selected category.',
+            'water_body_category.in' => 'Please choose one of the listed categories.',
             'pollution_type.required' => 'Please choose an observation type.',
             'pollution_type.in' => 'Please choose one of the listed observation types.',
             'description.required' => 'Please describe what you observed.',
@@ -60,7 +66,7 @@ class StorePollutionReportRequest extends FormRequest
     public function safeOldInput(): array
     {
         $input = array_filter($this->only([
-            'water_body_id', 'pollution_type', 'description', 'latitude', 'longitude', 'reporter_name', 'reporter_email',
+            'water_body_id', 'water_body_category', 'pollution_type', 'description', 'latitude', 'longitude', 'reporter_name', 'reporter_email',
         ]), fn (mixed $value): bool => is_scalar($value) || $value === null);
         $token = $this->input('report_form_token');
         if (is_string($token) && strlen($token) <= 2048) {

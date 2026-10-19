@@ -24,14 +24,14 @@ class WaterBodyCardTest extends TestCase
         $this->seed(DatabaseSeeder::class);
         $this->seed(ExplorerSeeder::class);
         $response = $this->get(route('map.index'))->assertOk()->assertSee('id="water-detail-dialog"', false)
-            ->assertSee('Close profile')->assertSee('Scientific water-quality assessment: Not Assessed.')
+            ->assertSee('Close profile')->assertSee('Community-reported observations, not scientific measurements.')
             ->assertSee('Historical aquaculture')->assertSee('Potential habitat compatibility')->assertSee('Insufficient data')
-            ->assertSee('Research &amp; sources', false)->assertSee('Not Assessed')->assertSee('Spring type:')
+            ->assertSee('Research &amp; sources', false)->assertSee('Not Assessed')->assertDontSee('Spring type:')
             ->assertSee('Barrera marquez')->assertSee('Dionisia.besas')->assertSee('Photo by');
-        $this->assertDatabaseCount('water_bodies', 28);
+        $this->assertDatabaseCount('water_bodies', 30);
         $this->assertCount(28, $response->viewData('lakes'));
         $images = array_filter(array_column($response->viewData('profiles'), 'image'));
-        $this->assertCount(20, $images);
+        $this->assertCount(26, $images);
         foreach ($images as $image) {
             $this->assertFileExists(public_path($image['path']));
             $this->assertSame('image/jpeg', getimagesize(public_path($image['path']))['mime']);
@@ -54,8 +54,16 @@ class WaterBodyCardTest extends TestCase
         $profiles = $response->viewData('profiles');
         $supplement = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR);
         $this->assertCount(12, $supplement);
+        $replacements = json_decode(file_get_contents(database_path('data/waterfall-photos.json')), true, flags: JSON_THROW_ON_ERROR);
         $originals = 0;
-        foreach (WaterBody::all() as $lake) {
+        foreach (WaterBody::whereIn('category', ['lake', 'river', 'waterfall'])->get() as $lake) {
+            if (isset($replacements[$lake->name])) {
+                $expected = $replacements[$lake->name]['image'];
+                $expected['license_url'] = url($expected['license_url']);
+                $this->assertSame($expected, $profiles[$lake->id]['image']);
+
+                continue;
+            }
             if ($lake->image !== null) {
                 $this->assertSame($lake->image, $profiles[$lake->id]['image']);
                 $originals++;
@@ -107,8 +115,8 @@ class WaterBodyCardTest extends TestCase
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         $xpath = new DOMXPath($document);
-        $this->assertSame(8, $xpath->query('//article[starts-with(@id,"profile-")]//div[@data-photo-placeholder]')->length);
-        foreach (['Hulugan Falls', 'Bukal Falls', 'Bunga Twin Falls', 'Hidden Valley Springs'] as $name) {
+        $this->assertSame(2, $xpath->query('//article[starts-with(@id,"profile-")]//div[@data-photo-placeholder]')->length);
+        foreach (['Hulugan Falls', 'Bukal Falls', 'Bunga Twin Falls'] as $name) {
             $lake = WaterBody::where('name', $name)->sole();
             $this->assertStringContainsString('object-contain', $xpath->evaluate('string(//article[@id="profile-'.$lake->id.'"]//img/@class)'));
         }
@@ -126,7 +134,7 @@ class WaterBodyCardTest extends TestCase
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         $xpath = new DOMXPath($document);
-        foreach (['all' => '27', 'lake' => '9', 'river' => '5', 'waterfall' => '11', 'spring' => '2'] as $category => $count) {
+        foreach (['all' => '27', 'lake' => '9', 'river' => '5', 'waterfall' => '13'] as $category => $count) {
             $this->assertSame($count, trim($xpath->evaluate('string(//button[@data-category="'.$category.'"]//span[@data-category-count])')));
         }
         $lake = WaterBody::where('name', 'Sampaloc Lake')->sole();
@@ -152,7 +160,7 @@ class WaterBodyCardTest extends TestCase
             'overview' => ['Sampaloc Lake', 'San Pablo City', 'Judgefloro'],
             'classification' => ['freshwater', 'drinking-water safety'],
             'fish' => ['Nile tilapia', 'Oreochromis niloticus', 'July-September 2017', 'Insufficient data'],
-            'pollution' => ['Community Pollution Reports', '0 currently verified community reports.', 'Scientific Water Quality Assessment', 'Not Assessed', 'No published measurement values'],
+            'pollution' => ['Visible Pollution Reports', '0 currently verified community reports.', 'Unresolved verified observations: 0.', 'Environmental conditions remain unknown.', 'What these observations mean', 'not scientific measurements'],
             'research' => ['Research & sources', 'OpenStreetMap contributors', 'Geographic reference and limitations', 'Image attribution', 'Judgefloro'],
         ] as $section => $expectedText) {
             $panels = $xpath->query($root.'//section[@data-profile-section="'.$section.'"]');
@@ -166,6 +174,18 @@ class WaterBodyCardTest extends TestCase
         $this->assertSame(1, $xpath->query('//button[@data-profile-tab="overview"][@aria-selected="true"][@tabindex="0"]')->length);
         $this->assertGreaterThan(0, $xpath->query($root.'//section[@data-profile-section="research"]//article[@data-research-card]')->length);
         $this->assertSame(2, $xpath->query($root.'//section[@data-profile-section="pollution"]/section')->length);
+        $this->assertSame('Environmental Overview', trim($xpath->evaluate('string(//button[@data-profile-tab="overview"])')));
+        $this->assertSame('Visible Pollution Reports', trim($xpath->evaluate('string(//button[@data-profile-tab="pollution"])')));
+        foreach ($response->viewData('lakes') as $record) {
+            $overview = '//article[@id="profile-'.$record['id'].'"]//section[@data-profile-section="overview"]';
+            $this->assertSame(1, $xpath->query($overview.'//dl[@data-environment-summary]/following-sibling::*[self::figure or @data-photo-placeholder]')->length);
+            $summary = $xpath->evaluate('string('.$overview.'//dl[@data-environment-summary])');
+            $this->assertStringContainsString('Water body classification', $summary);
+            $this->assertStringContainsString('Aquatic species & habitat', $summary);
+            $this->assertStringContainsString('Visible pollution reports', $summary);
+        }
+        $this->assertSame(26, $xpath->query('//article[starts-with(@id,"profile-")]//figure/img')->length);
+        $this->assertSame(2, $xpath->query('//article[starts-with(@id,"profile-")]//div[@data-photo-placeholder]')->length);
     }
 
     public function test_new_geometries_preserve_island_holes_and_existing_lake_coordinates(): void

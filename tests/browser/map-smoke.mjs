@@ -43,13 +43,24 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'photo-credits/browser';
+const artifactDirectory = 'waterfall-update/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
-const imageCatalogue = ['explorer.json', 'missing-water-bodies.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
+const imageCatalogue = ['explorer.json', 'missing-water-bodies.json', 'waterfall-expansion.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
+const imageReplacements = JSON.parse(readFileSync(path.join(root, 'database/data/waterfall-photos.json'), 'utf8'));
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
 await mkdir(output, { recursive: true });
+const fixtureDirectory = path.resolve(root, 'storage/app/day4-browser', `fixture-${Date.now()}`);
+assert(fixtureDirectory.startsWith(`${path.resolve(root, 'storage/app/day4-browser')}${path.sep}`));
+for (const directory of ['', 'sessions', 'cache', 'photos']) {
+    await mkdir(path.join(fixtureDirectory, directory), { recursive: true });
+}
+const fixtureEnvironment = { ...process.env, APP_ENV: 'testing', AQUAMAP_REPORT_FIXTURE: fixtureDirectory, AQUAMAP_BROWSER_FULL_CATALOGUE: '1' };
+const fixtureRouter = path.join(root, 'tests/browser/report-fixture.php');
+const setup = spawnSync('php', [fixtureRouter, 'setup'], { cwd: root, env: fixtureEnvironment, windowsHide: true, encoding: 'utf8' });
+assert.equal(setup.status, 0, 'Isolated map fixture setup failed.');
+assert.equal(JSON.parse(setup.stdout).lakes, 30);
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function unusedPort() {
@@ -73,8 +84,8 @@ async function waitFor(task, message, timeout = 15000) {
 const httpPort = await unusedPort();
 const debugPort = await unusedPort();
 const base = `http://127.0.0.1:${httpPort}`;
-const server = spawn('php', ['-S', `127.0.0.1:${httpPort}`, '-t', path.join(root, 'public'), path.join(root, 'vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php')], {
-    cwd: path.join(root, 'public'), windowsHide: true, stdio: 'ignore',
+const server = spawn('php', ['-S', `127.0.0.1:${httpPort}`, '-t', path.join(root, 'public'), fixtureRouter], {
+    cwd: root, env: fixtureEnvironment, windowsHide: true, stdio: 'ignore',
 });
 let browser;
 let socket;
@@ -197,9 +208,14 @@ try {
     async function verifyPhoto(lake, viewport) {
         await assertTabState('overview');
         await assertDialogBounds(viewport === 'desktop');
+        assert.equal(await evaluate(`(() => {
+            const summary = document.querySelector('#selected-lake [data-environment-summary]');
+            const photo = document.querySelector('#selected-lake figure, #selected-lake [data-photo-placeholder]');
+            return !!summary && !!(summary.compareDocumentPosition(photo) & Node.DOCUMENT_POSITION_FOLLOWING);
+        })()`), true, 'Environmental information must precede the photograph.');
         const original = imageCatalogue.find(item => item.name === lake.name && item.municipality === lake.municipality);
         assert(original, `Missing catalogue identity for ${lake.name}`);
-        const expected = original.image ?? imageSupplement[lake.name]?.image;
+        const expected = imageReplacements[lake.name]?.image ?? original.image ?? imageSupplement[lake.name]?.image;
         assert.equal(await evaluate('!!document.querySelector("#selected-lake img")'), !!expected, `${lake.name}: image coverage mismatch`);
         assert.equal(await evaluate('!!document.querySelector("#selected-lake [data-photo-placeholder]")'), !expected);
         if (expected) {
@@ -220,9 +236,9 @@ try {
             assert(rendered.caption.includes(expected.author) && rendered.caption.includes(expected.license), `${lake.name}: missing attribution`);
             assert.equal(rendered.credit, `Photo by ${expected.author} · Source · License.`);
             assert.deepEqual(rendered.labels, ['Source', 'License']);
-            assert.deepEqual(rendered.links, [expected.source_url, expected.license_url].map(url => new URL(url).href));
+            assert.deepEqual(rendered.links, [expected.source_url, expected.license_url].map(url => new URL(url, base).href));
         }
-        if (['Bunga Twin Falls', 'Hidden Valley Springs', 'Hulugan Falls', 'Bumbungan River', 'Al Fresco Springs Resort'].includes(lake.name)) {
+        if (imageReplacements[lake.name] || ['Hulugan Falls', 'Bumbungan River'].includes(lake.name)) {
             await screenshot(`${viewport}-${lake.name.toLowerCase().replaceAll(' ', '-')}.png`);
         }
     }
@@ -234,7 +250,7 @@ try {
     async function verifyTabbedProfile(lake, prefix) {
         await assertTabState('overview');
         const token = await evaluate('(window.profileDocumentToken ??= crypto.randomUUID())');
-        for (const [key, text] of [['overview', lake.description], ['classification', 'drinking-water safety'], ['fish', 'Insufficient data'], ['pollution', 'Community Pollution Reports'], ['research', 'Geographic reference and limitations']]) {
+        for (const [key, text] of [['overview', lake.description], ['classification', 'drinking-water safety'], ['fish', 'Insufficient data'], ['pollution', 'Visible Pollution Reports'], ['research', 'Geographic reference and limitations']]) {
             await selectTab(key);
             assert.equal((await evaluate('document.querySelector("#selected-lake [role=tabpanel]:not([hidden])").textContent')).includes(text), true);
             assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), lake.name);
@@ -248,6 +264,9 @@ try {
         assert.equal(tree.nodes.filter(node => !node.ignored && node.role?.value === 'tab').length, 5);
         assert.equal(tree.nodes.filter(node => !node.ignored && node.role?.value === 'tabpanel').length, 1);
         assert.equal(tree.nodes.find(node => !node.ignored && node.role?.value === 'dialog')?.name?.value, lake.name);
+        assert.deepEqual(tree.nodes.filter(node => !node.ignored && node.role?.value === 'tab').map(node => node.name?.value), ['Environmental Overview', 'Water Classification', 'Fish & Habitat', 'Visible Pollution Reports', 'Research & Sources']);
+        assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-report-category]").length'), 9);
+        assert.equal(await evaluate('[...document.querySelectorAll("#selected-lake [data-report-category] td")].every(cell => cell.textContent.trim() === "0")'), true);
         await evaluate('document.getElementById("profile-tab-research").focus()');
         await keypress('ArrowRight', 'ArrowRight', 39);
         await assertTabState('overview');
@@ -284,7 +303,9 @@ try {
     await waitFor(() => evaluate('[...document.querySelectorAll(".leaflet-tile")].every(tile => tile.complete)'), 'Map tiles did not finish loading.', 20000);
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true, 'Desktop horizontal overflow.');
     assert.equal(await evaluate('document.querySelectorAll("[data-lake-id]").length'), 28);
-    results.push('Desktop: 28 source-checked database markers/profiles, OpenStreetMap tiles and attribution, no horizontal overflow.');
+    assert.equal(await evaluate('document.querySelector("[data-category=spring]")'), null);
+    assert.equal(await evaluate('document.body.textContent.includes("Hidden Valley Springs") || document.body.textContent.includes("Al Fresco Springs Resort")'), false);
+    results.push('Desktop: 28 lake, river and waterfall profiles, no spring filter/profiles, OpenStreetMap attribution and no horizontal overflow.');
     await screenshot('desktop.png');
 
     const lakes = await evaluate('JSON.parse(document.getElementById("lake-data").textContent)');
@@ -328,7 +349,7 @@ try {
         await click('#reset-map');
     }
     results.push('All 28 sidebar profiles: modal heading, initial focus, close/focus restoration, description, sources and authorized image loading pass.');
-    results.push('Desktop: all 28 profiles match the image inventory; 20 local photographs load with exact authors, licenses, source links and responsive sizing; 8 explicit placeholders; fitted images use contain.');
+    results.push('Desktop: 26 photographs and two placeholders; all nine document replacements have exact image paths, credit, source and permission links.');
     if (verifyFish) results.push('All three lakes show Nile tilapia, July-September 2017 sampling, historical aquaculture evidence, two references and insufficient_data compatibility.');
     await click('[data-category=lake]');
     await click('.lake-marker[title="Sampaloc Lake"]');
@@ -357,7 +378,7 @@ try {
         await evaluate('(() => { const input = document.getElementById("water-search"); input.value = ' + JSON.stringify(value) + '; input.dispatchEvent(new Event("input", {bubbles:true})); })()');
         await pause(200);
     }
-    for (const [category, expected] of [['lake', 10], ['river', 5], ['waterfall', 11], ['spring', 2]]) {
+    for (const [category, expected] of [['lake', 10], ['river', 5], ['waterfall', 13]]) {
         await click('[data-category="' + category + '"]');
         assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), expected);
         assert.equal(await evaluate('[...document.querySelectorAll("[data-water-row]")].filter(row => !row.hidden).length'), expected);
@@ -399,7 +420,7 @@ try {
         await closeProfile();
         await click('#reset-map');
     }
-    results.push('390px mobile: all 28 profiles match the inventory, all 20 images load with exact attribution and responsive sizing, 8 placeholders remain, no horizontal overflow.');
+    results.push('390px mobile: all 28 profiles match the inventory, all 26 images load with exact attribution and responsive sizing, two placeholders remain, no horizontal overflow.');
     const mobileLake = lakes.find(lake => lake.name === "Pandin Lake");
     await click(`[data-lake-id="${mobileLake.id}"]`);
     assert.equal(await evaluate('document.querySelector("#selected-lake-heading")?.textContent'), mobileLake.name);
@@ -426,34 +447,44 @@ try {
     await closeProfile();
     await click('#reset-map');
     assert.equal(await evaluate('document.querySelectorAll("[data-lake-id][aria-pressed=true]").length'), 0);
-    await click('[data-category=spring]');
-    assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 2);
-    await setSearch('los banos');
+    await click('[data-category=waterfall]');
+    assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 13);
+    await setSearch('talay');
     assert.equal(await evaluate('document.querySelectorAll(".lake-marker").length'), 1);
-    await click('[data-lake-id="' + lakes.find(lake => lake.name === 'Al Fresco Springs Resort').id + '"]');
+    await click('[data-lake-id="' + lakes.find(lake => lake.name === 'Talay Falls').id + '"]');
     await assertTabState('overview');
-    assert.match(await evaluate('document.getElementById("selected-lake").textContent'), /not a verified spring source/);
-    assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-photo-placeholder]").length'), 1);
-    assert.equal(await evaluate('document.querySelector("#selected-lake img")'), null);
+    assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-photo-placeholder]").length'), 0);
+    assert.equal(await evaluate('document.querySelector("#selected-lake img").getAttribute("src")'), '/images/water-bodies/document-talay-falls.jpg');
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
-    await screenshot('mobile-resort.png', true);
+    await screenshot('mobile-waterfall.png', true);
     await selectTab('classification');
-    assert.match(await evaluate('document.querySelector("#profile-panel-classification").textContent'), /operator claim/);
+    assert.match(await evaluate('document.querySelector("#profile-panel-classification").textContent'), /not a water-safety classification/);
     await selectTab('fish');
     assert.match(await evaluate('document.querySelector("#profile-panel-fish").textContent'), /Fish habitat: Not Assessed/);
     assert.equal(await evaluate('document.querySelectorAll("#profile-panel-fish [data-fish-card]").length'), 0);
     await selectTab('pollution');
     assert.match(await evaluate('document.querySelector("#profile-panel-pollution").textContent'), /0 currently verified community reports/);
-    results.push('Opening a different resort resets Overview; classification retains operator limitations, missing fish stays Not Assessed, and Pollution contains only verified counts and unknown science.');
+    results.push('Opening a waterfall resets Environmental Overview; classification retains safety limitations, missing fish stays Not Assessed, and Visible Pollution Reports keeps observation counts separate from scientific claims.');
     await closeProfile();
     await click('#reset-map');
-    results.push('390px mobile: categories, accent-insensitive locality search, resort/source distinction and photo placeholder pass without overflow.');
+    results.push('390px mobile: waterfall filtering/search, profile tabs and document photograph pass without overflow.');
     results.push('320px/390px portrait and 640px landscape: compact viewport-bounded dialog, horizontally scrolling tabs, selection and reset without horizontal overflow.');
     await navigate('/reports/create');
     await waitFor(() => evaluate('!!document.querySelector("select[name=water_body_id]")'), 'Public reporting form failed to load with the expanded catalogue.');
-    assert.equal(await evaluate('[...document.querySelectorAll("select[name=water_body_id] option")].filter(option => option.value).length'), 28);
+    assert.equal(await evaluate('JSON.parse(document.getElementById("incident-lakes").textContent).length'), 30);
+    assert.equal(await evaluate('document.getElementById("water_body_id").disabled'), true);
+    for (const [category, expected] of [['lake', 10], ['river', 5], ['waterfall', 13], ['spring', 2]]) {
+        await evaluate(`(() => { const category = document.getElementById('water_body_category'); category.value = ${JSON.stringify(category)}; category.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+        assert.equal(await evaluate('[...document.querySelectorAll("select[name=water_body_id] option")].filter(option => option.value).length'), expected);
+        assert.equal(await evaluate(`Array.from(document.querySelectorAll('#water_body_id option[data-category]')).every(option => option.dataset.category === ${JSON.stringify(category)})`), true);
+    }
+    await screenshot('mobile-report-categories.png', true);
+    const permission = await fetch(`${base}/images/water-bodies/document-photo-permission.html`);
+    assert.equal(permission.status, 200);
+    assert((await permission.text()).includes("project owner's permission declaration"));
+    assert.deepEqual(await evaluate('[...document.querySelectorAll("select[name=pollution_type] option")].filter(option => ["plastic_waste", "floating_garbage", "illegal_dumping"].includes(option.value)).map(option => option.textContent.trim())'), ['Plastic waste', 'Floating garbage', 'Suspected illegal dumping']);
     assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
-    results.push('Live MySQL reporting form loads all 28 locations without sort-buffer errors; no form was submitted.');
+    results.push('Category-first reporting dynamically lists all 30 records in four categories with exact 10/5/13/2 counts; springs stay off the map. Permission record loads; no report was submitted.');
     assert.deepEqual(failures, [], 'Browser JavaScript exceptions occurred.');
     assert.equal(databaseSnapshot(), originalRecords, 'Browser verification changed lake or fish records.');
     assert.equal(sharedCacheSnapshot(), originalCache, 'Browser verification changed shared file cache.');
@@ -476,4 +507,5 @@ try {
     server.kill();
     await pause(300);
     await rm(profile, { recursive: true, force: true, maxRetries: 6, retryDelay: 200 });
+    await rm(fixtureDirectory, { recursive: true, force: true, maxRetries: 6, retryDelay: 200 });
 }

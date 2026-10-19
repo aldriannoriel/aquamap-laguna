@@ -18,17 +18,19 @@ class PollutionReportController extends Controller
 {
     public function create(Request $request): Response
     {
-        $lakes = WaterBody::query()->get(['id', 'name', 'geography'])
+        $lakes = WaterBody::query()->whereIn('category', array_keys(WaterBody::REPORT_CATEGORIES))
+            ->get(['id', 'name', 'category', 'geography'])
             ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->values()
             ->map(fn (WaterBody $water): object => (object) [
-                'id' => $water->id, 'name' => $water->name,
+                'id' => $water->id, 'name' => $water->name, 'category' => $water->category,
                 ...ExplorerProfile::referencePoint($water->geography) ?? ['latitude' => null, 'longitude' => null],
             ]);
 
         return response()->view('reports.create', [
             'lakes' => $lakes,
             'types' => PollutionReport::TYPES,
+            'categories' => WaterBody::REPORT_CATEGORIES,
             'reportFormToken' => ReportFormToken::issue($request),
         ])->header('Cache-Control', 'no-store, private');
     }

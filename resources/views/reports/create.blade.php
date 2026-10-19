@@ -44,12 +44,32 @@
             <fieldset class="space-y-5">
                 <legend class="mb-5 text-xl font-semibold">What did you observe?</legend>
                 <p class="text-xs text-muted">Fields marked * are required.</p>
+                @php
+                    $selectedCategory = old('water_body_category') ?: $lakes->firstWhere('id', (int) old('water_body_id'))?->category;
+                @endphp
+                <div>
+                    <label for="water_body_category" class="form-label">Category <span aria-hidden="true">*</span></label>
+                    <p id="water-category-help" class="mb-2 text-xs leading-5 text-muted">Choose a category, then choose the water body where you observed the concern.</p>
+                    <select id="water_body_category" name="water_body_category" class="form-input" aria-controls="water_body_id" aria-describedby="water-category-help water-category-status water_body_category-error" aria-invalid="{{ $errors->has('water_body_category') ? 'true' : 'false' }}">
+                        <option value="">Choose a category</option>
+                        @foreach ($categories as $category => $label)
+                            <option value="{{ $category }}" @selected($selectedCategory === $category) @disabled(!$lakes->contains('category', $category))>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    <p id="water_body_category-error" class="form-error">@error('water_body_category'){{ $message }}@enderror</p>
+                    <p id="water-category-status" class="mt-2 text-xs text-muted" role="status" aria-live="polite">Water bodies are grouped by category below.</p>
+                    <noscript><p class="mt-2 text-xs text-muted">Without JavaScript, use the category headings in the water body list. The category filter is optional.</p></noscript>
+                </div>
                 <div>
                     <label for="water_body_id" class="form-label">Water body *</label>
                     <select id="water_body_id" name="water_body_id" class="form-input" required aria-invalid="{{ $errors->has('water_body_id') ? 'true' : 'false' }}" aria-describedby="water_body_id-error">
                         <option value="">Choose a water body</option>
-                        @foreach ($lakes as $lake)
-                            <option value="{{ $lake->id }}" @selected((string) old('water_body_id') === (string) $lake->id)>{{ $lake->name }}</option>
+                        @foreach ($lakes->groupBy('category') as $category => $waterBodies)
+                            <optgroup label="{{ $categories[$category] }}">
+                                @foreach ($waterBodies as $lake)
+                                    <option value="{{ $lake->id }}" data-category="{{ $category }}" @selected((string) old('water_body_id') === (string) $lake->id)>{{ $lake->name }}</option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
                     </select>
                     <p id="water_body_id-error" class="form-error">@error('water_body_id'){{ $message }}@enderror</p>
@@ -67,7 +87,7 @@
                 </div>
                 <div>
                     <label for="description" class="form-label">Description *</label>
-                    <p id="description-help" class="mb-2 text-xs leading-5 text-muted">Describe what you saw, when it happened and nearby landmarks. Avoid including other people's personal details. Maximum 5,000 characters.</p>
+                    <p id="description-help" class="mb-2 text-xs leading-5 text-muted">Describe visible concerns such as plastic waste, floating garbage or suspected illegal dumping: what you saw, when it happened and nearby landmarks. Avoid including other people's personal details. Maximum 5,000 characters.</p>
                     <textarea id="description" name="description" rows="5" maxlength="5000" required class="form-input resize-y" aria-invalid="{{ $errors->has('description') ? 'true' : 'false' }}" aria-describedby="description-help description-error">{{ old('description') }}</textarea>
                     <p id="description-error" class="form-error">@error('description'){{ $message }}@enderror</p>
                 </div>

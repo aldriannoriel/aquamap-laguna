@@ -55,7 +55,6 @@
 .category-filter[aria-pressed="true"] { border-color: var(--color-estuary); background: var(--color-estuary); color: white; }
 .category-river { background: #376aa0; }
 .category-waterfall { background: #456845; }
-.category-spring { background: #8c5330; }
 
 .profile-open { overflow: hidden; }
 .water-detail-dialog { position: fixed; inset: 0; margin: auto; width: calc(100vw - 1rem); max-width: none; height: min(40rem, calc(100dvh - 1rem)); max-height: calc(100dvh - 1rem); padding: 0; overflow: hidden; overflow-wrap: anywhere; border: 1px solid var(--color-line); border-radius: 1rem; background: white; box-shadow: 0 12px 40px #123f4330; }

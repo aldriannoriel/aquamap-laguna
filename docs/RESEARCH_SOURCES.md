@@ -176,3 +176,44 @@ The existing unique lake/species pair stores one representative study reference.
 All seeded links retain `compatibility_status = insufficient_data`. The Day 3 public display always communicates insufficient data because no validated assessment pipeline or current measurements exist, even if an unsupported legacy status says otherwise. Incomplete evidence metadata is labeled incomplete; a missing link does not imply fish absence.
 
 Still needed: current lake/station observations with dates, depths, methods and units; validated species/life-stage requirements for pH, dissolved oxygen, salinity and seasonal conditions; evidence for any further species or wild occurrence; authoritative coordinate datum/precision. Multiple studies per lake/species would require a future evidence history design rather than overwriting this representative record. No predictive scores, stocking recommendations, pollution incidents or measurements were created.
+
+
+## Requested waterfall inventory and two additions (2026-10-20)
+
+Read-only database inspection verified both the configured and connected schema as `aquamap_laguna`. The database had 28 records: 10 lakes, 5 rivers, 11 waterfalls and 2 spring-associated resort references. The original catalogue/seed data and database agree. All original names, aliases, scientific records and metadata were retained.
+
+| Requested name | Existing canonical database record | Inventory outcome |
+| --- | --- | --- |
+| Hulugan Falls | Hulugan Falls, Luisiana | Already present |
+| Aliw Falls | Aliw Falls, qualified Luisiana/Cavinti access locality | Already present; locality caveat retained |
+| Talay Falls | Talay Falls, Luisiana | Already present |
+| Buruwisan Falls | Buruwisan Falls, Siniloan | Already present |
+| Lanzones Falls | Lanzones Falls, Siniloan | Already present |
+| Bukal / Kilangin Falls | Bukal Falls, Majayjay / Liliw access area | Already present; existing alias retained |
+| Majayjay / Taytay Falls | Taytay Falls, Majayjay | Already present; name preserved |
+| Cavinti / Pagsanjan Falls | Pagsanjan Falls, Cavinti | Already present; existing aliases retained |
+| Balon-Balon Falls | None | Added as Balon-Balon Falls, Cavinti |
+| Buntot Palos Falls | Buntot Palos Falls, Pangil | Already present |
+| Ambon-Ambon Falls | None | Added as Ambon-Ambon Falls, Pangil |
+| Bunga Falls | Bunga Twin Falls, Nagcarlan | Already present; name preserved |
+| Dampalit Falls | Dampalit Falls, Los Ba?os | Already present |
+
+The reviewed additions live in `database/data/waterfall-expansion.json`. `waterfalls:import` imports only those two records through the guarded transactional catalogue importer. It checks canonical/alias identities in both directions and refuses conflicting existing metadata. Repeating the import preserves values and timestamps. No migration or destructive database operation is required. The full catalogue remains importable for isolated fixtures through ExplorerSeeder. Final inventory is 30 stored records, 28 public map profiles (10 lakes, 5 rivers, 13 waterfalls), and 30 reporting choices including the two spring resorts. Springs remain off the public map; reporting inclusion follows the user's newer explicit category request.
+
+### Balon-Balon Falls, Cavinti
+
+- [Laguna University's first-party community field visit](https://lu.edu.ph/lu-partners-with-cavinti-community-for-eco-friendly-tourism-training/) identifies Balon-Balon, Kipot and Porosa Falls in Tibatib, Cavinti. The described event occurred 2025-09-29; a publication date is not substituted for the event date.
+- [J. P. Leo Castillo's original Flickr record, Balon-Balon Falls, Left Section](https://www.flickr.com/photos/jpleo/53951884343) supplies public photo geolocation metadata: **14.264828 N, 121.518805 E**. Taken 2024-08-12, uploaded 2024-08-27. The local source-page snapshot records those exact values. The [firsthand field account](https://shoestringdiary.wordpress.com/2024/08/18/the-tri-falls-of-tibatib-part-1-balon-balon-falls/) independently identifies the falls in Tibatib. The geographic reference uses the web-map coordinate convention; it is a photographer-published reference near the falls, not a surveyed waterfall centroid. The source photograph is separately marked all rights reserved; using its factual geographic reference does not license its image. The displayed document photograph has the project owner's separate permission declaration.
+- Precision of the published digits is not positional accuracy. The photo-location/reference distinction is visible in the overview and geographic limits. No river basin, legal boundary, fish presence, measurements or pollution condition was inferred.
+
+### Ambon-Ambon Falls, Pangil
+
+- The [Senate Legislative Reference Bureau's House Bill 2749 record](https://issuances-library.senate.gov.ph/bills/house-bill-no-2749-15th-congress-republic), filed 2010-08-24, explicitly names Ambon-Ambon Falls in Pangil. A bill record is historical locality evidence, not proof of enactment or environmental status.
+- The [Pangil Wikivoyage listing, revision 5322962](https://en.wikivoyage.org/w/index.php?title=Pangil&oldid=5322962), supplies the named waterfall's map coordinates **14.412799 N, 121.484128 E**. Its HTML listing parameters and linked map marker were checked directly. Credit: Wikivoyage contributors, CC BY-SA; coordinate precision is not surveyed accuracy. The Pangil site must not be confused with the identically named falls in Bagac, Bataan or Laurel, Batangas, or with the coordinates of the access road or eco-park entrance.
+- No independent survey accuracy is established. A community-listed geographic reference is shown with explicit limitations; municipality labels are not certified boundaries. No fish occurrence or environmental condition is inferred.
+
+OpenStreetMap/Nominatim checks did not supply a named Balon-Balon falls feature and returned access-road results for Ambon-Ambon rather than a waterfall. Overpass endpoints had TLS/timeouts; the primary OSM API returned a rate-limit response for the Balon area. Those road/failed-query results were not used as waterfall coordinates and no rate limit was bypassed. Published source references above were retained instead. Geography check dates use Laguna's Asia/Manila calendar, while the application timestamp timezone remains unchanged; future check dates are still rejected.
+
+### Supplied photographs
+
+The Google Doc was directly accessible through its DOCX export. All ten embedded photographs were inspected and nine matched the requested inventory; Hidden Falls is outside the requested additions and Balisong Falls has no photo. [IMAGE_INVENTORY.md](IMAGE_INVENTORY.md) records all nine associations, source publishers, permission basis, optimization and preserved previous assets. Inclusion in the document was not treated as permission: the project owner explicitly confirmed ownership/permission for all images after being asked about local display, resizing and attribution. The public permission page records that declaration without claiming an independently verified or unrestricted public license. Unidentified photographers remain explicitly unidentified.

@@ -160,6 +160,13 @@ try {
         await pause(3100); // Exercise the real server timer; never disable protection in browser fixtures.
     }
     async function field(id, value) {
+        if (id === 'water_body_id') {
+            await evaluate(`(() => {
+                const lake = JSON.parse(document.getElementById('incident-lakes').textContent).find(item => String(item.id) === ${JSON.stringify(value)});
+                const category = document.getElementById('water_body_category');
+                if (lake && category.value !== lake.category) { category.value = lake.category; category.dispatchEvent(new Event('change', { bubbles: true })); }
+            })()`);
+        }
         await evaluate(`(()=>{const e=document.getElementById(${JSON.stringify(id)});e.value=${JSON.stringify(value)};e.dispatchEvent(new Event('change',{bubbles:true}));})()`);
     }
     async function choosePhoto() {
@@ -228,6 +235,9 @@ try {
         await navigate();
         assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
         await screenshot('desktop-form.png',true);
+        await click('#submit-report');
+        assert.equal(await evaluate('document.getElementById("water_body_category").validity.valueMissing'),true,'Category must be chosen first.');
+        await field('water_body_category','lake');
         await click('#submit-report');
         assert.equal(await evaluate('document.getElementById("water_body_id").validity.valueMissing'),true,'Native required validation must be present.');
         await evaluate('document.getElementById("report-form").noValidate=true');

@@ -19,7 +19,7 @@ class ExplorerProfile
             || ! is_string($value['checked_on'] ?? null)
             || ! preg_match('/^\d{4}-\d{2}-\d{2}$/D', $value['checked_on'])
             || ! checkdate((int) substr($value['checked_on'], 5, 2), (int) substr($value['checked_on'], 8, 2), (int) substr($value['checked_on'], 0, 4))
-            || $value['checked_on'] > now()->toDateString()
+            || $value['checked_on'] > now('Asia/Manila')->toDateString()
             || ! is_array($value['geometry'] ?? null)) {
             return null;
         }

@@ -58,7 +58,7 @@ if ($setup) {
     $rows = [];
     foreach (['water_bodies', 'fish_species', 'water_body_fish'] as $table) {
         $query = DB::table($table);
-        if ($table === 'water_bodies') {
+        if ($table === 'water_bodies' && getenv('AQUAMAP_BROWSER_FULL_CATALOGUE') !== '1') {
             $query->whereIn('name', ['Sampaloc Lake', 'Pandin Lake', 'Yambo Lake']);
         }
         $rows[$table] = $query->get()->map(fn (object $row): array => (array) $row)->all();

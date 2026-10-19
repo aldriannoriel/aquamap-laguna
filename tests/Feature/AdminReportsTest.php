@@ -42,6 +42,27 @@ class AdminReportsTest extends TestCase
         ], $attributes));
     }
 
+    public function test_verification_and_resolution_update_public_category_counts_without_publishing_report_details(): void
+    {
+        $report = $this->report(['pollution_type' => 'plastic_waste']);
+        $admin = $this->admin();
+        $pending = $this->get(route('map.index'))->assertOk();
+        $this->assertSame(0, $pending->viewData('profiles')[$report->water_body_id]['report_categories']['plastic_waste']);
+
+        $this->actingAs($admin)->patch(route('admin.reports.status', $report), ['status' => 'verified', 'expected_status' => 'pending'])
+            ->assertRedirectToRoute('admin.reports.show', $report)->assertSessionHasNoErrors();
+        $verified = $this->get(route('map.index'))->assertOk()->assertDontSee($report->description);
+        $this->assertSame(1, $verified->viewData('profiles')[$report->water_body_id]['report_categories']['plastic_waste']);
+
+        $this->patch(route('admin.reports.status', $report), ['status' => 'resolved', 'expected_status' => 'verified'])
+            ->assertRedirectToRoute('admin.reports.show', $report)->assertSessionHasNoErrors();
+        $resolved = $this->get(route('map.index'))->assertOk()->assertDontSee($report->description);
+        $this->assertSame(0, $resolved->viewData('profiles')[$report->water_body_id]['report_categories']['plastic_waste']);
+        $this->assertSame('resolved', $report->fresh()->status);
+        $this->assertSame(['verified', 'resolved'], $report->reviews()->pluck('new_status')->all());
+        $this->assertDatabaseCount('pollution_reports', 1);
+    }
+
     public function test_dashboard_counts_each_status_and_includes_unknown_legacy_rows_only_in_total(): void
     {
         foreach (['pending', 'pending', 'verified', 'rejected', 'resolved', 'legacy_unknown'] as $status) {

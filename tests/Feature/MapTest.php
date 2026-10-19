@@ -40,7 +40,7 @@ class MapTest extends TestCase
         $response = $this->get(route('map.index'));
 
         $response->assertOk()->assertViewIs('map.index')
-            ->assertSee("Explore Laguna's waters", false)->assertDontSee('private-fixture@example.test')
+            ->assertSee("Understand Laguna's aquatic environments", false)->assertDontSee('private-fixture@example.test')
             ->assertDontSee('Private test-only report.');
         $payload = $this->lakePayload($response);
         $this->assertSame(['Pandin Lake', 'Sampaloc Lake', 'Yambo Lake'], array_column($payload, 'name'));
