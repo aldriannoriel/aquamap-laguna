@@ -73,7 +73,7 @@ class RiverExpansionTest extends TestCase
         $this->artisan('rivers:import', ['--no-interaction' => true])->assertExitCode(0);
 
         $response = $this->get(route('map.index'))->assertOk()->assertSee('River course not yet mapped.')
-            ->assertSee('Length not yet verified.')->assertSee('Mapped segment length:')->assertSee('Clear selection');
+            ->assertSee('Length not yet verified.')->assertSee('Mapped course length:')->assertSee('Clear selection');
         $records = collect($response->viewData('lakes'))->keyBy('name');
         $this->assertCount(52, $records);
         $this->assertCount(29, $records->where('category', 'river'));
@@ -81,8 +81,8 @@ class RiverExpansionTest extends TestCase
         $this->assertNull($records['San Isidro River']['geography']);
         $this->assertNull($records['San Isidro River']['latitude']);
         $this->assertNull($records['San Isidro River']['longitude']);
-        $this->assertSame('LineString', $records['San Pedro River']['geography']['geometry']['type']);
-        $this->assertSame('LineString', $records['Tunasan River']['geography']['geometry']['type']);
+        $this->assertSame('MultiLineString', $records['San Pedro River']['geography']['geometry']['type']);
+        $this->assertSame('MultiLineString', $records['Tunasan River']['geography']['geometry']['type']);
         $this->get(route('reports.create'))->assertOk()->assertSee('San Isidro River')->assertSee('San Pedro River')->assertSee('Matikiw River');
     }
 
@@ -104,13 +104,13 @@ class RiverExpansionTest extends TestCase
         $this->assertNull($profiles[WaterBody::where('name', 'Yambo Lake')->sole()->id]['mapped_length_km']);
     }
 
-    public function test_great_circle_length_measures_each_part_without_bridging_gaps(): void
+    public function test_ellipsoidal_geodesic_length_measures_each_part_without_bridging_gaps(): void
     {
         $geography = ['status' => 'source_verified', 'crs' => 'EPSG:4326', 'checked_on' => '2026-10-21', 'source_url' => 'https://example.test/river',
             'geometry' => ['type' => 'MultiLineString', 'coordinates' => [[[0, 0], [1, 0]], [[100, 0], [101, 0]]]]];
-        $this->assertSame(222.39, WaterBodyMetrics::mappedLength($geography));
+        $this->assertSame(222.639, WaterBodyMetrics::mappedLength($geography));
         $geography['geometry'] = ['type' => 'LineString', 'coordinates' => [[0, 60], [1, 60]]];
-        $this->assertSame(55.597, WaterBodyMetrics::mappedLength($geography));
+        $this->assertSame(55.799, WaterBodyMetrics::mappedLength($geography));
         $geography['status'] = 'unverified';
         $this->assertNull(WaterBodyMetrics::mappedLength($geography));
     }

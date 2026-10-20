@@ -91,6 +91,7 @@
     <p data-geographic-note class="mt-3 text-xs leading-5 text-muted">Location awaiting verification. This profile has no published map feature.</p>
 @endif
     @if ($lake['geography'])<a href="{{ $lake['geography']['source_url'] }}" target="_blank" rel="noopener noreferrer" class="lake-detail-source">Geographic source</a>@endif
+    @if ($profile['original_geography_note'])<p data-original-geographic-note class="mt-3 text-xs text-muted">Earlier catalogue reach note (preserved for provenance): {{ $profile['original_geography_note'] }}</p>@endif
     </article>
     @if ($profile['image'])
         <article data-image-credit class="rounded-lg border border-line bg-mist p-4 text-xs leading-5">

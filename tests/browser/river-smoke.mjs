@@ -42,7 +42,7 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'river-expansion/browser';
+const artifactDirectory = 'river-courses/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json', 'waterfall-expansion.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const imageReplacements = JSON.parse(readFileSync(path.join(root, 'database/data/waterfall-photos.json'), 'utf8'));
@@ -168,6 +168,9 @@ try {
         const lakes = await evaluate('JSON.parse(document.getElementById("lake-data").textContent)');
         assert.equal(lakes.length, 52);
         assert.equal(lakes.filter(item => item.category === 'river').length, 29);
+        const balanac = lakes.find(item => item.name === 'Balanac River');
+        assert.equal(balanac.geography.geometry.coordinates.length, 20);
+        assert(Math.min(...balanac.geography.geometry.coordinates.flat().map(point => point[1])) < 14.18, 'Balanac must extend upstream beyond its old Pagsanjan reach.');
         assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
         const selectedPaths = 'document.querySelectorAll(".selected-water-course")';
         for (const lake of lakes.filter(item => (width !== 320 && !process.argv.includes('--quick')) || ['Balanac River', 'San Isidro River', 'Yambo Lake'].includes(item.name))) {
@@ -186,8 +189,14 @@ try {
             }
             const text = await evaluate('document.getElementById("map-selection-summary").textContent');
             if (lake.category === 'river') {
-                assert(text.includes(shape ? 'Mapped segment length:' : 'River course not yet mapped.'));
-                assert(text.includes(['Bumbungan River', 'San Pedro River', 'Tunasan River'].includes(lake.name) ? 'Length not yet verified.' : 'Reported river length:'));
+                assert(text.includes(shape ? 'Mapped course length:' : 'River course not yet mapped.'));
+                assert(text.includes(['Bumbungan River', 'San Pedro River', 'Tunasan River'].includes(lake.name) ? 'Length not yet verified.' : 'Provincial reported figure:'));
+                assert(text.includes('Whole-river length and complete headwater-to-mouth coverage are not independently verified.'));
+                if (lake.name === 'Balanac River') {
+                    assert(text.includes('19.272 km'));
+                    assert(text.includes('10.70 km'));
+                    assert.equal(await evaluate(`document.querySelectorAll('#map-selection-summary [data-course-sources] a[href^="https://www.openstreetmap.org/way/"]').length`), 20);
+                }
             }
             if (lake.category === 'lake') {
                 assert(!text.includes('river length'));

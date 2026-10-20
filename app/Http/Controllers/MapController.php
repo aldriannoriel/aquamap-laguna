@@ -6,6 +6,7 @@ use App\Models\FishSpecies;
 use App\Models\PollutionReport;
 use App\Models\WaterBody;
 use App\Support\ExplorerProfile;
+use App\Support\RiverCourseCatalogue;
 use App\Support\WaterBodyMetrics;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -52,8 +53,11 @@ class MapController extends Controller
             return [$lake->id => $counts];
         });
 
+        $courseCatalogue = RiverCourseCatalogue::load();
+        $displayGeographies = $records->mapWithKeys(fn (WaterBody $lake): array => [$lake->id => RiverCourseCatalogue::resolve($lake, $courseCatalogue)])->all();
+
         $lakes = $records
-            ->map(function (WaterBody $lake) use ($fields, $reportsByLake): array {
+            ->map(function (WaterBody $lake) use ($fields, $reportsByLake, $displayGeographies): array {
                 $data = $lake->only($fields);
                 $data['description'] = filled($data['description']) ? trim($data['description']) : null;
                 $data['source_url'] = $this->publicSource($data['source_url']);
@@ -62,7 +66,10 @@ class MapController extends Controller
                 $data['site_type'] = $lake->site_type === 'resort' ? 'resort' : 'water_body';
                 $data['spring_type'] = in_array($lake->spring_type, ['geothermal_hot_spring', 'natural_spring'], true) ? $lake->spring_type : null;
                 $data['official_url'] = $this->publicSource($lake->official_url);
-                $data['geography'] = ExplorerProfile::geography($lake->geography, $lake->category);
+                $data['geography'] = $displayGeographies[$lake->id]['geography'];
+                if (($displayGeographies[$lake->id]['course']['coverage'] ?? null) === 'available_named_course') {
+                    $data['description'] = $displayGeographies[$lake->id]['course']['note'];
+                }
                 $data['verified_report_count'] = array_sum($reportsByLake[$lake->id]);
 
                 return $data;
@@ -89,7 +96,7 @@ class MapController extends Controller
         $images = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR);
         $metrics = json_decode(file_get_contents(database_path('data/water-body-metrics.json')), true, flags: JSON_THROW_ON_ERROR);
         $replacements = json_decode(file_get_contents(database_path('data/waterfall-photos.json')), true, flags: JSON_THROW_ON_ERROR);
-        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $reportsByLake, $metrics): array {
+        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $reportsByLake, $metrics, $displayGeographies): array {
             $supplement = $images[$lake->name] ?? null;
             $image = $lake->image;
             if ($image === null && is_array($supplement) && ($supplement['municipality'] ?? null) === $lake->municipality) {
@@ -111,7 +118,10 @@ class MapController extends Controller
                 'reported_length' => $lake->category === 'river' ? WaterBodyMetrics::reported($metrics['rivers'][$lake->name] ?? null, $lake->municipality) : null,
                 'length_note' => $lake->category === 'river' && $lake->name === 'Bumbungan River'
                     && $lake->municipality === $metrics['rivers']['Bumbungan River']['municipality'] ? $metrics['rivers']['Bumbungan River']['note'] : null,
-                'mapped_length_km' => $lake->category === 'river' ? WaterBodyMetrics::mappedLength(ExplorerProfile::geography($lake->geography, 'river')) : null,
+                'mapped_length_km' => $lake->category === 'river' ? WaterBodyMetrics::mappedLength($displayGeographies[$lake->id]['geography']) : null,
+                'course' => $displayGeographies[$lake->id]['course'],
+                'original_geography_note' => $lake->category === 'river' && $displayGeographies[$lake->id]['course'] !== null
+                    && is_string($lake->geography['note'] ?? null) ? $lake->geography['note'] : null,
                 'surface_area' => $lake->category === 'lake' ? WaterBodyMetrics::reported($metrics['lakes'][$lake->name] ?? null, $lake->municipality) : null,
             ]];
         })->all();

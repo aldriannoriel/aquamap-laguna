@@ -16,19 +16,19 @@ The table's location column is a reference locality, not an exhaustive list of m
 
 ## Geometry provenance and licensing
 
-`database/data/river-expansion.json` stores WGS84 longitude/latitude geometry, exact original way-node sequences, source URLs, way versions/dates, coverage notes and ODbL attribution. Every new line was checked against the original **OpenStreetMap API way and nodes**, requiring the expected name (or explicit alias), a river/stream waterway tag, complete node references and plausible Laguna-region coordinates. Multiple ways remain separate MultiLineString parts. No simplification, arbitrary connector, municipal centroid, watershed outline or synthetic river course was created.
+The initial additive records in `database/data/river-expansion.json` remain unchanged. The current `database/data/river-courses.json` presentation supplement audits all **29** existing rivers, retaining original database records and matching each entry by exact canonical name, reference locality and baseline geometry source. Its **173 original OSM ways** provide **17 connected named courses**; **15 extend farther** than baseline 0119109. Bi?an and Dalitiwan have no additional attributable connected named ways in the retrieved sources. Twelve other rivers remain unmapped. No mapped course has independently verified full headwater-to-mouth coverage.
 
-The public [WaterwayMap Laguna directory](https://waterwaymap.org/river/region/PH-Laguna/) was used only to discover candidate **node** IDs, then the OSM node/ways and way/full endpoints established the actual geometry. Directory IDs must not be interpreted as way IDs: a candidate Santa Rosa ID resolved to an unrelated road and was rejected. No WaterwayMap geometry or calculated directory length is imported. A bulk Overpass request failed (TLS/HTTP 406); it was abandoned. Government centreline data with a reviewed license was not obtained.
+WaterwayMap's public river pages expose candidate way IDs in their JOSM object list; the directory's numeric identifiers are node IDs and must never be interpreted as way IDs. Original [OSM way/node APIs](https://wiki.openstreetmap.org/wiki/API_v0.6) then supplied full way metadata and every original node coordinate. Twenty discovery pages produced 203 candidate ways and 5,364 nodes. Name/explicit-alias, waterway type and region checks preceded connectivity review against existing source ways. Twenty-two disconnected same-name San Juan ways and eight disconnected Santa Rosa ways were excluded. An unrelated Taraka River candidate was in Lanao del Sur and was rejected. WaterwayMap geometry and calculated lengths are not imported.
 
-Derived OSM geographic data is credited to [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/). Original source objects and their metadata are retained. The application shows attribution and license links. These are community-mapped reference reaches, not surveyed, current-certified or legally authoritative lines. OSM's separate `boundary` tags do not make the river geometry a watershed or certified boundary.
+Each geometry part exactly preserves its original way-node sequence; no simplification, connector, municipal clipping, inferred headwater, basin polygon or synthetic point is added. The application additionally validates shared-node coordinates, unique way IDs, no repeated undirected edges, connectivity, exactly two terminal nodes and no branching. This prevents a tributary network being summed as a single course. Original source IDs, revisions, timestamps, node IDs, source snapshot hashes and rejected candidate IDs remain in the committed supplement. Sanitized public source lists omit contributor account metadata. Original-way revisions do not date every node or certify positional accuracy.
 
-Raw source snapshots, rejected candidates, hashes and preparation evidence are in ignored `storage/app/river-expansion/`; the committed catalogue and table below retain durable provenance without contributor account metadata. Existing source catalogues remain unchanged.
+Derived geographic data is credited to [OpenStreetMap contributors](https://www.openstreetmap.org/copyright), under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/), with attribution/license links in the map. These are community-mapped named courses, without survey/legal certification. The supplement and its source-node metadata make the derived data available; source object links cover every imported way. Original API snapshots and preparation evidence are retained in ignored `storage/app/river-courses/`; earlier `river-expansion/` evidence is preserved.
 
 ## Length and area semantics
 
 `database/data/water-body-metrics.json` is an exact-name/locality presentation supplement. It never overwrites database records. Twenty-six approximate river lengths are source-checked against the transcription; Bumbungan/Pagsanjan is withheld as an ambiguous total, and San Pedro/Tunasan have no verified source total. Future corrections require reviewed evidence.
 
-`WaterBodyMetrics::mappedLength` calculates only validated LineString/MultiLineString parts using great-circle distances on the IUGG mean-radius sphere (6,371,008.8 m), rounded to 0.001 km for display. This is a spherical geodesic approximation, not an ellipsoidal survey; vertex precision and rounding do not imply positional accuracy. It never bridges disconnected parts or substitutes a mapped segment length for a source total. All current river courses are partial.
+The map labels **mapped course length** separately from the **provincial reported figure (approximate; extent unspecified)**. `WaterBodyMetrics::mappedLength` sums WGS84 ellipsoidal geodesics between consecutive source vertices, using [Vincenty's original inverse method](https://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf) and [NGA WGS84 constants](https://earth-info.nga.mil/index.php?action=wgs84&dir=wgs84): semi-major axis 6,378,137 m, inverse flattening 298.257223563. Parts are never bridged, and a nonconvergent segment yields unknown. Distances are rounded to 0.001 km for display; rounding and coordinate digits do not imply survey accuracy. No calculated distance is promoted to a verified whole-river total or used to estimate a coverage percentage. A longer mapped distance than a provincial figure indicates an unresolved extent/source difference, not an automatic correction of that figure. Balanac now has 19.272 km mapped versus its original 0.741 km reach and the table's approximate 10.70 km of unspecified extent.
 
 Nine existing lake polygons support highlighting: Sampaloc, Yambo, Bunot, Mohicap, Calibato, Palakpakin, Caliraya, Lumot and Laguna de Bay. Pandin retains its source-checked shoreline point; a complete shoreline is still unavailable. No lake geometry was fabricated or replaced.
 
@@ -45,38 +45,61 @@ Unmapped profiles stay selectable and available in Report a Concern. A point mar
 
 The test database guard, private report/photo/contact handling, server-assigned pending status, timing/honeypot/throttle protections and administrator review rules remain unchanged. See `CURRENT_STATE.md` for final execution evidence and `EXPANSION_PROGRESS.md` for the recovery checkpoint.
 
-## Reviewed inventory
+## All-29 course audit against baseline 0119109
 
-The rows below correspond to the 27 provincial entries. “Partial” always means selected named reaches, not full river coverage. All remaining rivers need independent point/centreline evidence.
+Reviewed 2026-10-21. Before and after distances below use the same WGS84 ellipsoid, separating geometry changes from the former spherical calculation. These distances describe supplied mapping only. **Whole-river length: unverified for every row.** The source count links to the first original way; the [complete catalogue](../database/data/river-courses.json) lists every way and revision. Reference localities are not clipping boundaries. Bumbungan's provincial 4.00 km lead remains withheld as a whole-river figure; San Pedro/Tunasan have no verified reported totals.
 
-<!-- Inventory rows are generated from the reviewed committed catalogues below. -->
+| River | Reference locality | Before km | Mapped km | Provincial approx. km | Source ways |
+| --- | --- | ---: | ---: | ---: | --- |
+| Balanac River | Pagsanjan | 0.741 | 19.272 | 10.70 | 20; [first way](https://www.openstreetmap.org/way/118529511) |
+| Balatuin River | San Pablo City | 0.167 | 8.252 | 9.10 | 8; [first way](https://www.openstreetmap.org/way/25423124) |
+| Banca-Banca River | Victoria | Unknown | Unknown | 9.10 | Not yet mapped |
+| Bay River | Bay | 0.544 | 4.560 | 5.80 | 6; [first way](https://www.openstreetmap.org/way/26451207) |
+| Biñan River | Biñan City | 4.980 | 4.980 | 7.10 | 1; [first way](https://www.openstreetmap.org/way/26949260) |
+| Botocan River | Luisiana | 0.782 | 8.567 | 3.90 | 5; [first way](https://www.openstreetmap.org/way/99663609) |
+| Bumbungan River | Pagsanjan | 2.501 | 38.150 | Unverified | 21; [first way](https://www.openstreetmap.org/way/114040110) |
+| Calo River | Bay | 1.442 | 12.677 | 15.10 | 7; [first way](https://www.openstreetmap.org/way/37779871) |
+| Dalitiwan River | Majayjay | 2.518 | 2.518 | 11.60 | 1; [first way](https://www.openstreetmap.org/way/97211396) |
+| Maimpis River | Nagcarlan | Unknown | Unknown | 9.00 | Not yet mapped |
+| Makpongo River | San Pablo City | Unknown | Unknown | 3.90 | Not yet mapped |
+| Malaunod River | San Pablo City | 1.096 | 3.434 | 9.45 | 11; [first way](https://www.openstreetmap.org/way/476317798) |
+| Matikiw River | Pakil | Unknown | Unknown | 5.00 | Not yet mapped |
+| Onipa River | San Pablo City | Unknown | Unknown | 6.00 | Not yet mapped |
+| Pangil River | Pangil | 0.453 | 11.690 | 7.00 | 5; [first way](https://www.openstreetmap.org/way/109868348) |
+| Pila River | Pila | Unknown | Unknown | 2.70 | Not yet mapped |
+| Prinza River | Calauan | Unknown | Unknown | 11.20 | Not yet mapped |
+| Romero River | Famy | Unknown | Unknown | 3.20 | Not yet mapped |
+| San Antonio River | Santa Maria / Mabitac | Unknown | Unknown | 8.80 | Not yet mapped |
+| San Cristobal River | Calamba City | 2.362 | 10.562 | 18.90 | 8; [first way](https://www.openstreetmap.org/way/27371773) |
+| San Isidro River | San Pedro City | Unknown | Unknown | 4.90 | Not yet mapped |
+| San Juan River | Calamba City | 0.537 | 9.873 | 14.80 | 13; [first way](https://www.openstreetmap.org/way/123544407) |
+| San Pedro River | San Pedro City | 0.840 | 19.555 | Unverified | 26; [first way](https://www.openstreetmap.org/way/77319896) |
+| Santa Cruz River | Santa Cruz | 1.853 | 15.605 | 11.00 | 21; [first way](https://www.openstreetmap.org/way/30705665) |
+| Santa Rosa River | Santa Rosa City | 1.067 | 11.834 | 11.05 | 6; [first way](https://www.openstreetmap.org/way/90546142) |
+| Siniloan River | Siniloan | 3.647 | 4.526 | 6.10 | 4; [first way](https://www.openstreetmap.org/way/211563245) |
+| Tarak River | San Pablo City | Unknown | Unknown | 5.80 | Not yet mapped |
+| Tigas River | Alaminos | Unknown | Unknown | 8.90 | Not yet mapped |
+| Tunasan River | San Pedro / Muntinlupa boundary area | 1.596 | 11.598 | Unverified | 10; [first way](https://www.openstreetmap.org/way/91237596) |
 
-| Provincial entry / existing canonical profile | Reference locality | Approx. source km | Geometry |
-| --- | --- | ---: | --- |
-| San Isidro River | San Pedro City | 4.90 | Not yet mapped |
-| Biñan River | Biñan City | 7.10 | Partial; [26949260](https://www.openstreetmap.org/way/26949260) |
-| Santa Rosa River | Santa Rosa City | 11.05 | Partial; [90984742](https://www.openstreetmap.org/way/90984742), [1446694906](https://www.openstreetmap.org/way/1446694906) |
-| San Cristobal River | Calamba City | 18.90 | Partial; [27371773](https://www.openstreetmap.org/way/27371773), [110617725](https://www.openstreetmap.org/way/110617725) |
-| San Juan River | Calamba City | 14.80 | Partial; [549175324](https://www.openstreetmap.org/way/549175324) |
-| Bay River | Bay | 5.80 | Partial; [413242115](https://www.openstreetmap.org/way/413242115) |
-| Calo River | Bay | 15.10 | Partial; [413242117](https://www.openstreetmap.org/way/413242117) |
-| Prinza River | Calauan | 11.20 | Not yet mapped |
-| Banca-Banca River | Victoria | 9.10 | Not yet mapped |
-| Pila River | Pila | 2.70 | Not yet mapped |
-| Santa Cruz River | Santa Cruz | 11.00 | Partial; [existing sources](RESEARCH_SOURCES.md) |
-| Balanac River | Pagsanjan | 10.70 | Partial; [existing sources](RESEARCH_SOURCES.md) |
-| Bumbungan River | Pagsanjan | Unverified (table: 4.00) | Partial; [existing sources](RESEARCH_SOURCES.md) |
-| Pangil River | Pangil | 7.00 | Partial; [1428178449](https://www.openstreetmap.org/way/1428178449), [1428178453](https://www.openstreetmap.org/way/1428178453) |
-| Siniloan River | Siniloan | 6.10 | Partial; [211563245](https://www.openstreetmap.org/way/211563245), [679990142](https://www.openstreetmap.org/way/679990142) |
-| Romero River | Famy | 3.20 | Not yet mapped |
-| San Antonio River | Santa Maria / Mabitac | 8.80 | Not yet mapped |
-| Tigas River | Alaminos | 8.90 | Not yet mapped |
-| Makpongo River | San Pablo City | 3.90 | Not yet mapped |
-| Balatuin River | San Pablo City | 9.10 | Partial; [113962651](https://www.openstreetmap.org/way/113962651) |
-| Malaunod River | San Pablo City | 9.45 | Partial; [476317798](https://www.openstreetmap.org/way/476317798), [1455171120](https://www.openstreetmap.org/way/1455171120) |
-| Onipa River | San Pablo City | 6.00 | Not yet mapped |
-| Tarak River | San Pablo City | 5.80 | Not yet mapped |
-| Maimpis River | Nagcarlan | 9.00 | Not yet mapped |
-| Dalitiwan River | Majayjay | 11.60 | Partial; [97211396](https://www.openstreetmap.org/way/97211396) |
-| Botocan River | Luisiana | 3.90 | Partial; [131583391](https://www.openstreetmap.org/way/131583391) |
-| Matikiw River | Pakil | 5.00 | Not yet mapped |
+## Evidence gaps for the twelve unmapped profiles
+
+- **San Isidro:** [DENR](https://calabarzon.denr.gov.ph/news-events/icymi-denr-calabarzon-leads-joint-response-to-massive-fire-and-oil-spill-in-san-pedro-city-laguna/) identifies it as a San Pedro tributary. That does not license assigning San Pedro's differently named centreline to San Isidro.
+- **Prinza:** [JICA's locality evidence](https://openjicareport.jica.go.jp/pdf/11750908_01.pdf) is a research lead; no reusable source-checked river line was retrieved. Barangay coordinates are not a course.
+- **Banca-Banca / Pila:** [LLDA's Pila sub-basin material](https://llda.gov.ph/wp-content/uploads/2019/09/Vol_15.Pila-SB.pdf) distinguishes the systems. Watershed outlines and total drainage-network lengths are not individual named centrelines or whole-river lengths. LLDA direct retrieval was restricted; indexed passages were reviewed only.
+- **Romero:** [LLDA's Siniloan-Famy report](https://llda.gov.ph/wp-content/uploads/2019/09/Vol_10.Siniloan-SB.pdf) uses Mayor/Romelo/Romero naming in the Siniloan system; [its 2017 annual report](https://llda.gov.ph/wp-content/uploads/dox/ar/ar17.pdf) also calls Siniloan River Romelo. An alternate-spelling OSM search retrieved [Romelo way 545851314](https://www.openstreetmap.org/way/545851314) in Siniloan. Its assignment to the provincial Famy entry, independently of the existing Siniloan profile, remains unresolved. No course was duplicated under a guessed identity.
+- **San Antonio:** [BSWM's Laguna material](https://www.bswm.da.gov.ph/wp-content/uploads/Laguna.pdf) provides Santa Maria/Mabitac river/floodplain context; no attributable named line was retrieved.
+- **Tigas:** Alaminos government's [Climate and Disaster Risk Assessment, River Systems map](https://alaminoslaguna.com/wp-content/uploads/2020/07/Climate-and-Disaster-Risk-Assessment.pdf) labels Tigas but uses GCS Luzon 1911 and mixed source mapping. A reusable georeferenced centreline, licensed vector data and verified transformation were not obtained. The map was not traced into guessed WGS84 coordinates.
+- **Onipa:** a named GeoNames gazetteer point is a discovery lead only. It supplies no upstream/downstream line and is not substituted for a river course.
+- **Makpongo / Tarak:** the provincial table establishes names/localities; possible Makampongo/Tarac spellings remain unverified identity leads. Exact/alternate OSM-index searches retrieved no attributable line. The unrelated Taraka waterway in Lanao del Sur was rejected.
+- **Maimpis:** [JICA's geography/geology report](https://openjicareport.jica.go.jp/pdf/11197951_01.pdf) identifies the river and regional drainage. Maimpes/Manipis gazetteer spellings were checked as leads, with no attributable line retrieved. Neighboring Santa Cruz/Liliw/Nagcarlan courses are not substitutes.
+- **Matikiw:** the provincial entry/locality does not identify which channel is the named river. Barangay boundaries, irrigation canals and lake-shore references were not assigned a river identity.
+
+Public Nominatim searches were spaced at least 1.1 seconds apart: all twelve exact-name queries returned no result; five alternate spellings also returned none, while Romelo returned the ambiguous Siniloan candidate above. An index miss does not prove that no geographic data exists. The main Overpass endpoint failed TLS; the officially listed public Private.coffee instance timed out without a response. No access controls or rate limits were bypassed. [NAMRIA Geoportal](https://geoportal.gov.ph/) metadata lists waterbody 1:10,000/1:50,000 and Manila Bay river-network layers with downloads disabled; its available major-basin polygons do not supply named centreline geometry. A legacy NREL river WFS host failed DNS resolution. Restricted downloads/captcha flows were not bypassed. These access limits and raw query results are preserved in ignored evidence storage.
+
+The application records each gap and leaves missing course/point values unknown. To extend coverage later, obtain attributable original centrelines with a usable license, declared CRS/datum and enough name/locality evidence to distinguish aliases and connected tributaries. A map image, an approximate source length, or a nearby unnamed stream is insufficient.
+
+## Audit and recovery of the course supplement
+
+After the existing baseline/initial additive import, no new persistent migration or seeding is needed: MapController applies the reviewed supplement on read, without changing any of the 54 records, IDs, timestamps, descriptions, points, environmental links, photos or reports. Original reach notes remain available as historical provenance in Research & Sources. An identity/source or geometry validation failure falls back to the original sanitized reach.
+
+Run `php artisan rivers:audit-courses --json --no-interaction` to inspect all stored rivers, baseline/mapped distances, source counts, coverage notes and unknown whole-river totals. The command is read-only and refuses any persistent database other than configured and connected aquamap_laguna. Normal migrations/imports for the earlier expansion remain as described above. Future edits to stored identity/source metadata require re-review before the supplement applies.
