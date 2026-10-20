@@ -14,6 +14,7 @@ class WaterBody extends Model
         'lake' => 'Lakes',
         'river' => 'Rivers',
         'waterfall' => 'Waterfalls',
+        'spring' => 'Springs / Resorts',
     ];
 
     public const CATEGORIES = [

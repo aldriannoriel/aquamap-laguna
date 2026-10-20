@@ -176,6 +176,8 @@ try {
         assert.equal(await evaluate('document.getElementById("photo").files[0].size'),3*1024*1024);
     }
     if (verifySpam) {
+        const proofPng=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6Z3UAAAAASUVORK5CYII=','base64');
+        await writeFile(path.join(fixture,'synthetic-photo.png'),Buffer.concat([proofPng,Buffer.alloc(3*1024*1024-proofPng.length)]));
         await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1100,deviceScaleFactor:1,mobile:false});
         await send('Page.navigate',{url:`${base}/reports/create`});
         await waitFor(()=>evaluate('!!document.getElementById("report-form")'),'Reporting form did not load.');
@@ -195,18 +197,21 @@ try {
         assert.equal(await evaluate('document.getElementById("website").tabIndex'),-1,'Honeypot must not enter keyboard navigation.');
         await field('water_body_id',String(lakes[0].id));await field('pollution_type','solid_waste');
         await field('description','Synthetic private spam-check observation.');await field('website','https://bot.example.test');
+        await choosePhoto();
         await click('#submit-report');
         await waitFor(()=>evaluate('!!document.getElementById("form-errors")'),'Honeypot submission was not rejected.');
         assert.equal(await evaluate('document.getElementById("description").value'),'Synthetic private spam-check observation.');
         assert.equal(await evaluate('document.getElementById("website").value'),'');
         assert.equal(fixtureCommand('check').reports,0);
         await waitFor(()=>evaluate('!!document.querySelector("#incident-map .leaflet-control-zoom-in")'),'Retry form did not initialize.');
+        await choosePhoto();
         await click('#submit-report');
         await waitFor(()=>evaluate('!!document.getElementById("report-success")'),'Legitimate retry did not succeed.');
         assert.equal(await evaluate('!!document.getElementById("duplicate-warning")'),false);
         await navigate();
         await field('water_body_id',String(lakes[0].id));await field('pollution_type','solid_waste');
         await field('description','A different synthetic observation for the same lake and type.');
+        await choosePhoto();
         await click('#submit-report');
         await waitFor(()=>evaluate('!!document.getElementById("duplicate-warning")'),'Same-session repeat warning was not shown.');
         assert.equal(await evaluate('document.getElementById("duplicate-warning").textContent.includes("still been saved privately")'),true);
@@ -219,11 +224,12 @@ try {
         assert.equal(await evaluate('document.getElementById("website").getClientRects().length'),0);
         await field('water_body_id',String(lakes[0].id));await field('pollution_type','solid_waste');
         await field('description','Synthetic mobile repeat; not a real pollution report.');
+        await choosePhoto();
         await click('#submit-report');
         await waitFor(()=>evaluate('!!document.getElementById("duplicate-warning")'),'Mobile repeat warning did not appear.');
         assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true,'Mobile warning overflow.');
         await screenshot('spam-mobile-warning.png');
-        assert.deepEqual(fixtureCommand('check'),{reports:3,pending:3,photos:0,largestPhoto:0});
+        assert.deepEqual(fixtureCommand('check'),{reports:3,pending:3,photos:3,largestPhoto:3*1024*1024});
         const limited=await evaluate('fetch("/reports",{method:"POST",body:new FormData(document.getElementById("report-form"))}).then(r=>r.status)');
         assert.equal(limited,429,'The original five-attempts/hour limit must remain active.');
         results.push('390px mobile: accessible blank honeypot, normal anonymous submission and readable nonblocking repeat warning; all three reports remain private/pending in SQLite. Sixth POST receives 429 after two rejected attempts and three valid submissions.');

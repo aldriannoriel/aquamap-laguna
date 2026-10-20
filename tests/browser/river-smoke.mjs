@@ -42,7 +42,7 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'river-courses/browser';
+const artifactDirectory = process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json', 'waterfall-expansion.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const imageReplacements = JSON.parse(readFileSync(path.join(root, 'database/data/waterfall-photos.json'), 'utf8'));
@@ -137,6 +137,10 @@ try {
     }
     let mobile = false;
     async function click(selector) {
+        if (mobile && (selector.includes('data-lake-id') || selector.includes('data-category'))) {
+            await evaluate('document.getElementById("water-sidebar").open = true');
+            await pause(100);
+        }
         const point = await evaluate(`(() => { const element = document.querySelector(${JSON.stringify(selector)}); if (!element) throw new Error('Missing control'); (element.closest('#lake-map') || element).scrollIntoView({block:'center'}); const r = element.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
         await pause(100);
         if (mobile) {
@@ -149,7 +153,7 @@ try {
         await pause(80);
     }
     async function screenshot(name, fullPage = false) {
-        await evaluate('document.getElementById("map-selection").scrollIntoView({block:"start"})');
+        await evaluate('document.querySelector(".explorer-map").scrollIntoView({block:"start"})');
         const metrics = fullPage ? await send('Page.getLayoutMetrics') : null;
         const shot = await send('Page.captureScreenshot', {
             format: 'png', captureBeyondViewport: fullPage,
@@ -159,92 +163,117 @@ try {
     }
     await send('Runtime.enable');
     await send('Page.enable');
-    for (const [width, height] of [[1440, 1100], [390, 844], [320, 740]]) {
-        mobile = width < 1024;
+    for (const [width, height] of [[1440, 1100], [1024, 900], [390, 844], [320, 740]]) {
+        mobile = width < 768;
         await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile });
         await send('Emulation.setTouchEmulationEnabled', { enabled: mobile });
         await navigate('/map');
-        await waitFor(() => evaluate('document.querySelectorAll(".lake-marker").length === 40'), 'Expected 40 verified locations; unmapped rivers must have no marker.');
+        await waitFor(() => evaluate('document.querySelectorAll(".lake-marker").length === 42'), 'Expected 42 sourced map locations and 12 unmapped rivers.');
         const lakes = await evaluate('JSON.parse(document.getElementById("lake-data").textContent)');
-        assert.equal(lakes.length, 52);
+        assert.equal(lakes.length, 54);
         assert.equal(lakes.filter(item => item.category === 'river').length, 29);
-        const balanac = lakes.find(item => item.name === 'Balanac River');
-        assert.equal(balanac.geography.geometry.coordinates.length, 20);
-        assert(Math.min(...balanac.geography.geometry.coordinates.flat().map(point => point[1])) < 14.18, 'Balanac must extend upstream beyond its old Pagsanjan reach.');
+        assert(lakes.every(item => !('verified_report_count' in item)));
+        assert.equal(await evaluate('document.querySelectorAll("[data-profile-tab]").length'), 4);
+        assert.equal(await evaluate('!!document.getElementById("map-selection")'), false);
+        assert.equal(await evaluate('document.querySelectorAll(".report-fab").length'), 1);
         assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
-        const selectedPaths = 'document.querySelectorAll(".selected-water-course")';
-        for (const lake of lakes.filter(item => (width !== 320 && !process.argv.includes('--quick')) || ['Balanac River', 'San Isidro River', 'Yambo Lake'].includes(item.name))) {
-            await click(`[data-lake-id="${lake.id}"]`);
-            assert.equal(await evaluate('document.getElementById("map-selection-heading").textContent'), lake.name);
-            assert.equal(await evaluate('document.getElementById("water-detail-dialog").open'), false, 'Selection card must allow map interactions.');
-            const shape = lake.geography && lake.geography.geometry.type !== 'Point';
-            assert.equal(await evaluate(`${selectedPaths}.length > 0`), !!shape);
-            if (shape) {
-                const paths = await evaluate(`[...${selectedPaths}].map(path => ({color:path.getAttribute('stroke'),weight:Number(path.getAttribute('stroke-width')),rect: (()=>{const r=path.getBoundingClientRect(),m=document.getElementById('lake-map').getBoundingClientRect();return {left:r.left-m.left,right:r.right-m.left,top:r.top-m.top,bottom:r.bottom-m.top,width:m.width,height:m.height};})()}))`);
-                for (const path of paths) {
-                    assert.equal(path.color, '#0066ff');
-                    assert(path.weight >= 4);
-                    assert(path.rect.left >= 20 && path.rect.top >= 20 && path.rect.right <= path.rect.width - 20 && path.rect.bottom <= path.rect.height - 20, `${lake.name}: selected extent must fit inside the map.`);
-                }
-            }
-            const text = await evaluate('document.getElementById("map-selection-summary").textContent');
-            if (lake.category === 'river') {
-                assert(text.includes(shape ? 'Mapped course length:' : 'River course not yet mapped.'));
-                assert(text.includes(['Bumbungan River', 'San Pedro River', 'Tunasan River'].includes(lake.name) ? 'Length not yet verified.' : 'Provincial reported figure:'));
-                assert(text.includes('Whole-river length and complete headwater-to-mouth coverage are not independently verified.'));
-                if (lake.name === 'Balanac River') {
-                    assert(text.includes('19.272 km'));
-                    assert(text.includes('10.70 km'));
-                    assert.equal(await evaluate(`document.querySelectorAll('#map-selection-summary [data-course-sources] a[href^="https://www.openstreetmap.org/way/"]').length`), 20);
-                }
-            }
-            if (lake.category === 'lake') {
-                assert(!text.includes('river length'));
-                assert(text.includes(['Yambo Lake', 'Pandin Lake', 'Calibato Lake'].includes(lake.name) ? 'Reported surface area:' : 'Surface area not yet verified.'));
-            }
-            if (['Balanac River', 'Yambo Lake', 'San Isidro River'].includes(lake.name)) {
-                await screenshot(`${width}-${lake.name.split(' ')[0]}.png`);
-                await click('.leaflet-control-zoom-in');
-                assert.equal(await evaluate('document.getElementById("water-detail-dialog").open'), false);
-                await click('#open-water-profile');
-                assert.equal(await evaluate('document.getElementById("water-detail-dialog").open'), true);
-                for (const tab of ['overview', 'classification', 'fish', 'pollution', 'research']) {
-                    await click(`[data-profile-tab="${tab}"]`);
-                    assert.equal(await evaluate(`document.querySelector('#selected-lake [data-profile-section="${tab}"]').hidden`), false);
-                }
-                assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
-                await click('#close-water-detail');
-                await waitFor(() => evaluate('document.getElementById("map-selection").hidden'), 'Closing profile must clear selection.');
-            } else {
-                await click('#clear-water-selection');
-            }
-            assert.equal(await evaluate(`${selectedPaths}.length`), 0);
-            await click('#reset-map');
+        if (!mobile) {
+            const layout = await evaluate('(()=>{const s=document.getElementById("water-sidebar").getBoundingClientRect(),m=document.querySelector(".explorer-map").getBoundingClientRect(),l=document.getElementById("water-list");return {left:s.left,mapLeft:m.left,top:s.top,mapTop:m.top,ratio:s.width/(s.width+m.width),scroll:l.scrollHeight>l.clientHeight,overflow:getComputedStyle(l).overflowY};})()');
+            assert(layout.left < layout.mapLeft);
+            assert(Math.abs(layout.top-layout.mapTop) < 2);
+            assert(layout.ratio >= .3 && layout.ratio <= .35);
+            assert(layout.scroll && layout.overflow === 'auto');
+            const initialPage = await evaluate('scrollY');
+            await evaluate('document.getElementById("water-list").scrollTop = 400');
+            assert.equal(await evaluate('scrollY'), initialPage);
         }
-        results.push(`${width}px: river and lake selections show source lengths/areas separately, correct blue geometry, fitBounds, unmapped fallbacks, clear, tabs and an interactive map without overflow.`);
+        const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Balanac River','San Isidro River','Yambo Lake','Hidden Valley Springs','Pagsanjan Falls'].includes(item.name));
+        for (const lake of samples) {
+            await click('[data-lake-id="'+lake.id+'"]');
+            assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), lake.name);
+            assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'), false);
+            assert.equal(await evaluate('document.getElementById("water-detail-dialog").getAttribute("aria-modal")'), 'false');
+            assert.equal(await evaluate('getComputedStyle(document.documentElement).overflowY === "hidden"'), false);
+            const shape = lake.geography && lake.geography.geometry.type !== 'Point';
+            assert.equal(await evaluate('document.querySelectorAll(".selected-water-course").length > 0'), !!shape);
+            if (shape) {
+                const paths=await evaluate('[...document.querySelectorAll(".selected-water-course")].map(p=>{const r=p.getBoundingClientRect(),m=document.getElementById("lake-map").getBoundingClientRect();return {color:p.getAttribute("stroke"),left:r.left-m.left,right:r.right-m.left,top:r.top-m.top,bottom:r.bottom-m.top,width:m.width,height:m.height};})');
+                for(const path of paths) {
+                    assert.equal(path.color,'#0066ff');
+                    assert(path.left>=15&&path.top>=15&&path.right<=path.width-15&&path.bottom<=path.height-15,lake.name+': full selected extent must fit.');
+                }
+            }
+            const overview=await evaluate('document.querySelector("#selected-lake [data-profile-section=overview]").textContent');
+            if(lake.category==='river') {
+                assert(overview.includes(shape?'Mapped course length:':'River course not yet mapped.'));
+                assert(overview.includes('Whole-river length and complete headwater-to-mouth coverage are not independently verified.'));
+            }
+            if(lake.name==='Balanac River') {
+                assert(overview.includes('19.272 km')&&overview.includes('10.70 km'));
+                assert.equal(lake.geography.geometry.coordinates.length,20);
+                assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-course-sources] a").length'),20);
+            }
+            if(lake.name==='Hidden Valley Springs')assert(overview.includes('spring source')||overview.includes('spring-source'));
+            const expectedImage=await evaluate('document.querySelector("#selected-lake [data-water-image]")?.getAttribute("src") || null');
+            if(expectedImage) {
+                const photoResponse = await fetch(base+expectedImage);
+                assert(photoResponse.ok,lake.name+': photo asset must load');
+                await photoResponse.arrayBuffer();
+            }
+            if(['Balanac River','San Isidro River','Yambo Lake'].includes(lake.name)) {
+                const nav=await evaluate('(()=>{const n=document.getElementById("profile-tabs").getBoundingClientRect(),c=document.getElementById("lake-information").getBoundingClientRect(),f=document.querySelector(".report-fab").getBoundingClientRect();return {bottom:n.top>=c.bottom-1,overlap:n.left<f.right&&n.right>f.left&&n.top<f.bottom&&n.bottom>f.top};})()');
+                assert(nav.bottom&&!nav.overlap,'Bottom tabs must remain accessible and clear of floating report action.');
+                await screenshot(width+'-'+lake.name.split(' ')[0]+'.png');
+                await click('.leaflet-control-zoom-in');
+                assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'),false);
+                for(const tab of ['overview','classification','fish','research']) {
+                    await click('[data-profile-tab="'+tab+'"]');
+                    assert.equal(await evaluate('document.querySelector("#selected-lake [data-profile-section='+tab+']").hidden'),false);
+                }
+                await click('[data-profile-tab=classification]');
+                const type=await evaluate('document.querySelector("#selected-lake [data-water-type]").textContent');
+                assert.equal(type.trim(),lake.name==='Yambo Lake'?'Freshwater':'Water type not yet verified');
+                await click('[data-profile-tab=overview]');
+                assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'),true);
+            }
+            await click('#close-water-detail');
+            assert.equal(await evaluate('document.querySelectorAll(".selected-water-course").length'),0);
+        }
         await click('[data-category=river]');
-        assert.equal(await evaluate('document.querySelector("[data-category=river] [data-category-count]").textContent'), '29');
-        await evaluate('(()=>{const search=document.getElementById("water-search");search.value="Binan";search.dispatchEvent(new Event("input",{bubbles:true}));})()');
-        assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'), 1);
+        assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'),29);
+        await evaluate('(()=>{const s=document.getElementById("water-search");s.value="Binan";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
+        assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'),1);
+        await evaluate('(()=>{const s=document.getElementById("water-search");s.value="no matching place fixture";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
+        assert.equal(await evaluate('document.getElementById("filter-empty").hidden'),false);
         await click('#reset-map');
-        const river = lakes.find(lake => lake.name === 'Balanac River');
-        await click(`[data-lake-id="${river.id}"]`);
-        const nextRiver = lakes.find(lake => lake.name === 'Santa Cruz River');
-        await click(`[data-lake-id="${nextRiver.id}"]`);
-        await click(`.lake-marker[title="Santa Cruz River"]`);
-        assert.equal(await evaluate('document.getElementById("map-selection-heading").textContent'), 'Santa Cruz River');
-        await evaluate('document.querySelector(".selected-water-course").focus()');
-        await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
-        await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
-        assert.equal(await evaluate('document.getElementById("map-selection-heading").textContent'), 'Santa Cruz River');
-        await click('#clear-water-selection');
+        assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'),54);
+        const river=lakes.find(item=>item.name==='Balanac River');
+        await click('[data-lake-id="'+river.id+'"]');
+        await evaluate('document.getElementById("lake-map").focus({preventScroll:true})');
+        const beforeWheel=await evaluate('document.querySelector(".selected-water-course").getBoundingClientRect().width');
+        const point=await evaluate('(()=>{const r=document.getElementById("lake-map").getBoundingClientRect();return {x:r.right-80,y:r.top+90};})()');
+        await send('Input.dispatchMouseEvent',{type:'mouseWheel',...point,deltaX:0,deltaY:-240});
+        await waitFor(()=>evaluate('document.querySelector(".selected-water-course").getBoundingClientRect().width > '+(beforeWheel+1)),'Focused wheel zoom must work with the profile open.');
+        assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'),false);
+        await click('#close-water-detail');
+        await evaluate('document.querySelector(".report-fab").focus({preventScroll:true})');
+        assert.equal(await evaluate('document.getElementById("lake-map").dispatchEvent(new WheelEvent("wheel",{deltaY:120,bubbles:true,cancelable:true}))'),true,'Unfocused map must allow normal page scrolling.');
+        await click('#reset-map');
+        await evaluate('(()=>{const s=document.getElementById("water-search");s.value="Pagsanjan Falls";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
+        await click('.lake-marker[title="Pagsanjan Falls"]');
+        assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'),'Pagsanjan Falls');
+        await click('[data-profile-tab=overview]');
+        await send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
+        await send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
+        assert.equal(await evaluate('document.activeElement.dataset.profileTab'),'classification');
+        await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
+        assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'),true);
+        results.push(width+'px: '+samples.length+' direct profiles, source geometry/photos/measurements, four bottom sections, privacy, independent list scrolling, filters/empty state, wheel zoom with open card, keyboard/Escape and fixed report action passed.');
         await navigate('/reports/create');
-        const choices = await evaluate('JSON.parse(document.getElementById("incident-lakes").textContent)');
-        assert.equal(choices.length, 54);
-        assert.equal(choices.find(item => item.name === 'San Isidro River').latitude, null);
-        await evaluate("(()=>{const category=document.getElementById('water_body_category');category.value='river';category.dispatchEvent(new Event('change',{bubbles:true}));})()");
-        assert.equal(await evaluate('[...document.querySelectorAll("#water_body_id option")].filter(option=>option.value).length'), 29);
-        results.push(`${width}px: 29 river reporting choices include unmapped profiles; no incident point is fabricated.`);
+        assert.equal(await evaluate('document.getElementById("photo").required'),true);
+        const choices=await evaluate('JSON.parse(document.getElementById("incident-lakes").textContent)');
+        assert.equal(choices.length,54);
+        assert.equal(choices.find(item=>item.name==='San Isidro River').latitude,null);
     }
     assert.deepEqual(failures, []);
     assert.equal(databaseSnapshot(), originalRecords, 'Real database must remain unchanged.');

@@ -39,7 +39,7 @@ class WaterfallExpansionTest extends TestCase
         $this->artisan('waterfalls:import', ['--no-interaction' => true])->assertExitCode(0);
         $this->assertSame($imported, WaterBody::orderBy('id')->get()->toArray());
         $response = $this->get(route('map.index'))->assertOk()->assertSee('approximate photo-location reference')->assertSee('not surveyed positional accuracy');
-        $this->assertCount(28, $response->viewData('lakes'));
+        $this->assertCount(30, $response->viewData('lakes'));
         $this->assertSame(13, collect($response->viewData('lakes'))->where('category', 'waterfall')->count());
     }
 

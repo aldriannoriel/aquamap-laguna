@@ -4,6 +4,20 @@ namespace App\Support;
 
 class ExplorerProfile
 {
+    public static function waterType(mixed $entry, string $municipality, string $category): ?array
+    {
+        if (! is_array($entry) || ($entry['status'] ?? null) !== 'source_verified'
+            || ($entry['municipality'] ?? null) !== $municipality || ($entry['category'] ?? null) !== $category
+            || ! in_array($entry['type'] ?? null, ['freshwater', 'brackish', 'saltwater'], true)
+            || ! self::url($entry['source_url'] ?? null)
+            || ! is_string($entry['reference'] ?? null) || ! filled($entry['reference'])
+            || ! is_string($entry['note'] ?? null)) {
+            return null;
+        }
+
+        return array_intersect_key($entry, array_flip(['type', 'source_url', 'reference', 'note']));
+    }
+
     public static function url(mixed $value): ?string
     {
         return is_string($value) && filter_var($value, FILTER_VALIDATE_URL)

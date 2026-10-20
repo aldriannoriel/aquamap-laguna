@@ -29,7 +29,7 @@
                     <li><a href="#{{ in_array($field, ['submission', 'website', 'report_form_token']) ? 'report-form' : (in_array($field, ['latitude', 'longitude']) ? 'incident-map' : $field) }}" class="underline underline-offset-4">{{ $messages[0] }}</a></li>
                 @endforeach
             </ul>
-            <p class="mt-3 text-muted">Your text and selected point have been kept. Please select your photo again, if any.</p>
+            <p class="mt-3 text-muted">Your text and selected point have been kept. Please select your required photo again.</p>
         </div>
     @endif
 
@@ -113,9 +113,9 @@
             </fieldset>
 
             <div class="border-t border-line pt-5">
-                <label for="photo" class="form-label">Photo <span class="font-normal text-muted">(optional)</span></label>
-                <p id="photo-help" class="mb-3 text-xs leading-5 text-muted">JPEG, PNG or WebP, up to 5 MB. Photos remain private. Avoid identifiable people and sensitive information; photos may contain location metadata.</p>
-                <input id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" class="form-input file:mr-3 file:rounded-md file:border-0 file:bg-mist file:px-3 file:py-2 file:font-medium file:text-estuary" aria-invalid="{{ $errors->has('photo') ? 'true' : 'false' }}" aria-describedby="photo-help photo-error">
+                <label for="photo" class="form-label">Photo proof <span class="font-normal text-muted">(required)</span></label>
+                <p id="photo-help" class="mb-3 text-xs leading-5 text-muted">Photo proof is required for every new report. JPEG, PNG or WebP, up to 5 MB. Photos remain private. Avoid identifiable people and sensitive information; photos may contain location metadata.</p>
+                <input id="photo" name="photo" type="file" required accept="image/jpeg,image/png,image/webp" class="form-input file:mr-3 file:rounded-md file:border-0 file:bg-mist file:px-3 file:py-2 file:font-medium file:text-estuary" aria-invalid="{{ $errors->has('photo') ? 'true' : 'false' }}" aria-describedby="photo-help photo-error">
                 <p id="photo-error" class="form-error">@error('photo'){{ $message }}@enderror</p>
             </div>
 

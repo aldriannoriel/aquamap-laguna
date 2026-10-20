@@ -1,5 +1,12 @@
 # Research sources
 
+## Approved redesign draft evidence (2026-10-21)
+
+The read-only water-body-evidence.json supplement uses Bicaldo et al. (2024), Frontiers in Microbiology 15:1410666, study-site freshwater context, for Yambo, Pandin and Calibato only. The source is https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full. These are historical hydrological labels, not current salinity measurements or DENR water-quality classes. No type is inferred from river geometry or fish occurrence. Other types and Filipino fish names remain unverified. Original classifications, historical aquaculture studies, source URLs and GIS data are preserved.
+
+The public report aggregate exception is withdrawn by the newer redesign request: no report counts or individual details are projected/queryable through the public map. Administrator-only moderation/evidence remains. New proof photos are required by the owner-confirmed policy; historical photo-less records remain valid.
+
+
 ## Provincial rivers and geographic measurements (2026-10-21)
 
 The current provincial river inventory and all new length/area/geometry evidence are documented in [RIVER_INVENTORY.md](RIVER_INVENTORY.md), including the 27 source rows, three reused profiles, 24 additions and the subsequent all-29 course audit. `river-courses.json` now supplies 173 original OSM ways for 17 connected named courses, extending 15 highlights; twelve courses remain missing. Complete headwater-to-mouth coverage and whole-river totals are not independently verified. All 54 stored records and the prior catalogues below remain unchanged. The supplement retains original node sequences, object versions/dates, source links and ODbL attribution. Geometry is checked by name/alias, locality, baseline-source identity, source-node connectivity, no duplicate edges and no branches; unrelated same-name San Juan/Santa Rosa ways were rejected. WaterwayMap pages discover way IDs only; original OSM way/node APIs supply coordinates, not WaterwayMap length estimates. No municipality clipping is applied.

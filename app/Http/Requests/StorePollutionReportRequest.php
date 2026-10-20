@@ -41,7 +41,7 @@ class StorePollutionReportRequest extends FormRequest
             'description' => ['required', 'string', 'max:5000'],
             'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:-180,180'],
-            'photo' => ['bail', 'nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:5120'],
+            'photo' => ['bail', 'required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:5120'],
             'reporter_name' => ['nullable', 'string', 'max:255'],
             'reporter_email' => ['nullable', 'string', 'email', 'max:254'],
         ];
@@ -58,6 +58,7 @@ class StorePollutionReportRequest extends FormRequest
             'pollution_type.required' => 'Please choose an observation type.',
             'pollution_type.in' => 'Please choose one of the listed observation types.',
             'description.required' => 'Please describe what you observed.',
+            'photo.required' => 'Please attach a photo showing the visible concern. Photo proof is required for new reports.',
             'photo.max' => 'The photo must be no larger than 5 MB.',
             'photo.uploaded' => 'The photo could not be uploaded. Please choose a JPEG, PNG or WebP up to 5 MB.',
         ];

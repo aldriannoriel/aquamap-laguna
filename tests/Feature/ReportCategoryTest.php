@@ -6,6 +6,8 @@ use App\Models\PollutionReport;
 use App\Models\WaterBody;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\ExplorerSeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
@@ -25,7 +27,7 @@ class ReportCategoryTest extends TestCase
         $response = $this->get(route('reports.create'))->assertOk()->assertSee('Category')->assertSee('Natural Springs / Spring Resorts')->assertSee('Al Fresco Springs Resort')->assertSee('Hidden Valley Springs');
         $this->assertSame(['lake' => 10, 'river' => 5, 'spring' => 2, 'waterfall' => 13], $response->viewData('lakes')->countBy('category')->sortKeys()->all());
         $response->assertSee('optgroup label="Waterfalls"', false);
-        $this->get(route('map.index'))->assertOk()->assertDontSee('Al Fresco Springs Resort')->assertDontSee('Hidden Valley Springs');
+        $this->get(route('map.index'))->assertOk()->assertSee('Al Fresco Springs Resort')->assertSee('Hidden Valley Springs');
     }
 
     #[TestWith(['lake', 'Pandin Lake'])]
@@ -39,7 +41,8 @@ class ReportCategoryTest extends TestCase
         $water = WaterBody::where('name', $name)->sole();
         $form = $this->get(route('reports.create'))->assertOk();
         $this->travel(3)->seconds();
-        $this->post(route('reports.store'), ['water_body_category' => $category, 'water_body_id' => $water->id, 'pollution_type' => 'other', 'description' => 'Isolated category fixture', 'report_form_token' => $form->viewData('reportFormToken'), 'status' => 'verified'])
+        Storage::fake('pollution-reports');
+        $this->post(route('reports.store'), ['photo' => UploadedFile::fake()->image('proof.png'), 'water_body_category' => $category, 'water_body_id' => $water->id, 'pollution_type' => 'other', 'description' => 'Isolated category fixture', 'report_form_token' => $form->viewData('reportFormToken'), 'status' => 'verified'])
             ->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
         $report = PollutionReport::sole();
         $this->assertSame($water->id, $report->water_body_id);

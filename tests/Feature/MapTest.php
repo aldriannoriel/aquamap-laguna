@@ -40,14 +40,14 @@ class MapTest extends TestCase
         $response = $this->get(route('map.index'));
 
         $response->assertOk()->assertViewIs('map.index')
-            ->assertSee("Understand Laguna's aquatic environments", false)->assertDontSee('private-fixture@example.test')
+            ->assertDontSee("Understand Laguna's aquatic environments", false)->assertSee('Find a water body')->assertDontSee('private-fixture@example.test')
             ->assertDontSee('Private test-only report.');
         $payload = $this->lakePayload($response);
         $this->assertSame(['Pandin Lake', 'Sampaloc Lake', 'Yambo Lake'], array_column($payload, 'name'));
         foreach ($payload as $item) {
-            $this->assertSame(['id', 'name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url', 'category', 'aliases', 'site_type', 'spring_type', 'official_url', 'geography', 'verified_report_count'], array_keys($item));
+            $this->assertSame(['id', 'name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url', 'category', 'aliases', 'site_type', 'spring_type', 'official_url', 'geography'], array_keys($item));
         }
-        $this->assertSame($lake->latitude, $payload[1]['latitude']);
+        $this->assertSame($lake->latitude, collect($payload)->firstWhere('id', $lake->id)['latitude']);
         $this->assertSame($lake->longitude, $payload[1]['longitude']);
         $this->assertSame($lake->source_url, $payload[1]['source_url']);
         $this->assertDatabaseCount('water_bodies', 3);
@@ -68,11 +68,11 @@ class MapTest extends TestCase
 
         $response = $this->get(route('map.index'));
 
-        $response->assertOk()->assertDontSee('Unrelated lake fixture')->assertDontSee('Other locality fixture');
+        $response->assertOk()->assertSee('Unrelated lake fixture')->assertSee('Other locality fixture');
         $payload = $this->lakePayload($response);
-        $this->assertCount(3, $payload);
+        $this->assertCount(5, $payload);
         $this->assertSame($otherLocation->latitude, $payload[1]['latitude']);
-        $this->assertSame('Changed only inside the isolated test database.', $payload[1]['description']);
+        $this->assertSame('Changed only inside the isolated test database.', collect($payload)->firstWhere('id', $lake->id)['description']);
     }
 
     #[TestWith([null, null])]

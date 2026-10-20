@@ -1,0 +1,29 @@
+{
+  "Yambo Lake": {
+    "status": "source_verified",
+    "municipality": "San Pablo City",
+    "category": "lake",
+    "type": "freshwater",
+    "source_url": "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full",
+    "reference": "Bicaldo et al. (2024), Frontiers in Microbiology 15:1410666, study-site freshwater context",
+    "note": "Historical freshwater study context for this named maar lake. This is not a current salinity measurement, a DENR water-quality class or a safety assessment."
+  },
+  "Pandin Lake": {
+    "status": "source_verified",
+    "municipality": "San Pablo City",
+    "category": "lake",
+    "type": "freshwater",
+    "source_url": "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full",
+    "reference": "Bicaldo et al. (2024), Frontiers in Microbiology 15:1410666, study-site freshwater context",
+    "note": "Historical freshwater study context for this named maar lake. This is not a current salinity measurement, a DENR water-quality class or a safety assessment."
+  },
+  "Calibato Lake": {
+    "status": "source_verified",
+    "municipality": "San Pablo City",
+    "category": "lake",
+    "type": "freshwater",
+    "source_url": "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full",
+    "reference": "Bicaldo et al. (2024), Frontiers in Microbiology 15:1410666, study-site freshwater context",
+    "note": "Historical freshwater study context for this named maar lake. This is not a current salinity measurement, a DENR water-quality class or a safety assessment."
+  }
+}

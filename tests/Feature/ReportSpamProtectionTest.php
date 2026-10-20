@@ -21,14 +21,18 @@ class ReportSpamProtectionTest extends TestCase
         $this->artisan('migrate', ['--database' => 'sqlite', '--no-interaction' => true])->assertExitCode(0);
     }
 
-    private function payload(): array
+    private function payload(bool $withPhoto = true): array
     {
         if (! WaterBody::exists()) {
             $this->seed(WaterBodySeeder::class);
         }
         $token = $this->get(route('reports.create'))->assertOk()->viewData('reportFormToken');
 
-        return ['water_body_id' => WaterBody::where('name', 'Pandin Lake')->sole()->id,
+        if ($withPhoto) {
+            Storage::fake('pollution-reports');
+        }
+
+        return [...($withPhoto ? ['photo' => UploadedFile::fake()->image('proof.png')] : []), 'water_body_id' => WaterBody::where('name', 'Pandin Lake')->sole()->id,
             'pollution_type' => 'solid_waste', 'description' => 'Synthetic isolated spam protection fixture.', 'report_form_token' => $token];
     }
 

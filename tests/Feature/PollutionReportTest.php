@@ -19,13 +19,17 @@ class PollutionReportTest extends TestCase
         $this->artisan('migrate', ['--database' => 'sqlite', '--no-interaction' => true])->assertExitCode(0);
     }
 
-    private function payload(): array
+    private function payload(bool $withPhoto = true): array
     {
         $this->seed(WaterBodySeeder::class);
         $token = $this->get(route('reports.create'))->assertOk()->viewData('reportFormToken');
         $this->travel(3)->seconds();
 
-        return ['water_body_id' => WaterBody::where('name', 'Pandin Lake')->sole()->id,
+        if ($withPhoto) {
+            Storage::fake('pollution-reports');
+        }
+
+        return [...($withPhoto ? ['photo' => UploadedFile::fake()->image('proof.png')] : []), 'water_body_id' => WaterBody::where('name', 'Pandin Lake')->sole()->id,
             'pollution_type' => 'solid_waste', 'description' => 'Synthetic isolated test observation; never a real report.', 'report_form_token' => $token];
     }
 
@@ -60,7 +64,7 @@ class PollutionReportTest extends TestCase
         $this->assertSame($payload['description'], $report->description);
         $this->assertDatabaseCount('report_reviews', 0);
         $response = $this->get(route('map.index'))->assertOk();
-        $this->assertSame(0, collect($response->viewData('lakes'))->firstWhere('id', $report->water_body_id)['verified_report_count']);
+        $this->assertArrayNotHasKey('verified_report_count', collect($response->viewData('lakes'))->firstWhere('id', $report->water_body_id));
     }
 
     public function test_anonymous_report_is_pending_without_automatically_assigning_lake_coordinates(): void
@@ -72,7 +76,7 @@ class PollutionReportTest extends TestCase
         $this->assertSame($payload['water_body_id'], $report->water_body_id);
         $this->assertSame('pending', $report->status);
         $this->assertSame($payload['description'], $report->description);
-        foreach (['latitude', 'longitude', 'reporter_name', 'reporter_email', 'photo_path'] as $field) {
+        foreach (['latitude', 'longitude', 'reporter_name', 'reporter_email'] as $field) {
             $this->assertNull($report->$field);
         }
         $this->assertTrue($report->waterBody->pollutionReports->contains($report));
@@ -86,7 +90,7 @@ class PollutionReportTest extends TestCase
     public function test_optional_photo_contacts_and_incident_point_are_private(string $extension): void
     {
         Storage::fake('pollution-reports');
-        $payload = $this->payload() + ['photo' => UploadedFile::fake()->image('private-observation.'.$extension),
+        $payload = $this->payload(false) + ['photo' => UploadedFile::fake()->image('private-observation.'.$extension),
             'reporter_name' => 'Private Test Reporter', 'reporter_email' => 'private-test@example.test',
             'latitude' => '14.1000000', 'longitude' => '121.3000000'];
         $this->post(route('reports.store'), $payload)->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
@@ -139,7 +143,7 @@ class PollutionReportTest extends TestCase
     public function test_photo_at_five_megabyte_boundary_is_accepted(): void
     {
         Storage::fake('pollution-reports');
-        $this->post(route('reports.store'), $this->payload() + ['photo' => UploadedFile::fake()->image('boundary.png')->size(5120)])
+        $this->post(route('reports.store'), $this->payload(false) + ['photo' => UploadedFile::fake()->image('boundary.png')->size(5120)])
             ->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
         $this->assertDatabaseCount('pollution_reports', 1);
         Storage::disk('pollution-reports')->assertExists(PollutionReport::sole()->photo_path);
@@ -196,7 +200,7 @@ class PollutionReportTest extends TestCase
         $fixture = UploadedFile::fake()->createWithContent($name, $contents);
         // Use real MIME detection: fake files otherwise infer MIME from the filename.
         $upload = new UploadedFile($fixture->getRealPath(), $name, null, UPLOAD_ERR_OK, true);
-        $this->post(route('reports.store'), $this->payload() + ['photo' => $upload])
+        $this->post(route('reports.store'), $this->payload(false) + ['photo' => $upload])
             ->assertSessionHasErrors('photo');
         $this->assertDatabaseCount('pollution_reports', 0);
         $this->assertSame([], Storage::disk('pollution-reports')->allFiles());
@@ -208,8 +212,8 @@ class PollutionReportTest extends TestCase
         $payload = $this->payload();
         $image = UploadedFile::fake()->image('real.png');
         $disguised = UploadedFile::fake()->createWithContent('real.php', file_get_contents($image->getRealPath()));
-        $this->post(route('reports.store'), $payload + ['photo' => $disguised])->assertSessionHasErrors('photo');
-        $this->post(route('reports.store'), $payload + ['photo' => UploadedFile::fake()->image('large.png')->size(5121)])
+        $this->post(route('reports.store'), array_replace($payload, ['photo' => $disguised]))->assertSessionHasErrors('photo');
+        $this->post(route('reports.store'), array_replace($payload, ['photo' => UploadedFile::fake()->image('large.png')->size(5121)]))
             ->assertSessionHasErrors(['photo' => 'The photo must be no larger than 5 MB.']);
         $this->assertDatabaseCount('pollution_reports', 0);
         $this->assertSame([], Storage::disk('pollution-reports')->allFiles());
@@ -222,7 +226,8 @@ class PollutionReportTest extends TestCase
         ])->assertSessionHasNoErrors();
         $report = PollutionReport::sole();
         $this->assertSame('pending', $report->status);
-        $this->assertNull($report->photo_path);
+        $this->assertNotNull($report->photo_path);
+        $this->assertStringNotContainsString('unsafe.php', $report->photo_path);
         $this->assertNotSame(9999, $report->id);
         $this->assertNotSame('2001-01-01', $report->created_at->toDateString());
     }
@@ -267,7 +272,7 @@ class PollutionReportTest extends TestCase
             throw new \RuntimeException('Sensitive database failure fixture');
         });
         try {
-            $this->post(route('reports.store'), $payload + ['photo' => UploadedFile::fake()->image('fixture.png')])
+            $this->post(route('reports.store'), array_replace($payload, ['photo' => UploadedFile::fake()->image('fixture.png')]))
                 ->assertRedirectToRoute('reports.create')->assertSessionHasErrors('submission')->assertDontSee('Sensitive database failure fixture');
             $this->assertSame([], Storage::disk('pollution-reports')->allFiles());
             $this->assertDatabaseCount('pollution_reports', 0);

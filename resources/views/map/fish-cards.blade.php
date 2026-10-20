@@ -1,24 +1,24 @@
-<section data-fish-section class="mt-6 border-t border-line pt-5" aria-label="Fish and habitat information">
-    <h3 class="text-lg font-semibold text-estuary">Fish &amp; habitat</h3>
+<section data-fish-section class="mt-0" aria-label="Fish and habitat information">
+    <h3 class="text-base font-semibold text-estuary">Fish &amp; habitat</h3>
     <p class="mt-1 text-sm leading-6 text-muted">Occurrence records describe what a study found. They do not establish habitat suitability.</p>
-    <div class="mt-4 grid gap-4">
+    <div class="mt-4 grid gap-3">
         @forelse ($fish as $species)
             @php
                 $documented = $species['evidence_type'] && $species['occurrence_source_url']
                     && $species['sampling_period'] && $species['publication_year'];
             @endphp
             <article data-fish-card class="min-w-0 overflow-hidden rounded-xl border border-line bg-white">
-                <div class="flex flex-wrap items-start justify-between gap-3 bg-mist/70 p-4">
+                <div class="flex flex-wrap items-start justify-between gap-3 bg-mist/70 p-3">
                     <div class="min-w-0">
-                        <h4 class="text-lg font-semibold text-ink">{{ $species['common_name'] }}</h4>
+                        <h4 class="text-base font-semibold text-ink">{{ $species['common_name'] }}</h4>
                         <p class="mt-1 text-sm text-muted"><i>{{ $species['scientific_name'] }}</i></p>
-                        <p class="mt-1 text-xs text-muted">{{ ucfirst($species['water_type']) }}</p>
+                        <p data-filipino-name class="mt-1 text-xs text-muted">Filipino common name: Not yet verified.</p>
                     </div>
                     <span data-evidence-badge class="rounded-md bg-water/10 px-2 py-1 text-xs font-medium text-estuary">
                         {{ $documented ? ($species['evidence_type'] === 'aquaculture' ? 'Historical aquaculture' : 'Historical wild occurrence') : 'Evidence incomplete' }}
                     </span>
                 </div>
-                <div class="grid gap-5 p-4 text-sm leading-6 sm:grid-cols-2">
+                <div class="grid gap-3 p-3 text-sm leading-6 ">
                     <section class="min-w-0">
                         <h5 class="font-semibold text-estuary">Documented occurrence</h5>
                         @if ($documented)
@@ -39,7 +39,7 @@
                         <p class="mt-2"><span data-compatibility-status="{{ $species['compatibility_status'] }}" class="inline-block rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-900">Insufficient data</span></p>
                         <p class="mt-2 text-muted">Not assessed. Current water-body measurements and complete species requirements have not been validated. Historical occurrence does not establish present suitability.</p>
                     </section>
-                    <section class="min-w-0 border-t border-line pt-4 sm:col-span-2">
+                    <section class="min-w-0 border-t border-line pt-4 ">
                         <h5 class="font-semibold text-estuary">General species habitat</h5>
                         <p class="mt-2 text-muted">{{ $species['habitat_requirements'] ?? 'Habitat requirements are not available for this species.' }}</p>
                         @if ($species['source_url'])
@@ -51,7 +51,7 @@
                 </div>
             </article>
         @empty
-            <p class="rounded-xl bg-mist p-4 text-sm leading-6 text-muted">No verified fish records are available for this water body. This does not establish that fish are absent. Potential habitat compatibility remains unassessed.</p>
+            <p class="rounded-xl bg-mist p-3 text-sm leading-6 text-muted">No verified fish records are available for this water body. This does not establish that fish are absent. Potential habitat compatibility remains unassessed.</p>
         @endforelse
     </div>
 </section>

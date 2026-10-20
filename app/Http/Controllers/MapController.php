@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\FishSpecies;
-use App\Models\PollutionReport;
 use App\Models\WaterBody;
 use App\Support\ExplorerProfile;
 use App\Support\RiverCourseCatalogue;
 use App\Support\WaterBodyMetrics;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class MapController extends Controller
@@ -21,12 +19,6 @@ class MapController extends Controller
         $metadata = ['category', 'aliases', 'site_type', 'spring_type', 'official_url', 'geography', 'research_references', 'image'];
         $records = WaterBody::query()->select([...$fields, ...$metadata])
             ->whereIn('category', array_keys(WaterBody::PUBLIC_CATEGORIES))
-            ->where(function (Builder $query): void {
-                $query->whereNotNull('geography')->orWhere('category', 'river')->orWhere(function (Builder $legacy): void {
-                    $legacy->where('municipality', 'San Pablo City')
-                        ->whereIn('name', ['Sampaloc Lake', 'Pandin Lake', 'Yambo Lake']);
-                });
-            })
             ->with(['fishSpecies' => fn (BelongsToMany $query): BelongsToMany => $query
                 ->select(['fish_species.id', 'common_name', 'scientific_name', 'water_type', 'habitat_requirements', 'fish_species.source_url'])
                 ->orderBy('common_name')])
@@ -34,30 +26,11 @@ class MapController extends Controller
             ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->values();
 
-        $reportCategories = PollutionReport::TYPES + ['uncategorized' => 'Other legacy category'];
-        $reportCounts = PollutionReport::query()
-            ->where('status', 'verified')
-            ->whereIn('water_body_id', $records->modelKeys())
-            ->select(['water_body_id', 'pollution_type'])
-            ->selectRaw('COUNT(*) as report_count')
-            ->groupBy('water_body_id', 'pollution_type')
-            ->toBase()->get()
-            ->groupBy('water_body_id');
-        $reportsByLake = $records->mapWithKeys(function (WaterBody $lake) use ($reportCategories, $reportCounts): array {
-            $counts = array_fill_keys(array_keys($reportCategories), 0);
-            foreach ($reportCounts->get($lake->id, collect()) as $reportCount) {
-                $category = array_key_exists($reportCount->pollution_type, PollutionReport::TYPES) ? $reportCount->pollution_type : 'uncategorized';
-                $counts[$category] += (int) $reportCount->report_count;
-            }
-
-            return [$lake->id => $counts];
-        });
-
         $courseCatalogue = RiverCourseCatalogue::load();
         $displayGeographies = $records->mapWithKeys(fn (WaterBody $lake): array => [$lake->id => RiverCourseCatalogue::resolve($lake, $courseCatalogue)])->all();
 
         $lakes = $records
-            ->map(function (WaterBody $lake) use ($fields, $reportsByLake, $displayGeographies): array {
+            ->map(function (WaterBody $lake) use ($fields, $displayGeographies): array {
                 $data = $lake->only($fields);
                 $data['description'] = filled($data['description']) ? trim($data['description']) : null;
                 $data['source_url'] = $this->publicSource($data['source_url']);
@@ -70,7 +43,6 @@ class MapController extends Controller
                 if (($displayGeographies[$lake->id]['course']['coverage'] ?? null) === 'available_named_course') {
                     $data['description'] = $displayGeographies[$lake->id]['course']['note'];
                 }
-                $data['verified_report_count'] = array_sum($reportsByLake[$lake->id]);
 
                 return $data;
             })
@@ -93,10 +65,11 @@ class MapController extends Controller
             return [$lake->id => $fish];
         })->all();
 
+        $evidence = json_decode(file_get_contents(database_path('data/water-body-evidence.json')), true, flags: JSON_THROW_ON_ERROR);
         $images = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR);
         $metrics = json_decode(file_get_contents(database_path('data/water-body-metrics.json')), true, flags: JSON_THROW_ON_ERROR);
         $replacements = json_decode(file_get_contents(database_path('data/waterfall-photos.json')), true, flags: JSON_THROW_ON_ERROR);
-        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $reportsByLake, $metrics, $displayGeographies): array {
+        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $metrics, $displayGeographies, $evidence): array {
             $supplement = $images[$lake->name] ?? null;
             $image = $lake->image;
             if ($image === null && is_array($supplement) && ($supplement['municipality'] ?? null) === $lake->municipality) {
@@ -112,9 +85,10 @@ class MapController extends Controller
             }
 
             return [$lake->id => [
+                'water_type_evidence' => ExplorerProfile::waterType($evidence[$lake->name] ?? null, $lake->municipality, $lake->category),
+                'legacy_classification' => $lake->water_type,
                 'references' => ExplorerProfile::references($lake->research_references),
                 'image' => ExplorerProfile::image($image),
-                'report_categories' => $reportsByLake[$lake->id],
                 'reported_length' => $lake->category === 'river' ? WaterBodyMetrics::reported($metrics['rivers'][$lake->name] ?? null, $lake->municipality) : null,
                 'length_note' => $lake->category === 'river' && $lake->name === 'Bumbungan River'
                     && $lake->municipality === $metrics['rivers']['Bumbungan River']['municipality'] ? $metrics['rivers']['Bumbungan River']['note'] : null,
@@ -126,7 +100,7 @@ class MapController extends Controller
             ]];
         })->all();
 
-        return view('map.index', ['lakes' => $lakes, 'fishByLake' => $fishByLake, 'profiles' => $profiles, 'categories' => WaterBody::PUBLIC_CATEGORIES, 'reportCategories' => $reportCategories]);
+        return view('map.index', ['lakes' => $lakes, 'fishByLake' => $fishByLake, 'profiles' => $profiles, 'categories' => WaterBody::PUBLIC_CATEGORIES]);
     }
 
     private function publicSource(?string $source): ?string

@@ -5,7 +5,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "test:browser": "node tests/browser/map-smoke.mjs"
+        "test:browser": "node tests/browser/river-smoke.mjs"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

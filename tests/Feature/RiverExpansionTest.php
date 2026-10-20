@@ -9,6 +9,8 @@ use App\Support\ExplorerProfile;
 use App\Support\WaterBodyMetrics;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\ExplorerSeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\TestWith;
 use RuntimeException;
 use Tests\TestCase;
@@ -73,9 +75,9 @@ class RiverExpansionTest extends TestCase
         $this->artisan('rivers:import', ['--no-interaction' => true])->assertExitCode(0);
 
         $response = $this->get(route('map.index'))->assertOk()->assertSee('River course not yet mapped.')
-            ->assertSee('Length not yet verified.')->assertSee('Mapped course length:')->assertSee('Clear selection');
+            ->assertSee('Length not yet verified.')->assertSee('Mapped course length:')->assertSee('Close profile and clear selection');
         $records = collect($response->viewData('lakes'))->keyBy('name');
-        $this->assertCount(52, $records);
+        $this->assertCount(54, $records);
         $this->assertCount(29, $records->where('category', 'river'));
         $this->assertCount(17, $records->where('category', 'river')->filter(fn (array $record): bool => $record['geography'] !== null));
         $this->assertNull($records['San Isidro River']['geography']);
@@ -157,7 +159,8 @@ class RiverExpansionTest extends TestCase
         $form = $this->get(route('reports.create'))->assertOk();
         $this->travel(3)->seconds();
 
-        $this->post(route('reports.store'), ['water_body_category' => 'river', 'water_body_id' => $water->id,
+        Storage::fake('pollution-reports');
+        $this->post(route('reports.store'), ['photo' => UploadedFile::fake()->image('proof.png'), 'water_body_category' => 'river', 'water_body_id' => $water->id,
             'pollution_type' => 'other', 'description' => 'Private isolated river concern', 'status' => 'verified',
             'report_form_token' => $form->viewData('reportFormToken')])->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
 
