@@ -42,7 +42,7 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
+const artifactDirectory = process.argv.includes('--fish') ? 'fish-names/browser' : process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json', 'waterfall-expansion.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const imageReplacements = JSON.parse(readFileSync(path.join(root, 'database/data/waterfall-photos.json'), 'utf8'));
@@ -156,7 +156,7 @@ try {
         await waitFor(async () => {
             const { frameTree } = await send('Page.getFrameTree');
             if (navigation.loaderId && frameTree.frame.loaderId !== navigation.loaderId) return false;
-            return evaluate('document.readyState === "complete"');
+            return evaluate('document.readyState !== "loading"');
         }, 'New page did not finish navigation.');
     }
     let mobile = false;
@@ -213,7 +213,8 @@ try {
             await evaluate('document.getElementById("water-list").scrollTop = 400');
             assert.equal(await evaluate('scrollY'), initialPage);
         }
-        const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Balanac River','San Isidro River','Yambo Lake','Hidden Valley Springs','Pagsanjan Falls'].includes(item.name));
+        const fishLakes = ['Pandin Lake', 'Sampaloc Lake', 'Yambo Lake'];
+        const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Balanac River','San Isidro River','Yambo Lake','Hidden Valley Springs','Pagsanjan Falls'].includes(item.name) || (process.argv.includes('--fish') && fishLakes.includes(item.name)));
         const contrastSelector = '[data-lake-id="'+samples[0].id+'"]';
         const { root: documentNode } = await send('DOM.getDocument');
         const { nodeId: contrastNode } = await send('DOM.querySelector', { nodeId: documentNode.nodeId, selector: contrastSelector });
@@ -257,6 +258,49 @@ try {
                 const photoResponse = await fetch(base+expectedImage);
                 assert(photoResponse.ok,lake.name+': photo asset must load');
                 await photoResponse.arrayBuffer();
+            }
+            if (process.argv.includes('--fish')) {
+                await click('[data-profile-tab=fish]');
+                const cards = await evaluate('document.querySelectorAll("#selected-lake [data-fish-card]").length');
+                assert.equal(cards, fishLakes.includes(lake.name) ? 1 : 0, lake.name+': existing occurrence links only.');
+                if (cards) {
+                    const fish = await evaluate(`(() => {
+                        const card = document.querySelector('#selected-lake [data-fish-card]');
+                        const source = card.querySelector('[data-fish-name-source]');
+                        return { english: card.querySelector('h4').textContent, scientific: card.querySelector('i').textContent,
+                            filipino: card.querySelector('[data-filipino-name] [lang=fil]').textContent,
+                            badge: card.querySelector('[data-evidence-badge]').textContent.trim(),
+                            compatibility: card.querySelector('[data-compatibility-status]').dataset.compatibilityStatus,
+                            source: source.href, rel: source.rel, overflow: card.scrollWidth > card.clientWidth };
+                    })()`);
+                    assert.equal(fish.english, 'Nile tilapia');
+                    assert.equal(fish.scientific, 'Oreochromis niloticus');
+                    assert.equal(fish.filipino, 'Plapla');
+                    assert.equal(fish.badge, 'Historical aquaculture');
+                    assert.equal(fish.compatibility, 'insufficient_data');
+                    assert(fish.source.startsWith('https://repository.seafdec.org.ph/'));
+                    assert(fish.rel.includes('noopener') && !fish.overflow);
+                    const readable = await evaluate(`(() => {
+                        const name = document.querySelector('#selected-lake [data-filipino-name]');
+                        name.scrollIntoView({block:'center'});
+                        const text = name.getBoundingClientRect(), panel = document.getElementById('lake-information').getBoundingClientRect();
+                        const source = name.querySelector('a');
+                        source.focus({preventScroll:true});
+                        return text.top >= panel.top && text.bottom <= panel.bottom && document.activeElement === source;
+                    })()`);
+                    assert(readable, lake.name+': Filipino name must scroll into view and its source must accept keyboard focus.');
+                    if (lake.name === 'Yambo Lake') await screenshot(width+'-fish-names.png');
+                    await click('[data-profile-tab=research]');
+                    const citations = await evaluate(`(() => {
+                        const group = document.querySelector('#selected-lake [data-fish-name-evidence]').closest('details');
+                        group.open = true;
+                        return [...group.querySelectorAll('[data-fish-name-reference]')].map(link => ({url:link.href,text:link.parentElement.textContent}));
+                    })()`);
+                    assert.equal(citations.length, 2);
+                    assert(citations.every(citation => citation.url.startsWith('https://') && citation.text.includes('SEAFDEC Aquaculture Department')));
+                    assert(citations[0].text.includes('2001') && citations[1].text.includes('2019'));
+                }
+                await click('[data-profile-tab=overview]');
             }
             if(['Balanac River','San Isidro River','Yambo Lake'].includes(lake.name)) {
                 const nav=await evaluate('(()=>{const n=document.getElementById("profile-tabs").getBoundingClientRect(),c=document.getElementById("lake-information").getBoundingClientRect(),f=document.querySelector(".report-fab").getBoundingClientRect();return {bottom:n.top>=c.bottom-1,overlap:n.left<f.right&&n.right>f.left&&n.top<f.bottom&&n.bottom>f.top};})()');
@@ -306,7 +350,7 @@ try {
         assert.equal(await evaluate('document.activeElement.dataset.profileTab'),'classification');
         await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
         assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'),true);
-        results.push(width+'px: '+samples.length+' direct profiles, source geometry/photos/measurements, four bottom sections, privacy, independent list scrolling, filters/empty state, wheel zoom with open card, keyboard/Escape and fixed report action passed.');
+        results.push(width+'px: '+samples.length+' direct profiles, source geometry/photos/measurements, four bottom sections, privacy, independent list scrolling, filters/empty state, wheel zoom with open card, keyboard/Escape and fixed report action passed.'+(process.argv.includes('--fish') ? ' Three historical fish profiles: English/Filipino/scientific names, safe name sources, two Research citations and unassessed suitability passed; no fish assigned elsewhere.' : ''));
         await navigate('/reports/create');
         assert.equal(await evaluate('document.getElementById("photo").required'),true);
         const choices=await evaluate('JSON.parse(document.getElementById("incident-lakes").textContent)');

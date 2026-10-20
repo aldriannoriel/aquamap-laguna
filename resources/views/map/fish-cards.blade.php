@@ -12,7 +12,11 @@
                     <div class="min-w-0">
                         <h4 class="text-base font-semibold text-ink">{{ $species['common_name'] }}</h4>
                         <p class="mt-1 text-sm text-muted"><i>{{ $species['scientific_name'] }}</i></p>
-                        <p data-filipino-name class="mt-1 text-xs text-muted">Filipino common name: Not yet verified.</p>
+                        @if ($species['filipino_name_evidence'] ?? null)
+                            <p data-filipino-name class="mt-1 text-xs text-muted">Filipino common name: <span lang="fil">{{ $species['filipino_name_evidence']['name'] }}</span>. <a data-fish-name-source href="{{ $species['filipino_name_evidence']['sources'][0]['url'] }}" target="_blank" rel="noopener noreferrer" class="text-estuary underline underline-offset-4">Name source<span class="sr-only"> for {{ $species['scientific_name'] }} (opens in a new tab)</span></a></p>
+                        @else
+                            <p data-filipino-name class="mt-1 text-xs text-muted">Filipino common name: Not yet verified.</p>
+                        @endif
                     </div>
                     <span data-evidence-badge class="rounded-md bg-water/10 px-2 py-1 text-xs font-medium text-estuary">
                         {{ $documented ? ($species['evidence_type'] === 'aquaculture' ? 'Historical aquaculture' : 'Historical wild occurrence') : 'Evidence incomplete' }}

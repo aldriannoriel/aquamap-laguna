@@ -4,6 +4,23 @@ namespace App\Support;
 
 class ExplorerProfile
 {
+    /**
+     * @return array{name: string, note: string, sources: array<int, array{title: string, publisher: string, url: string, published_on: ?string}>}|null
+     */
+    public static function fishName(mixed $entry, string $scientificName): ?array
+    {
+        if (! is_array($entry) || ($entry['status'] ?? null) !== 'source_verified'
+            || ($entry['scientific_name'] ?? null) !== $scientificName || ($entry['language'] ?? null) !== 'fil'
+            || ! is_string($entry['name'] ?? null) || ! filled($entry['name'])
+            || ! is_string($entry['note'] ?? null) || ! filled($entry['note'])) {
+            return null;
+        }
+
+        $sources = self::references($entry['sources'] ?? null);
+
+        return $sources === [] ? null : ['name' => trim($entry['name']), 'note' => $entry['note'], 'sources' => $sources];
+    }
+
     public static function waterType(mixed $entry, string $municipality, string $category): ?array
     {
         if (! is_array($entry) || ($entry['status'] ?? null) !== 'source_verified'

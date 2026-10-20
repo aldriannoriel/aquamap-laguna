@@ -6,4 +6,6 @@ The approved 2026-10-21 redesign stabilization retains the reviewed river-course
 
 Remaining Batch 1 against f165b0b shares one validated Water Type evidence result between map JSON and profiles. Unknown JSON values are null; legacy database classifications remain unchanged and qualified in Research. Sidebar metadata uses the existing estuary color for AA text contrast without layout changes.
 
+Remaining Batch 2 against 30a77d5 adds a read-only fish-name-evidence.json supplement, validated by exact scientific name, reviewed status, Filipino language and safe citations. Existing fish cards display sourced Plapla for Oreochromis niloticus or Not yet verified; both new naming citations appear in Research & Sources. Species/occurrence rows, classification and suitability semantics are unchanged.
+
 See [RESEARCH_SOURCES.md](RESEARCH_SOURCES.md) for geographic provenance and scientific limitations, and [CURRENT_STATE.md](CURRENT_STATE.md) for execution results and planned work.

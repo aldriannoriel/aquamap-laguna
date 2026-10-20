@@ -1,0 +1,23 @@
+{
+  "Oreochromis niloticus": {
+    "scientific_name": "Oreochromis niloticus",
+    "status": "source_verified",
+    "language": "fil",
+    "name": "Plapla",
+    "note": "Naming evidence only: these SEAFDEC/AQD publications pair the Filipino vernacular name plapla with Oreochromis niloticus. Common names are not unique species identifiers. These references do not establish occurrence or habitat suitability in any Laguna water body.",
+    "sources": [
+      {
+        "title": "Pagpapalaki ng tilapya, Aquaculture Extension Manual No. 22 (revised edition), p. 1",
+        "publisher": "R. V. Eguia, M. R. R. Eguia and Z. U. Basiao / SEAFDEC Aquaculture Department",
+        "published_on": "2001",
+        "url": "https://repository.seafdec.org.ph/bitstream/handle/10862/6507/EguiaRV2001-AEM22.pdf?sequence=1#page=9"
+      },
+      {
+        "title": "SEAFDEC/AQD expert helps identify local food fish, AQD Matters, January-February, p. 10",
+        "publisher": "J. M. Dela Cruz / SEAFDEC Aquaculture Department",
+        "published_on": "2019",
+        "url": "https://www.seafdec.org.ph/wp-content/uploads/2019/01/AQD-Matters_Jan-Feb-2019-issue.pdf#page=10"
+      }
+    ]
+  }
+}

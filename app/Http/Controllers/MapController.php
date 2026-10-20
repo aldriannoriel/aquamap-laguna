@@ -53,8 +53,9 @@ class MapController extends Controller
             })
             ->all();
 
-        $fishByLake = $records->mapWithKeys(function (WaterBody $lake): array {
-            $fish = $lake->fishSpecies->map(function (FishSpecies $species): array {
+        $fishNames = json_decode(file_get_contents(database_path('data/fish-name-evidence.json')), true, flags: JSON_THROW_ON_ERROR);
+        $fishByLake = $records->mapWithKeys(function (WaterBody $lake) use ($fishNames): array {
+            $fish = $lake->fishSpecies->map(function (FishSpecies $species) use ($fishNames): array {
                 $data = $species->only(['id', 'common_name', 'scientific_name', 'water_type', 'habitat_requirements', 'source_url']);
                 $data['habitat_requirements'] = filled($data['habitat_requirements']) ? trim($data['habitat_requirements']) : null;
                 $data['source_url'] = $this->publicSource($data['source_url']);
@@ -63,6 +64,7 @@ class MapController extends Controller
                 $data['sampling_period'] = filled($species->pivot->sampling_period) ? $species->pivot->sampling_period : null;
                 $data['publication_year'] = $species->pivot->publication_year ? (int) $species->pivot->publication_year : null;
                 $data['compatibility_status'] = 'insufficient_data';
+                $data['filipino_name_evidence'] = ExplorerProfile::fishName($fishNames[$species->scientific_name] ?? null, $species->scientific_name);
 
                 return $data;
             })->all();

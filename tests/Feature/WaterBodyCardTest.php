@@ -167,7 +167,7 @@ class WaterBodyCardTest extends TestCase
         }
         $this->assertSame('Profile', trim($xpath->evaluate('string(//button[@data-profile-tab="overview"])')));
         $this->assertSame('Water Type', trim($xpath->evaluate('string(//button[@data-profile-tab="classification"])')));
-        $response->assertSee('Historical aquaculture')->assertSee('Filipino common name: Not yet verified.')
+        $response->assertSee('Historical aquaculture')->assertSee('Plapla')->assertSee('Name source')
             ->assertSee('Water type not yet verified')->assertSee('OpenStreetMap contributors')->assertSee('Image attribution');
         $this->assertSame(27, $xpath->query('//article[starts-with(@id,"profile-")]//figure/img')->length);
         $this->assertSame(3, $xpath->query('//article[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
