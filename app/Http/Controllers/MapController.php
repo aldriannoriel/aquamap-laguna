@@ -6,6 +6,7 @@ use App\Models\FishSpecies;
 use App\Models\PollutionReport;
 use App\Models\WaterBody;
 use App\Support\ExplorerProfile;
+use App\Support\WaterBodyMetrics;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,7 +21,7 @@ class MapController extends Controller
         $records = WaterBody::query()->select([...$fields, ...$metadata])
             ->whereIn('category', array_keys(WaterBody::PUBLIC_CATEGORIES))
             ->where(function (Builder $query): void {
-                $query->whereNotNull('geography')->orWhere(function (Builder $legacy): void {
+                $query->whereNotNull('geography')->orWhere('category', 'river')->orWhere(function (Builder $legacy): void {
                     $legacy->where('municipality', 'San Pablo City')
                         ->whereIn('name', ['Sampaloc Lake', 'Pandin Lake', 'Yambo Lake']);
                 });
@@ -61,7 +62,7 @@ class MapController extends Controller
                 $data['site_type'] = $lake->site_type === 'resort' ? 'resort' : 'water_body';
                 $data['spring_type'] = in_array($lake->spring_type, ['geothermal_hot_spring', 'natural_spring'], true) ? $lake->spring_type : null;
                 $data['official_url'] = $this->publicSource($lake->official_url);
-                $data['geography'] = ExplorerProfile::geography($lake->geography);
+                $data['geography'] = ExplorerProfile::geography($lake->geography, $lake->category);
                 $data['verified_report_count'] = array_sum($reportsByLake[$lake->id]);
 
                 return $data;
@@ -86,8 +87,9 @@ class MapController extends Controller
         })->all();
 
         $images = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR);
+        $metrics = json_decode(file_get_contents(database_path('data/water-body-metrics.json')), true, flags: JSON_THROW_ON_ERROR);
         $replacements = json_decode(file_get_contents(database_path('data/waterfall-photos.json')), true, flags: JSON_THROW_ON_ERROR);
-        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $reportsByLake): array {
+        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $reportsByLake, $metrics): array {
             $supplement = $images[$lake->name] ?? null;
             $image = $lake->image;
             if ($image === null && is_array($supplement) && ($supplement['municipality'] ?? null) === $lake->municipality) {
@@ -106,6 +108,11 @@ class MapController extends Controller
                 'references' => ExplorerProfile::references($lake->research_references),
                 'image' => ExplorerProfile::image($image),
                 'report_categories' => $reportsByLake[$lake->id],
+                'reported_length' => $lake->category === 'river' ? WaterBodyMetrics::reported($metrics['rivers'][$lake->name] ?? null, $lake->municipality) : null,
+                'length_note' => $lake->category === 'river' && $lake->name === 'Bumbungan River'
+                    && $lake->municipality === $metrics['rivers']['Bumbungan River']['municipality'] ? $metrics['rivers']['Bumbungan River']['note'] : null,
+                'mapped_length_km' => $lake->category === 'river' ? WaterBodyMetrics::mappedLength(ExplorerProfile::geography($lake->geography, 'river')) : null,
+                'surface_area' => $lake->category === 'lake' ? WaterBodyMetrics::reported($metrics['lakes'][$lake->name] ?? null, $lake->municipality) : null,
             ]];
         })->all();
 

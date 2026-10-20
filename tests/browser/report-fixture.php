@@ -55,6 +55,9 @@ if ($setup) {
     // Reuse verified seeder data in memory, then copy it to the disposable file.
     Artisan::call('db:seed', ['--class' => DatabaseSeeder::class, '--no-interaction' => true]);
     Artisan::call('db:seed', ['--class' => ExplorerSeeder::class, '--no-interaction' => true]);
+    if (getenv('AQUAMAP_BROWSER_RIVERS') === '1') {
+        Artisan::call('rivers:import', ['--no-interaction' => true]);
+    }
     $rows = [];
     foreach (['water_bodies', 'fish_species', 'water_body_fish'] as $table) {
         $query = DB::table($table);

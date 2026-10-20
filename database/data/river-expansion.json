@@ -1,0 +1,3073 @@
+[
+  {
+    "name": "San Isidro River",
+    "municipality": "San Pedro City",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with San Pedro City as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 1 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Biñan River",
+    "municipality": "Biñan City",
+    "water_type": "Not Assessed",
+    "latitude": 14.3278677,
+    "longitude": 121.0776824,
+    "description": "Listed in the Laguna provincial major-river inventory with Biñan City as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [
+      "Binan River"
+    ],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/26949260",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 26949260,
+          "version": 15,
+          "timestamp": "2022-01-02T19:32:25Z",
+          "name": "Biñan River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/26949260"
+        }
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.0776824,
+            14.3278677
+          ],
+          [
+            121.0787534,
+            14.3285242
+          ],
+          [
+            121.0790265,
+            14.3286475
+          ],
+          [
+            121.0793459,
+            14.3286715
+          ],
+          [
+            121.0795001,
+            14.3287118
+          ],
+          [
+            121.079657,
+            14.3287638
+          ],
+          [
+            121.0800137,
+            14.3290596
+          ],
+          [
+            121.0805104,
+            14.3295288
+          ],
+          [
+            121.0808336,
+            14.3298077
+          ],
+          [
+            121.0811787,
+            14.3300434
+          ],
+          [
+            121.0814846,
+            14.330126
+          ],
+          [
+            121.0818359,
+            14.3302831
+          ],
+          [
+            121.0823036,
+            14.3304945
+          ],
+          [
+            121.0825991,
+            14.3306489
+          ],
+          [
+            121.0827317,
+            14.3306861
+          ],
+          [
+            121.0831581,
+            14.3306999
+          ],
+          [
+            121.0832733,
+            14.330759
+          ],
+          [
+            121.0834191,
+            14.3308336
+          ],
+          [
+            121.0835067,
+            14.3310322
+          ],
+          [
+            121.0837696,
+            14.3313619
+          ],
+          [
+            121.0839862,
+            14.3314689
+          ],
+          [
+            121.0842579,
+            14.331488
+          ],
+          [
+            121.0846175,
+            14.3315464
+          ],
+          [
+            121.0849504,
+            14.3316824
+          ],
+          [
+            121.0852652,
+            14.3319917
+          ],
+          [
+            121.0857046,
+            14.3323196
+          ],
+          [
+            121.0863369,
+            14.3326085
+          ],
+          [
+            121.0864454,
+            14.332783
+          ],
+          [
+            121.0864833,
+            14.3330692
+          ],
+          [
+            121.0865243,
+            14.3337985
+          ],
+          [
+            121.0863787,
+            14.3341791
+          ],
+          [
+            121.0860572,
+            14.3346883
+          ],
+          [
+            121.0855728,
+            14.3353837
+          ],
+          [
+            121.0852165,
+            14.335806
+          ],
+          [
+            121.0851126,
+            14.3362695
+          ],
+          [
+            121.0850905,
+            14.336631
+          ],
+          [
+            121.0851188,
+            14.3370987
+          ],
+          [
+            121.0851783,
+            14.3373591
+          ],
+          [
+            121.0855437,
+            14.3381984
+          ],
+          [
+            121.0856227,
+            14.3388914
+          ],
+          [
+            121.0852095,
+            14.3410003
+          ],
+          [
+            121.0851247,
+            14.3413771
+          ],
+          [
+            121.0850127,
+            14.3417604
+          ],
+          [
+            121.0848791,
+            14.3420589
+          ],
+          [
+            121.0847197,
+            14.3422087
+          ],
+          [
+            121.0847144,
+            14.342323
+          ],
+          [
+            121.0847391,
+            14.3424318
+          ],
+          [
+            121.0848497,
+            14.3425756
+          ],
+          [
+            121.0850282,
+            14.3426868
+          ],
+          [
+            121.0853064,
+            14.3427132
+          ],
+          [
+            121.0863491,
+            14.3426161
+          ],
+          [
+            121.0865007,
+            14.3426842
+          ],
+          [
+            121.0865906,
+            14.3428013
+          ],
+          [
+            121.0867341,
+            14.3433287
+          ],
+          [
+            121.0868076,
+            14.3438561
+          ],
+          [
+            121.0867555,
+            14.3441784
+          ],
+          [
+            121.086627,
+            14.3444744
+          ],
+          [
+            121.0864873,
+            14.3447501
+          ],
+          [
+            121.0862861,
+            14.3450229
+          ],
+          [
+            121.086067,
+            14.3455104
+          ],
+          [
+            121.0860823,
+            14.3459688
+          ],
+          [
+            121.0862221,
+            14.3464548
+          ],
+          [
+            121.0863371,
+            14.3467588
+          ],
+          [
+            121.0865103,
+            14.3470516
+          ],
+          [
+            121.0867099,
+            14.3473694
+          ],
+          [
+            121.0869974,
+            14.3477413
+          ],
+          [
+            121.0877008,
+            14.3485752
+          ],
+          [
+            121.0877613,
+            14.3488376
+          ],
+          [
+            121.0877762,
+            14.3491164
+          ],
+          [
+            121.0876675,
+            14.3493989
+          ],
+          [
+            121.0875134,
+            14.3495983
+          ],
+          [
+            121.0872973,
+            14.3497601
+          ],
+          [
+            121.0869603,
+            14.3498864
+          ],
+          [
+            121.0866077,
+            14.350091
+          ],
+          [
+            121.0861384,
+            14.3504334
+          ],
+          [
+            121.0857615,
+            14.351096
+          ],
+          [
+            121.0854936,
+            14.351596
+          ],
+          [
+            121.0852574,
+            14.3523497
+          ],
+          [
+            121.0851489,
+            14.3531016
+          ],
+          [
+            121.0851365,
+            14.3534832
+          ],
+          [
+            121.0852066,
+            14.3540904
+          ],
+          [
+            121.0853943,
+            14.3546061
+          ],
+          [
+            121.0857761,
+            14.355012
+          ],
+          [
+            121.0863183,
+            14.355138
+          ],
+          [
+            121.0870806,
+            14.3549322
+          ],
+          [
+            121.087606,
+            14.3550276
+          ],
+          [
+            121.0884763,
+            14.3551202
+          ],
+          [
+            121.0891323,
+            14.3551802
+          ],
+          [
+            121.0899226,
+            14.3553428
+          ],
+          [
+            121.090461,
+            14.3553529
+          ],
+          [
+            121.0911147,
+            14.3552041
+          ],
+          [
+            121.0918091,
+            14.355175
+          ],
+          [
+            121.0921516,
+            14.3552245
+          ],
+          [
+            121.0925317,
+            14.3553321
+          ],
+          [
+            121.0927994,
+            14.3554829
+          ],
+          [
+            121.0930574,
+            14.3557063
+          ],
+          [
+            121.0934383,
+            14.3560181
+          ],
+          [
+            121.0940004,
+            14.3563438
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 2 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Biñan River: OSM way 26949260, v15",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/26949260",
+        "published_on": "2022-01-02"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Santa Rosa River",
+    "municipality": "Santa Rosa City",
+    "water_type": "Not Assessed",
+    "latitude": 14.2507893,
+    "longitude": 121.0542103,
+    "description": "Listed in the Laguna provincial major-river inventory with Santa Rosa City as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. These Silang–Santa Rosa reaches include the upstream Cavite area; Santa Rosa City is the provincial table locality, not a coverage boundary. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [
+      "Sta. Rosa River",
+      "Silang - Santa Rosa River",
+      "Silang–Santa Rosa River"
+    ],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/90984742",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. These Silang–Santa Rosa reaches include the upstream Cavite area; Santa Rosa City is the provincial table locality, not a coverage boundary.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 90984742,
+          "version": 12,
+          "timestamp": "2025-12-16T09:14:45Z",
+          "name": "Silang - Santa Rosa River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/90984742"
+        },
+        {
+          "type": "way",
+          "id": 1446694906,
+          "version": 2,
+          "timestamp": "2025-12-16T09:14:45Z",
+          "name": "Silang - Santa Rosa River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/1446694906"
+        }
+      ],
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              121.0542103,
+              14.2507893
+            ],
+            [
+              121.0540693,
+              14.2510112
+            ],
+            [
+              121.0539727,
+              14.2513648
+            ],
+            [
+              121.0538332,
+              14.2517287
+            ],
+            [
+              121.0536401,
+              14.2519887
+            ],
+            [
+              121.0536509,
+              14.2521031
+            ],
+            [
+              121.0537796,
+              14.2523007
+            ],
+            [
+              121.0538288,
+              14.2524674
+            ],
+            [
+              121.053844,
+              14.252519
+            ],
+            [
+              121.0539298,
+              14.2528518
+            ],
+            [
+              121.05408,
+              14.2534549
+            ],
+            [
+              121.0541015,
+              14.2540684
+            ],
+            [
+              121.0541015,
+              14.2543908
+            ],
+            [
+              121.0541658,
+              14.2546819
+            ],
+            [
+              121.0539835,
+              14.2550979
+            ],
+            [
+              121.0538762,
+              14.255597
+            ],
+            [
+              121.053929,
+              14.2558774
+            ],
+            [
+              121.0539813,
+              14.2561121
+            ],
+            [
+              121.0541229,
+              14.2563873
+            ],
+            [
+              121.0544298,
+              14.2566722
+            ]
+          ],
+          [
+            [
+              121.0560728,
+              14.248252
+            ],
+            [
+              121.0559945,
+              14.2484973
+            ],
+            [
+              121.0559009,
+              14.2486961
+            ],
+            [
+              121.0558214,
+              14.2487974
+            ],
+            [
+              121.0557134,
+              14.2490745
+            ],
+            [
+              121.0556576,
+              14.2493959
+            ],
+            [
+              121.0555903,
+              14.2496016
+            ],
+            [
+              121.0554479,
+              14.2497683
+            ],
+            [
+              121.0553435,
+              14.249857
+            ],
+            [
+              121.0550515,
+              14.2499792
+            ],
+            [
+              121.0547413,
+              14.2500707
+            ],
+            [
+              121.0546609,
+              14.2501338
+            ],
+            [
+              121.0546204,
+              14.2502099
+            ],
+            [
+              121.0545973,
+              14.2503299
+            ],
+            [
+              121.0545517,
+              14.2503865
+            ],
+            [
+              121.0544884,
+              14.2504495
+            ],
+            [
+              121.0544431,
+              14.250496
+            ],
+            [
+              121.0542103,
+              14.2507893
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 3 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Silang - Santa Rosa River: OSM way 90984742, v12",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/90984742",
+        "published_on": "2025-12-16"
+      },
+      {
+        "title": "Silang - Santa Rosa River: OSM way 1446694906, v2",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/1446694906",
+        "published_on": "2025-12-16"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "San Cristobal River",
+    "municipality": "Calamba City",
+    "water_type": "Not Assessed",
+    "latitude": 14.2199233,
+    "longitude": 121.1415614,
+    "description": "Listed in the Laguna provincial major-river inventory with Calamba City as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/27371773",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 27371773,
+          "version": 21,
+          "timestamp": "2023-12-20T10:33:01Z",
+          "name": "San Cristobal River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/27371773"
+        },
+        {
+          "type": "way",
+          "id": 110617725,
+          "version": 3,
+          "timestamp": "2023-12-20T10:33:01Z",
+          "name": "San Cristobal River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/110617725"
+        }
+      ],
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              121.1415614,
+              14.2199233
+            ],
+            [
+              121.1419162,
+              14.2199476
+            ],
+            [
+              121.1424013,
+              14.2200682
+            ],
+            [
+              121.1432947,
+              14.2204632
+            ],
+            [
+              121.1446038,
+              14.2210973
+            ],
+            [
+              121.144739,
+              14.2211166
+            ],
+            [
+              121.1450878,
+              14.2211602
+            ],
+            [
+              121.1453376,
+              14.2212745
+            ],
+            [
+              121.1454089,
+              14.2212985
+            ],
+            [
+              121.1457464,
+              14.2214145
+            ],
+            [
+              121.1463368,
+              14.221383
+            ],
+            [
+              121.1469105,
+              14.2212481
+            ],
+            [
+              121.147125,
+              14.2211025
+            ],
+            [
+              121.1472377,
+              14.2209153
+            ],
+            [
+              121.1472914,
+              14.2204785
+            ],
+            [
+              121.1471626,
+              14.2200416
+            ],
+            [
+              121.14683,
+              14.2196256
+            ],
+            [
+              121.1467227,
+              14.219532
+            ],
+            [
+              121.1466262,
+              14.219584
+            ],
+            [
+              121.1464331,
+              14.2195736
+            ],
+            [
+              121.1462399,
+              14.2192096
+            ],
+            [
+              121.1461327,
+              14.2188456
+            ],
+            [
+              121.1460576,
+              14.2183672
+            ],
+            [
+              121.1464545,
+              14.21818
+            ],
+            [
+              121.1469051,
+              14.2177016
+            ],
+            [
+              121.1474094,
+              14.2174104
+            ],
+            [
+              121.1481175,
+              14.2171608
+            ],
+            [
+              121.1486566,
+              14.2170308
+            ],
+            [
+              121.1489624,
+              14.2169554
+            ],
+            [
+              121.1491474,
+              14.2170776
+            ],
+            [
+              121.1492078,
+              14.2172625
+            ],
+            [
+              121.1492596,
+              14.2176538
+            ],
+            [
+              121.1492848,
+              14.2183048
+            ],
+            [
+              121.1492102,
+              14.2190744
+            ],
+            [
+              121.149291,
+              14.2194445
+            ],
+            [
+              121.1495708,
+              14.2196431
+            ],
+            [
+              121.150202,
+              14.2198986
+            ],
+            [
+              121.1506266,
+              14.2199931
+            ],
+            [
+              121.1507863,
+              14.2200719
+            ],
+            [
+              121.1510387,
+              14.2201392
+            ]
+          ],
+          [
+            [
+              121.1510387,
+              14.2201392
+            ],
+            [
+              121.1513684,
+              14.2201095
+            ],
+            [
+              121.1521324,
+              14.219962
+            ],
+            [
+              121.152587,
+              14.2197062
+            ],
+            [
+              121.1528209,
+              14.2194327
+            ],
+            [
+              121.1535506,
+              14.2188317
+            ],
+            [
+              121.154044,
+              14.2186895
+            ],
+            [
+              121.154516,
+              14.2185986
+            ],
+            [
+              121.1547891,
+              14.2185777
+            ],
+            [
+              121.1551759,
+              14.2186423
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 4 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "San Cristobal River: OSM way 27371773, v21",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/27371773",
+        "published_on": "2023-12-20"
+      },
+      {
+        "title": "San Cristobal River: OSM way 110617725, v3",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/110617725",
+        "published_on": "2023-12-20"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "San Juan River",
+    "municipality": "Calamba City",
+    "water_type": "Not Assessed",
+    "latitude": 14.2099732,
+    "longitude": 121.1582545,
+    "description": "Listed in the Laguna provincial major-river inventory with Calamba City as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/549175324",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 549175324,
+          "version": 1,
+          "timestamp": "2017-12-26T15:51:48Z",
+          "name": "San Juan River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/549175324"
+        }
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.1582545,
+            14.2099732
+          ],
+          [
+            121.1583752,
+            14.2101315
+          ],
+          [
+            121.1585024,
+            14.2103646
+          ],
+          [
+            121.1585743,
+            14.2110995
+          ],
+          [
+            121.1585717,
+            14.2117282
+          ],
+          [
+            121.15854,
+            14.2127984
+          ],
+          [
+            121.158253,
+            14.2133034
+          ],
+          [
+            121.1580502,
+            14.2138799
+          ],
+          [
+            121.157947,
+            14.2142334
+          ],
+          [
+            121.1578297,
+            14.2146177
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 5 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "San Juan River: OSM way 549175324, v1",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/549175324",
+        "published_on": "2017-12-26"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Bay River",
+    "municipality": "Bay",
+    "water_type": "Not Assessed",
+    "latitude": 14.1922894,
+    "longitude": 121.2926704,
+    "description": "Listed in the Laguna provincial major-river inventory with Bay as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/413242115",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 413242115,
+          "version": 1,
+          "timestamp": "2016-04-25T05:36:07Z",
+          "name": "Bay River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/413242115"
+        }
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.2926704,
+            14.1922894
+          ],
+          [
+            121.2928394,
+            14.1926351
+          ],
+          [
+            121.2929145,
+            14.1930303
+          ],
+          [
+            121.292893,
+            14.1935816
+          ],
+          [
+            121.2927585,
+            14.1947506
+          ],
+          [
+            121.2926078,
+            14.1952476
+          ],
+          [
+            121.2923995,
+            14.1957659
+          ],
+          [
+            121.2921409,
+            14.1962386
+          ],
+          [
+            121.2916455,
+            14.1968688
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 6 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Bay River: OSM way 413242115, v1",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/413242115",
+        "published_on": "2016-04-25"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Calo River",
+    "municipality": "Bay",
+    "water_type": "Not Assessed",
+    "latitude": 14.1845999,
+    "longitude": 121.2776045,
+    "description": "Listed in the Laguna provincial major-river inventory with Bay as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/413242117",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 413242117,
+          "version": 2,
+          "timestamp": "2026-10-15T03:33:25Z",
+          "name": "Calo River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/413242117"
+        }
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.2776045,
+            14.1845999
+          ],
+          [
+            121.2767461,
+            14.1861445
+          ],
+          [
+            121.2764564,
+            14.1866334
+          ],
+          [
+            121.2763706,
+            14.1868102
+          ],
+          [
+            121.2762848,
+            14.1870079
+          ],
+          [
+            121.2761668,
+            14.1871535
+          ],
+          [
+            121.2758556,
+            14.1872783
+          ],
+          [
+            121.2755874,
+            14.1875176
+          ],
+          [
+            121.2736562,
+            14.1889842
+          ],
+          [
+            121.2729411,
+            14.1896448
+          ],
+          [
+            121.2723713,
+            14.1902045
+          ],
+          [
+            121.2720683,
+            14.190586
+          ],
+          [
+            121.271253,
+            14.1913973
+          ],
+          [
+            121.2708774,
+            14.1918342
+          ],
+          [
+            121.2707081,
+            14.1921264
+          ],
+          [
+            121.2705886,
+            14.1922144
+          ],
+          [
+            121.2703946,
+            14.1923022
+          ],
+          [
+            121.2702874,
+            14.1925415
+          ],
+          [
+            121.2700191,
+            14.1928535
+          ],
+          [
+            121.2697509,
+            14.1930927
+          ],
+          [
+            121.2696544,
+            14.193332
+          ],
+          [
+            121.2696865,
+            14.1935296
+          ],
+          [
+            121.2695685,
+            14.1937376
+          ],
+          [
+            121.2693539,
+            14.1942993
+          ],
+          [
+            121.2693161,
+            14.1943933
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 7 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Calo River: OSM way 413242117, v2",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/413242117",
+        "published_on": "2026-10-15"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Prinza River",
+    "municipality": "Calauan",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with Calauan as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 8 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Banca-Banca River",
+    "municipality": "Victoria",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with Victoria as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [
+      "Banca Banca River"
+    ],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 9 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Pila River",
+    "municipality": "Pila",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with Pila as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 10 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Pangil River",
+    "municipality": "Pangil",
+    "water_type": "Not Assessed",
+    "latitude": 14.4041577,
+    "longitude": 121.4704415,
+    "description": "Listed in the Laguna provincial major-river inventory with Pangil as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/1428178449",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 1428178449,
+          "version": 2,
+          "timestamp": "2026-03-17T22:34:37Z",
+          "name": "Pangil River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/1428178449"
+        },
+        {
+          "type": "way",
+          "id": 1428178453,
+          "version": 2,
+          "timestamp": "2026-03-17T22:34:37Z",
+          "name": "Pangil River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/1428178453"
+        }
+      ],
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              121.4704415,
+              14.4041577
+            ],
+            [
+              121.4704609,
+              14.4041239
+            ],
+            [
+              121.4705193,
+              14.4039233
+            ],
+            [
+              121.4704924,
+              14.4038551
+            ],
+            [
+              121.470463,
+              14.4038213
+            ],
+            [
+              121.4703664,
+              14.4037732
+            ],
+            [
+              121.4702732,
+              14.4037181
+            ],
+            [
+              121.4700667,
+              14.4035867
+            ],
+            [
+              121.4699135,
+              14.4035139
+            ],
+            [
+              121.4698044,
+              14.4034946
+            ],
+            [
+              121.4697085,
+              14.4035291
+            ],
+            [
+              121.4696154,
+              14.4035583
+            ],
+            [
+              121.4695376,
+              14.4035908
+            ],
+            [
+              121.4694807,
+              14.4036274
+            ],
+            [
+              121.4693722,
+              14.4036447
+            ]
+          ],
+          [
+            [
+              121.4693722,
+              14.4036447
+            ],
+            [
+              121.4693069,
+              14.4036238
+            ],
+            [
+              121.4692093,
+              14.4035525
+            ],
+            [
+              121.4691822,
+              14.4034791
+            ],
+            [
+              121.4691339,
+              14.4034142
+            ],
+            [
+              121.4690964,
+              14.4033544
+            ],
+            [
+              121.4690588,
+              14.4032375
+            ],
+            [
+              121.4690401,
+              14.4031855
+            ],
+            [
+              121.4690132,
+              14.403066
+            ],
+            [
+              121.4689891,
+              14.4029751
+            ],
+            [
+              121.4689931,
+              14.4028452
+            ],
+            [
+              121.4689502,
+              14.4027361
+            ],
+            [
+              121.4689318,
+              14.4026576
+            ],
+            [
+              121.4689099,
+              14.402601
+            ],
+            [
+              121.4688912,
+              14.4025178
+            ],
+            [
+              121.4689073,
+              14.4024035
+            ],
+            [
+              121.4689274,
+              14.4022945
+            ],
+            [
+              121.4689448,
+              14.4021983
+            ],
+            [
+              121.4689609,
+              14.402097
+            ],
+            [
+              121.4689958,
+              14.4019541
+            ],
+            [
+              121.4690226,
+              14.401832
+            ],
+            [
+              121.469028,
+              14.401767
+            ],
+            [
+              121.4690414,
+              14.4016449
+            ],
+            [
+              121.4690601,
+              14.4015254
+            ],
+            [
+              121.4690709,
+              14.4013981
+            ],
+            [
+              121.469095,
+              14.4012604
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 14 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Pangil River: OSM way 1428178449, v2",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/1428178449",
+        "published_on": "2026-03-17"
+      },
+      {
+        "title": "Pangil River: OSM way 1428178453, v2",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/1428178453",
+        "published_on": "2026-03-17"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Siniloan River",
+    "municipality": "Siniloan",
+    "water_type": "Not Assessed",
+    "latitude": 14.4171158,
+    "longitude": 121.4448029,
+    "description": "Listed in the Laguna provincial major-river inventory with Siniloan as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/211563245",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 211563245,
+          "version": 14,
+          "timestamp": "2026-03-15T23:36:32Z",
+          "name": "Siniloan River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/211563245"
+        },
+        {
+          "type": "way",
+          "id": 679990142,
+          "version": 3,
+          "timestamp": "2026-03-18T04:25:26Z",
+          "name": "Siniloan River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/679990142"
+        }
+      ],
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              121.4448029,
+              14.4171158
+            ],
+            [
+              121.4447513,
+              14.4169915
+            ],
+            [
+              121.4447233,
+              14.4169258
+            ],
+            [
+              121.4447134,
+              14.4168562
+            ],
+            [
+              121.4447165,
+              14.4167911
+            ],
+            [
+              121.4447149,
+              14.4167103
+            ],
+            [
+              121.4446686,
+              14.4166353
+            ],
+            [
+              121.4446348,
+              14.4165578
+            ],
+            [
+              121.4445785,
+              14.4164724
+            ],
+            [
+              121.4444919,
+              14.4163909
+            ],
+            [
+              121.4444144,
+              14.4163385
+            ],
+            [
+              121.4442795,
+              14.4162917
+            ],
+            [
+              121.4440864,
+              14.4162917
+            ],
+            [
+              121.4440059,
+              14.4162813
+            ],
+            [
+              121.4437149,
+              14.4162013
+            ],
+            [
+              121.4435765,
+              14.4160444
+            ],
+            [
+              121.4434639,
+              14.4157565
+            ],
+            [
+              121.4433941,
+              14.4154578
+            ],
+            [
+              121.4433109,
+              14.4151799
+            ],
+            [
+              121.4430535,
+              14.4148577
+            ],
+            [
+              121.4428979,
+              14.414764
+            ],
+            [
+              121.4426591,
+              14.4147018
+            ],
+            [
+              121.4420128,
+              14.4146679
+            ],
+            [
+              121.4414924,
+              14.4142782
+            ],
+            [
+              121.4407521,
+              14.4139717
+            ],
+            [
+              121.4405322,
+              14.4137483
+            ],
+            [
+              121.4404303,
+              14.4134573
+            ],
+            [
+              121.4404035,
+              14.4130521
+            ],
+            [
+              121.4405644,
+              14.4125897
+            ],
+            [
+              121.4410794,
+              14.411748
+            ],
+            [
+              121.4415729,
+              14.4109894
+            ],
+            [
+              121.4416587,
+              14.4106829
+            ],
+            [
+              121.4416128,
+              14.4104754
+            ],
+            [
+              121.441452,
+              14.4102946
+            ],
+            [
+              121.4411285,
+              14.41017
+            ],
+            [
+              121.4409131,
+              14.4099815
+            ],
+            [
+              121.4408594,
+              14.4098256
+            ],
+            [
+              121.4409667,
+              14.4095398
+            ],
+            [
+              121.4412349,
+              14.409332
+            ],
+            [
+              121.4413691,
+              14.4091242
+            ],
+            [
+              121.4413798,
+              14.4088852
+            ],
+            [
+              121.4412564,
+              14.4086773
+            ],
+            [
+              121.4410526,
+              14.4085682
+            ],
+            [
+              121.4405698,
+              14.4085319
+            ],
+            [
+              121.4398777,
+              14.4082617
+            ],
+            [
+              121.4392769,
+              14.4077889
+            ],
+            [
+              121.4390463,
+              14.4073161
+            ],
+            [
+              121.4389564,
+              14.4070478
+            ],
+            [
+              121.4390195,
+              14.4068397
+            ],
+            [
+              121.4393789,
+              14.406386
+            ],
+            [
+              121.4394593,
+              14.4061003
+            ],
+            [
+              121.4394182,
+              14.4058222
+            ],
+            [
+              121.4393431,
+              14.405561
+            ],
+            [
+              121.4391783,
+              14.4053984
+            ],
+            [
+              121.4387673,
+              14.4052534
+            ],
+            [
+              121.438188,
+              14.4049468
+            ],
+            [
+              121.4378607,
+              14.4043025
+            ],
+            [
+              121.4377266,
+              14.4040947
+            ],
+            [
+              121.4378017,
+              14.4034764
+            ],
+            [
+              121.4380538,
+              14.4031854
+            ],
+            [
+              121.4381933,
+              14.402749
+            ],
+            [
+              121.4381021,
+              14.4026139
+            ],
+            [
+              121.4376998,
+              14.4021982
+            ],
+            [
+              121.4379251,
+              14.4014085
+            ],
+            [
+              121.4381558,
+              14.4005044
+            ],
+            [
+              121.4385688,
+              14.399486
+            ],
+            [
+              121.4386117,
+              14.3992626
+            ],
+            [
+              121.4385956,
+              14.3991846
+            ],
+            [
+              121.4382845,
+              14.3988261
+            ],
+            [
+              121.438204,
+              14.3981143
+            ],
+            [
+              121.4382791,
+              14.3971582
+            ],
+            [
+              121.4384133,
+              14.3966023
+            ],
+            [
+              121.4387566,
+              14.3958384
+            ],
+            [
+              121.4392018,
+              14.3950227
+            ],
+            [
+              121.4393359,
+              14.3947161
+            ]
+          ],
+          [
+            [
+              121.446016,
+              14.4208252
+            ],
+            [
+              121.4456474,
+              14.4204895
+            ],
+            [
+              121.4455201,
+              14.4200306
+            ],
+            [
+              121.4455002,
+              14.4197101
+            ],
+            [
+              121.4452728,
+              14.4190177
+            ],
+            [
+              121.4452352,
+              14.4188864
+            ],
+            [
+              121.4451874,
+              14.4185327
+            ],
+            [
+              121.4451553,
+              14.4180854
+            ],
+            [
+              121.4451279,
+              14.4176557
+            ],
+            [
+              121.4449465,
+              14.4173964
+            ],
+            [
+              121.4448029,
+              14.4171158
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 15 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Siniloan River: OSM way 211563245, v14",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/211563245",
+        "published_on": "2026-03-15"
+      },
+      {
+        "title": "Siniloan River: OSM way 679990142, v3",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/679990142",
+        "published_on": "2026-03-18"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Romero River",
+    "municipality": "Famy",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with Famy as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 16 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "San Antonio River",
+    "municipality": "Santa Maria / Mabitac",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with Santa Maria / Mabitac as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 17 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Tigas River",
+    "municipality": "Alaminos",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with Alaminos as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 18 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Makpongo River",
+    "municipality": "San Pablo City",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with San Pablo City as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 19 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Balatuin River",
+    "municipality": "San Pablo City",
+    "water_type": "Not Assessed",
+    "latitude": 14.0755327,
+    "longitude": 121.3154585,
+    "description": "Listed in the Laguna provincial major-river inventory with San Pablo City as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/113962651",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 113962651,
+          "version": 4,
+          "timestamp": "2025-04-23T04:04:03Z",
+          "name": "Balatuin River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/113962651"
+        }
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.3154585,
+            14.0755327
+          ],
+          [
+            121.3152599,
+            14.0754506
+          ],
+          [
+            121.3150898,
+            14.075455
+          ],
+          [
+            121.3148879,
+            14.0754997
+          ],
+          [
+            121.3147221,
+            14.0753041
+          ],
+          [
+            121.3146628,
+            14.0751878
+          ],
+          [
+            121.314684,
+            14.0750226
+          ],
+          [
+            121.3148399,
+            14.0749058
+          ],
+          [
+            121.31492,
+            14.0747308
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 20 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Balatuin River: OSM way 113962651, v4",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/113962651",
+        "published_on": "2025-04-23"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Malaunod River",
+    "municipality": "San Pablo City",
+    "water_type": "Not Assessed",
+    "latitude": 14.0737564,
+    "longitude": 121.3587683,
+    "description": "Listed in the Laguna provincial major-river inventory with San Pablo City as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. OSM classifies these named Malaunod River reaches as waterway=stream; the river name follows the provincial inventory. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/476317798",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. OSM classifies these named Malaunod River reaches as waterway=stream; the river name follows the provincial inventory.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 476317798,
+          "version": 4,
+          "timestamp": "2025-12-01T14:43:45Z",
+          "name": "Malaunod River",
+          "waterway": "stream",
+          "url": "https://www.openstreetmap.org/way/476317798"
+        },
+        {
+          "type": "way",
+          "id": 1455171120,
+          "version": 1,
+          "timestamp": "2025-12-01T14:43:45Z",
+          "name": "Malaunod River",
+          "waterway": "stream",
+          "url": "https://www.openstreetmap.org/way/1455171120"
+        }
+      ],
+      "geometry": {
+        "type": "MultiLineString",
+        "coordinates": [
+          [
+            [
+              121.3587683,
+              14.0737564
+            ],
+            [
+              121.358702,
+              14.0737363
+            ],
+            [
+              121.3585764,
+              14.0736863
+            ],
+            [
+              121.3583344,
+              14.0735643
+            ],
+            [
+              121.3581684,
+              14.0733613
+            ],
+            [
+              121.3576847,
+              14.0731675
+            ],
+            [
+              121.3573951,
+              14.0731068
+            ],
+            [
+              121.3570928,
+              14.0729564
+            ],
+            [
+              121.3569164,
+              14.0728209
+            ],
+            [
+              121.3566885,
+              14.072525
+            ],
+            [
+              121.3565525,
+              14.0724074
+            ],
+            [
+              121.356329,
+              14.0723313
+            ],
+            [
+              121.3561929,
+              14.0723877
+            ],
+            [
+              121.3560574,
+              14.072438
+            ],
+            [
+              121.3559894,
+              14.0724237
+            ],
+            [
+              121.3558626,
+              14.0723061
+            ],
+            [
+              121.3557008,
+              14.072262
+            ],
+            [
+              121.3555925,
+              14.0722612
+            ],
+            [
+              121.3555359,
+              14.0722683
+            ],
+            [
+              121.3554642,
+              14.0722937
+            ],
+            [
+              121.3553809,
+              14.0723339
+            ],
+            [
+              121.3553043,
+              14.0723544
+            ],
+            [
+              121.3550294,
+              14.0723538
+            ],
+            [
+              121.3550962,
+              14.0723424
+            ],
+            [
+              121.354882,
+              14.0723422
+            ],
+            [
+              121.3544921,
+              14.0722808
+            ],
+            [
+              121.3542024,
+              14.0722288
+            ],
+            [
+              121.3539808,
+              14.072152
+            ],
+            [
+              121.3538609,
+              14.0720789
+            ],
+            [
+              121.353741,
+              14.0720154
+            ],
+            [
+              121.3536016,
+              14.071927
+            ],
+            [
+              121.3535104,
+              14.0717527
+            ],
+            [
+              121.3534835,
+              14.0716616
+            ],
+            [
+              121.3533602,
+              14.0716122
+            ],
+            [
+              121.3532421,
+              14.071633
+            ],
+            [
+              121.3531483,
+              14.0716174
+            ],
+            [
+              121.353041,
+              14.0716226
+            ],
+            [
+              121.3528505,
+              14.0717292
+            ],
+            [
+              121.3525904,
+              14.0717318
+            ],
+            [
+              121.3523517,
+              14.0716564
+            ],
+            [
+              121.3521398,
+              14.0715653
+            ],
+            [
+              121.3519439,
+              14.0714717
+            ],
+            [
+              121.3519064,
+              14.0713936
+            ],
+            [
+              121.3519386,
+              14.0711699
+            ],
+            [
+              121.3519144,
+              14.0710007
+            ],
+            [
+              121.3517106,
+              14.0708238
+            ],
+            [
+              121.3515631,
+              14.070751
+            ],
+            [
+              121.3511407,
+              14.0706275
+            ],
+            [
+              121.3508429,
+              14.0700199
+            ]
+          ],
+          [
+            [
+              121.3508429,
+              14.0700199
+            ],
+            [
+              121.3508409,
+              14.0698429
+            ]
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 21 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Malaunod River: OSM way 476317798, v4",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/476317798",
+        "published_on": "2025-12-01"
+      },
+      {
+        "title": "Malaunod River: OSM way 1455171120, v1",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/1455171120",
+        "published_on": "2025-12-01"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Onipa River",
+    "municipality": "San Pablo City",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with San Pablo City as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 22 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Tarak River",
+    "municipality": "San Pablo City",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with San Pablo City as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 23 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Maimpis River",
+    "municipality": "Nagcarlan",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with Nagcarlan as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 24 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Dalitiwan River",
+    "municipality": "Majayjay",
+    "water_type": "Not Assessed",
+    "latitude": 14.139237,
+    "longitude": 121.4918688,
+    "description": "Listed in the Laguna provincial major-river inventory with Majayjay as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/97211396",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 97211396,
+          "version": 9,
+          "timestamp": "2020-07-04T17:52:05Z",
+          "name": "Dalitiwan River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/97211396"
+        }
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.4918688,
+            14.139237
+          ],
+          [
+            121.4916469,
+            14.1395368
+          ],
+          [
+            121.4912744,
+            14.1398826
+          ],
+          [
+            121.4911872,
+            14.1400671
+          ],
+          [
+            121.4912189,
+            14.1403592
+          ],
+          [
+            121.4913616,
+            14.1409049
+          ],
+          [
+            121.4914329,
+            14.1413199
+          ],
+          [
+            121.4914884,
+            14.1417119
+          ],
+          [
+            121.4915676,
+            14.1420655
+          ],
+          [
+            121.4916786,
+            14.1423806
+          ],
+          [
+            121.4918292,
+            14.1427419
+          ],
+          [
+            121.4920036,
+            14.1430186
+          ],
+          [
+            121.4921383,
+            14.1434029
+          ],
+          [
+            121.4922017,
+            14.1437487
+          ],
+          [
+            121.4923286,
+            14.143987
+          ],
+          [
+            121.4925646,
+            14.1441542
+          ],
+          [
+            121.492852,
+            14.1444136
+          ],
+          [
+            121.49306,
+            14.1447018
+          ],
+          [
+            121.493278,
+            14.1450957
+          ],
+          [
+            121.4932962,
+            14.14536
+          ],
+          [
+            121.4933077,
+            14.1455281
+          ],
+          [
+            121.4932186,
+            14.1459892
+          ],
+          [
+            121.4929312,
+            14.1463063
+          ],
+          [
+            121.4925081,
+            14.1465537
+          ],
+          [
+            121.4921436,
+            14.1467887
+          ],
+          [
+            121.4919206,
+            14.1469788
+          ],
+          [
+            121.4917918,
+            14.147219
+          ],
+          [
+            121.4918414,
+            14.1474784
+          ],
+          [
+            121.4918215,
+            14.1477666
+          ],
+          [
+            121.4917775,
+            14.1480643
+          ],
+          [
+            121.4917061,
+            14.1483256
+          ],
+          [
+            121.4916801,
+            14.1485648
+          ],
+          [
+            121.4916769,
+            14.14876
+          ],
+          [
+            121.4915989,
+            14.1489646
+          ],
+          [
+            121.4915145,
+            14.1491095
+          ],
+          [
+            121.4913132,
+            14.1493109
+          ],
+          [
+            121.4911087,
+            14.1495344
+          ],
+          [
+            121.4909561,
+            14.149673
+          ],
+          [
+            121.4907776,
+            14.1498493
+          ],
+          [
+            121.4905957,
+            14.1499217
+          ],
+          [
+            121.4904042,
+            14.1499217
+          ],
+          [
+            121.4902289,
+            14.149887
+          ],
+          [
+            121.4900601,
+            14.1498052
+          ],
+          [
+            121.489875,
+            14.1497013
+          ],
+          [
+            121.4897614,
+            14.1496887
+          ],
+          [
+            121.4896542,
+            14.1497831
+          ],
+          [
+            121.4895601,
+            14.1499406
+          ],
+          [
+            121.4894237,
+            14.1502868
+          ],
+          [
+            121.4893198,
+            14.1505828
+          ],
+          [
+            121.4892419,
+            14.1507874
+          ],
+          [
+            121.4892257,
+            14.1510046
+          ],
+          [
+            121.4892549,
+            14.1512344
+          ],
+          [
+            121.4893458,
+            14.1513918
+          ],
+          [
+            121.4894724,
+            14.1515461
+          ],
+          [
+            121.4895536,
+            14.1517192
+          ],
+          [
+            121.4895471,
+            14.1519774
+          ],
+          [
+            121.4894562,
+            14.1521253
+          ],
+          [
+            121.4892452,
+            14.1522481
+          ],
+          [
+            121.4890081,
+            14.15233
+          ],
+          [
+            121.4886023,
+            14.1524748
+          ],
+          [
+            121.4883556,
+            14.1525629
+          ],
+          [
+            121.4880861,
+            14.1527014
+          ],
+          [
+            121.4876309,
+            14.1529635
+          ],
+          [
+            121.4873213,
+            14.1531076
+          ],
+          [
+            121.4869621,
+            14.1533838
+          ],
+          [
+            121.4865201,
+            14.1537841
+          ],
+          [
+            121.486471,
+            14.1538261
+          ],
+          [
+            121.4862438,
+            14.1540202
+          ],
+          [
+            121.4856617,
+            14.1543685
+          ],
+          [
+            121.485315,
+            14.1545366
+          ],
+          [
+            121.4851019,
+            14.1545774
+          ],
+          [
+            121.4849547,
+            14.1544949
+          ],
+          [
+            121.4845223,
+            14.1543325
+          ],
+          [
+            121.4842746,
+            14.1542244
+          ],
+          [
+            121.4836977,
+            14.15434
+          ],
+          [
+            121.4835051,
+            14.1543445
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 25 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Dalitiwan River: OSM way 97211396, v9",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/97211396",
+        "published_on": "2020-07-04"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Botocan River",
+    "municipality": "Luisiana",
+    "water_type": "Not Assessed",
+    "latitude": 14.1603248,
+    "longitude": 121.4803239,
+    "description": "Listed in the Laguna provincial major-river inventory with Luisiana as a reference locality. This does not establish its entire geographic coverage. Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": {
+      "status": "source_verified",
+      "crs": "EPSG:4326",
+      "source_url": "https://www.openstreetmap.org/way/131583391",
+      "checked_on": "2026-10-21",
+      "note": "Selected source-checked named OSM reaches only; incomplete river coverage. No missing segments are joined. Not a watershed, legal boundary, surveyed position or full river extent.",
+      "coverage": "partial",
+      "license": "OpenStreetMap contributors, ODbL 1.0",
+      "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+      "source_objects": [
+        {
+          "type": "way",
+          "id": 131583391,
+          "version": 3,
+          "timestamp": "2014-10-14T09:14:17Z",
+          "name": "Botocan River",
+          "waterway": "river",
+          "url": "https://www.openstreetmap.org/way/131583391"
+        }
+      ],
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            121.4803239,
+            14.1603248
+          ],
+          [
+            121.4807821,
+            14.1596163
+          ],
+          [
+            121.4814014,
+            14.1590999
+          ],
+          [
+            121.4820454,
+            14.1587036
+          ],
+          [
+            121.4823921,
+            14.1582233
+          ],
+          [
+            121.4826522,
+            14.1576949
+          ],
+          [
+            121.4829247,
+            14.1570945
+          ],
+          [
+            121.4831724,
+            14.156422
+          ],
+          [
+            121.4833705,
+            14.1557855
+          ],
+          [
+            121.4835315,
+            14.155065
+          ],
+          [
+            121.4835935,
+            14.1545246
+          ],
+          [
+            121.4835051,
+            14.1543445
+          ]
+        ]
+      }
+    },
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 26 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      },
+      {
+        "title": "Botocan River: OSM way 131583391, v3",
+        "publisher": "OpenStreetMap contributors",
+        "url": "https://www.openstreetmap.org/way/131583391",
+        "published_on": "2014-10-14"
+      }
+    ],
+    "image": null
+  },
+  {
+    "name": "Matikiw River",
+    "municipality": "Pakil",
+    "water_type": "Not Assessed",
+    "latitude": null,
+    "longitude": null,
+    "description": "Listed in the Laguna provincial major-river inventory with Pakil as a reference locality. This does not establish its entire geographic coverage. River course not yet mapped. No source-checked geographic point or river line is available. No location-specific fish record or current environmental assessment has been imported.",
+    "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+    "category": "river",
+    "site_type": "water_body",
+    "spring_type": null,
+    "official_url": null,
+    "aliases": [],
+    "geography": null,
+    "research_references": [
+      {
+        "title": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 27 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+        "publisher": "Provincial Government of Laguna (public document copy)",
+        "url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+        "published_on": "Plan period 2021–2030; checked 2026-10-21"
+      }
+    ],
+    "image": null
+  }
+]

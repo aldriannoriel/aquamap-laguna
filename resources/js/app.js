@@ -16,11 +16,28 @@ if (mapElement) {
     const profileTabs = [...dialog.querySelectorAll('[data-profile-tab]')];
     const features = new Map();
     const markers = new Map();
+    const selectionCard = document.getElementById('map-selection');
+    const selectionSummary = document.getElementById('map-selection-summary');
+    let selectedId = null;
     let category = 'all';
     let map;
     const normalize = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
     const matchesSearch = (lake) => normalize([lake.name, lake.municipality, ...lake.aliases].join(' ')).includes(normalize(search.value.trim()));
-    const visible = () => lakes.filter((lake) => lake.geography && matchesSearch(lake) && (category === 'all' || lake.category === category));
+    const visible = () => lakes.filter((lake) => matchesSearch(lake) && (category === 'all' || lake.category === category));
+
+    function styleSelection() {
+        features.forEach((feature, id) => {
+            const active = id === selectedId;
+            const secondary = selectedId !== null && !active;
+            const river = lakes.find((lake) => lake.id === id).category === 'river';
+            feature.setStyle({ color: active ? '#0066ff' : '#277e96', weight: active ? (river ? 7 : 4) : (river ? 4 : 2),
+                opacity: secondary ? 0.35 : 1, fillColor: active ? '#0066ff' : '#277e96', fillOpacity: active ? 0.24 : (secondary ? 0.04 : 0.12),
+                className: active ? 'selected-water-course' : '' });
+            feature.eachLayer((layer) => layer.getElement?.()?.classList.toggle('selected-water-course', active));
+            if (active) feature.bringToFront();
+        });
+        markers.forEach((marker, id) => marker.setOpacity(selectedId !== null && id !== selectedId ? 0.5 : 1));
+    }
 
     function positionDialog() {
         if (!dialog.open) return;
@@ -47,6 +64,11 @@ if (mapElement) {
 
     function clearSelection() {
         if (dialog.open) dialog.close();
+        selectedId = null;
+        selectionCard.hidden = true;
+        selectionSummary.replaceChildren();
+        styleSelection();
+        status.textContent = 'Selection cleared. Select another water body.';
         document.documentElement.classList.remove('profile-open');
         selected.hidden = true;
         buttons.forEach((button) => {
@@ -61,6 +83,7 @@ if (mapElement) {
 
     function selectLake(lake, moveMap = true) {
         clearSelection();
+        selectedId = lake.id;
         const source = document.getElementById('profile-' + lake.id);
         const profile = source.cloneNode(true);
         profile.removeAttribute('id');
@@ -80,6 +103,14 @@ if (mapElement) {
         selected.hidden = false;
         activateProfileTab('overview');
         document.getElementById('profile-tabs').scrollLeft = 0;
+        document.getElementById('map-selection-heading').textContent = lake.name;
+        const geographicSummary = profile.querySelector('[data-geography-summary]');
+        selectionSummary.replaceChildren();
+        if (geographicSummary) selectionSummary.append(geographicSummary.cloneNode(true));
+        else selectionSummary.textContent = lake.geography?.note || 'Location awaiting verification.';
+        selectionCard.hidden = false;
+        map?.invalidateSize({ pan: false });
+        styleSelection();
         buttons.forEach((button) => {
             const active = Number(button.dataset.lakeId) === lake.id;
             button.setAttribute('aria-pressed', String(active));
@@ -99,9 +130,7 @@ if (mapElement) {
         } else {
             status.textContent = lake.name + ' selected. Location awaiting verification; no marker is displayed.';
         }
-        dialog.showModal();
-        document.documentElement.classList.add('profile-open');
-        positionDialog();
+        if (window.innerWidth < 1024) selectionCard.scrollIntoView({ block: 'start', behavior: 'instant' });
         information.scrollTop = 0;
     }
 
@@ -117,7 +146,7 @@ if (mapElement) {
         buttons.forEach((button) => { button.closest('[data-water-row]').hidden = !ids.has(Number(button.dataset.lakeId)); });
         filters.forEach((button) => {
             button.setAttribute('aria-pressed', String(button.dataset.category === category));
-            button.querySelector('[data-category-count]').textContent = lakes.filter((lake) => lake.geography && matchesSearch(lake)
+            button.querySelector('[data-category-count]').textContent = lakes.filter((lake) => matchesSearch(lake)
                 && (button.dataset.category === 'all' || lake.category === button.dataset.category)).length;
         });
         for (const [id, marker] of markers) {
@@ -150,7 +179,7 @@ if (mapElement) {
             const feature = L.geoJSON(geometry, { style: { color: '#277e96', weight: lake.category === 'river' ? 5 : 2, fillOpacity: 0.12 } });
             const center = geometry.type === 'Point' ? L.latLng(geometry.coordinates[1], geometry.coordinates[0]) : feature.getBounds().getCenter();
             if (geometry.type !== 'Point') {
-                feature.on('click', () => selectLake(lake, false));
+                feature.on('click', () => selectLake(lake));
                 feature.on('add', () => feature.eachLayer((layer) => {
                     const element = layer.getElement?.();
                     if (!element) return;
@@ -158,7 +187,7 @@ if (mapElement) {
                     element.setAttribute('role', 'button');
                     element.setAttribute('aria-label', 'Select shape for ' + lake.name);
                     element.onkeydown = (event) => {
-                        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectLake(lake, false); }
+                        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectLake(lake); }
                     };
                 }));
                 features.set(lake.id, feature);
@@ -169,14 +198,30 @@ if (mapElement) {
                 iconSize: [36, 36], iconAnchor: [18, 18], popupAnchor: [0, -18],
             });
             const marker = L.marker(center, { icon, title: lake.name, alt: lake.name, keyboard: true });
-            marker.on('click', () => selectLake(lake, false));
+            marker.on('click', () => selectLake(lake));
             marker.on('add', () => marker.getElement()?.setAttribute('aria-label', 'Select ' + lake.name));
             markers.set(lake.id, marker);
         }
         new ResizeObserver(() => map.invalidateSize({ pan: false })).observe(mapElement);
     }
     document.getElementById('close-water-detail').addEventListener('click', () => dialog.close());
-    dialog.addEventListener('close', () => { if (!dialog.open) clearSelection(); });
+    dialog.addEventListener('close', () => {
+        if (!dialog.open) {
+            const trigger = buttons.find((button) => Number(button.dataset.lakeId) === selectedId);
+            clearSelection();
+            trigger?.focus({ preventScroll: true });
+        }
+    });
+    document.getElementById('clear-water-selection').addEventListener('click', () => {
+        const trigger = buttons.find((button) => Number(button.dataset.lakeId) === selectedId);
+        clearSelection();
+        trigger?.focus({ preventScroll: true });
+    });
+    document.getElementById('open-water-profile').addEventListener('click', () => {
+        dialog.showModal();
+        document.documentElement.classList.add('profile-open');
+        positionDialog();
+    });
     profileTabs.forEach((tab, index) => {
         tab.addEventListener('click', () => activateProfileTab(tab.dataset.profileTab));
         tab.addEventListener('keydown', (event) => {

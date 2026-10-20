@@ -12,7 +12,7 @@ class ExplorerProfile
                 ? $value : null;
     }
 
-    public static function geography(mixed $value): ?array
+    public static function geography(mixed $value, ?string $category = null): ?array
     {
         if (! is_array($value) || ($value['status'] ?? null) !== 'source_verified'
             || ($value['crs'] ?? null) !== 'EPSG:4326' || ! self::url($value['source_url'] ?? null)
@@ -24,6 +24,10 @@ class ExplorerProfile
             return null;
         }
         $geometry = $value['geometry'];
+        if (($category === 'river' && ! in_array($geometry['type'] ?? null, ['Point', 'LineString', 'MultiLineString'], true))
+            || ($category === 'lake' && ! in_array($geometry['type'] ?? null, ['Point', 'Polygon', 'MultiPolygon'], true))) {
+            return null;
+        }
         $coordinates = $geometry['coordinates'] ?? null;
         $valid = match ($geometry['type'] ?? null) {
             'Point' => self::point($coordinates),
@@ -34,12 +38,18 @@ class ExplorerProfile
             default => false,
         };
 
-        return $valid ? [
+        $result = $valid ? [
             'status' => 'source_verified', 'crs' => 'EPSG:4326',
             'source_url' => $value['source_url'], 'checked_on' => $value['checked_on'],
             'note' => is_string($value['note'] ?? null) ? $value['note'] : 'Source checked; positional accuracy is unconfirmed.',
             'geometry' => ['type' => $geometry['type'], 'coordinates' => $coordinates],
         ] : null;
+        if ($result && parse_url($value['source_url'], PHP_URL_HOST) === 'www.openstreetmap.org') {
+            $result['license'] = 'OpenStreetMap contributors, ODbL 1.0';
+            $result['license_url'] = 'https://opendatacommons.org/licenses/odbl/1-0/';
+        }
+
+        return $result;
     }
 
     public static function references(mixed $value): array
@@ -109,7 +119,8 @@ class ExplorerProfile
 
     private static function line(mixed $line): bool
     {
-        return is_array($line) && count($line) >= 2 && self::every($line, self::point(...));
+        return is_array($line) && count($line) >= 2 && self::every($line, self::point(...))
+            && count(array_unique(array_map(json_encode(...), $line))) >= 2;
     }
 
     private static function ring(mixed $ring): bool

@@ -26,7 +26,7 @@
                         <div><label for="water-search" class="form-label">Search places</label><input id="water-search" type="search" class="form-input" placeholder="Name, alternate name or municipality" autocomplete="off" aria-controls="water-list"></div>
                         <div class="grid grid-cols-2 gap-2" role="group" aria-label="Water body categories">
                             @foreach (['all' => 'All Water Bodies', ...$categories] as $category => $label)
-                                <button type="button" data-category="{{ $category }}" aria-pressed="{{ $category === 'all' ? 'true' : 'false' }}" aria-controls="water-list lake-map" class="category-filter flex min-h-12 items-center justify-between gap-2 rounded-lg border border-line px-3 py-2 text-left text-xs font-semibold {{ $category === 'all' ? 'col-span-2' : '' }}"><span>{{ $label }}</span><span data-category-count>{{ count(array_filter($lakes, fn ($item) => $item['geography'] && ($category === 'all' || $item['category'] === $category))) }}</span></button>
+                                <button type="button" data-category="{{ $category }}" aria-pressed="{{ $category === 'all' ? 'true' : 'false' }}" aria-controls="water-list lake-map" class="category-filter flex min-h-12 items-center justify-between gap-2 rounded-lg border border-line px-3 py-2 text-left text-xs font-semibold {{ $category === 'all' ? 'col-span-2' : '' }}"><span>{{ $label }}</span><span data-category-count>{{ count(array_filter($lakes, fn ($item) => $category === 'all' || $item['category'] === $category)) }}</span></button>
                             @endforeach
                         </div>
                         <p id="filter-status" class="text-xs leading-5 text-muted" role="status">{{ count(array_filter($lakes, fn ($item) => $item['geography'])) }} source-checked locations available. Research profiles are also listed below.</p>
@@ -34,8 +34,8 @@
                     </div>
                     <ul id="water-list" class="space-y-3 px-4 pb-5 max-h-72 overflow-y-auto lg:max-h-[570px]" aria-label="Water body selection">
                         @forelse ($lakes as $lake)
-                            <li data-water-row="{{ $lake['id'] }}" @if (!$lake['geography']) hidden @endif>
-                                <button type="button" data-lake-id="{{ $lake['id'] }}" aria-pressed="false" aria-haspopup="dialog" aria-controls="water-detail-dialog" class="lake-card w-full rounded-xl border border-line p-4 text-left hover:border-water hover:bg-mist">
+                            <li data-water-row="{{ $lake['id'] }}">
+                                <button type="button" data-lake-id="{{ $lake['id'] }}" aria-pressed="false" aria-controls="map-selection" class="lake-card w-full rounded-xl border border-line p-4 text-left hover:border-water hover:bg-mist">
                                     <span class="block text-lg font-semibold">{{ $lake['name'] }}</span><span class="mt-1 block text-sm text-muted">{{ $lake['municipality'] }}</span>
                                     <span class="mt-3 flex flex-wrap justify-between gap-2 text-xs"><span class="font-semibold text-water">{{ $categories[$lake['category']] }}</span><span class="selection-label text-muted">View details</span></span>
                                     @unless ($lake['geography'])<span class="mt-2 block text-xs text-muted">Location awaiting verification; not mapped.</span>@endunless
@@ -56,6 +56,13 @@
                     <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
                         <h2 id="map-heading" class="text-sm font-semibold">Source-checked locations</h2>
                         <button id="reset-map" type="button" class="secondary-button" disabled>Reset map &amp; filters</button>
+                    </div>
+                    <div id="map-selection" class="border-b border-line bg-mist px-5 py-4" hidden>
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <h3 id="map-selection-heading" class="font-semibold text-estuary"></h3>
+                            <div class="flex gap-2"><button id="open-water-profile" type="button" class="secondary-button" aria-haspopup="dialog" aria-controls="water-detail-dialog">Full profile</button><button id="clear-water-selection" type="button" class="secondary-button">Clear selection</button></div>
+                        </div>
+                        <div id="map-selection-summary" class="mt-3 max-h-48 overflow-y-auto" tabindex="0" role="region" aria-label="Selected water body geography"></div>
                     </div>
                     <div id="lake-map" class="h-[380px] w-full bg-mist sm:h-[500px] lg:h-[540px]" role="region" aria-label="Interactive water body map. Use arrow keys to pan and plus or minus to zoom." aria-describedby="map-status"></div>
                     <p id="tile-status" role="status" class="border-t border-line bg-mist px-5 py-3 text-xs leading-5 text-estuary" hidden>Some map tiles could not load. Check your connection. Water body details remain available.</p>

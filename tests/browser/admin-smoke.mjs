@@ -128,7 +128,7 @@ try {
     };
     let mobile = false;
     async function click(selector) {
-        const point = await evaluate(`(() => { const element = [...document.querySelectorAll(${JSON.stringify(selector)})].find(item => item.getClientRects().length > 0); if (!element) throw new Error('Missing visible control'); element.scrollIntoView({block:'center'}); const r = element.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
+        const point = await evaluate(`(async () => { const element = [...document.querySelectorAll(${JSON.stringify(selector)})].find(item => item.getClientRects().length > 0); if (!element) throw new Error('Missing visible control'); element.scrollIntoView({block:'center'}); await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))); const r = element.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
         if (mobile) {
             await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
             await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });

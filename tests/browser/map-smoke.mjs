@@ -148,6 +148,9 @@ try {
             await send('Input.dispatchMouseEvent', { type: 'mouseReleased', ...point, button: 'left', clickCount: 1 });
         }
         await pause(400);
+        if (selector.startsWith('[data-lake-id=') || selector.startsWith('.lake-marker')) {
+            await click('#open-water-profile');
+        }
     }
     async function screenshot(name, fullPage = false) {
         await evaluate('window.scrollTo(0, 0)');
@@ -417,6 +420,7 @@ try {
     await evaluate('document.querySelector("path[role=button]").focus()');
     await send('Input.dispatchKeyEvent', {type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
     await send('Input.dispatchKeyEvent', {type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+    await click('#open-water-profile');
     assert.equal(await evaluate('document.getElementById("selected-lake").hidden'), false);
     await assertTabState('overview');
     await closeProfile(true);

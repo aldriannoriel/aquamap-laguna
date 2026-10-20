@@ -1,6 +1,9 @@
 <section data-profile-section="overview" aria-label="Environmental Overview">
 <h2 class="lake-detail-title">{{ $lake['name'] }}</h2>
 <p class="lake-detail-meta">{{ $lake['municipality'] }} / {{ $categories[$lake['category']] }}</p>
+@if (in_array($lake['category'], ['river', 'lake'], true))
+    <div class="mt-3 border-l-4 border-water pl-3">@include('map.geographic-summary')</div>
+@endif
 <h3 class="mt-4 font-semibold text-estuary">Environmental Overview</h3>
 @php
     $documentedFishCount = count(array_filter($fishByLake[$lake['id']] ?? [], fn (array $species): bool => $species['evidence_type'] && $species['occurrence_source_url'] && $species['sampling_period'] && $species['publication_year']));

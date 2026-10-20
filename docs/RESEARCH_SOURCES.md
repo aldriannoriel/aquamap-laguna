@@ -1,5 +1,9 @@
 # Research sources
 
+## Provincial rivers and geographic measurements (2026-10-21)
+
+The current provincial river inventory and all new length/area/geometry evidence are documented in [RIVER_INVENTORY.md](RIVER_INVENTORY.md), including the 27 source rows, three reused profiles, 24 additions, 17 partial river courses, twelve missing courses and nine lake polygons. The original 30 records and prior catalogues below remain unchanged. The reviewed additive river catalogue uses original OSM way-node sequences and retains versions, dates and ODbL attribution. The metrics supplement presents 26 approximate lengths checked against the public PDPFP Table 33 transcription, with explicit third-party-copy limits; Pagsanjan/Bumbungan's extent is ambiguous and its total is withheld. Calculated great-circle segment lengths remain separate from reported figures. Historical Yambo/Pandin/Calibato surface areas come from Bicaldo et al. (2024), Table 1, with its LLDA (2014) attribution; other areas remain unknown. No environmental measurements, fish associations or reports were synthesized.
+
 Reviewed on 2026-10-17 for Days 1-3 and the GIS expansion. The expansion adds source-checked display geography alongside the original published points, without replacing them. No scientific measurements or suitability conclusions are seeded.
 
 ## GIS expansion: imported inventory

@@ -123,7 +123,7 @@ class WaterBodyCardTest extends TestCase
         }
     }
 
-    public function test_sidebar_counts_exclude_unverified_geometry_while_research_profiles_remain_available(): void
+    public function test_sidebar_keeps_unlocated_profiles_selectable_without_publishing_geometry(): void
     {
         $this->seed(DatabaseSeeder::class);
         $this->seed(ExplorerSeeder::class);
@@ -135,11 +135,12 @@ class WaterBodyCardTest extends TestCase
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         $xpath = new DOMXPath($document);
-        foreach (['all' => '27', 'lake' => '9', 'river' => '5', 'waterfall' => '13'] as $category => $count) {
+        foreach (['all' => '28', 'lake' => '10', 'river' => '5', 'waterfall' => '13'] as $category => $count) {
             $this->assertSame($count, trim($xpath->evaluate('string(//button[@data-category="'.$category.'"]//span[@data-category-count])')));
         }
         $lake = WaterBody::where('name', 'Sampaloc Lake')->sole();
-        $this->assertSame(1, $xpath->query('//li[@data-water-row="'.$lake->id.'"][@hidden]')->length);
+        $this->assertSame(0, $xpath->query('//li[@data-water-row="'.$lake->id.'"][@hidden]')->length);
+        $this->assertNull(collect($response->viewData('lakes'))->firstWhere('id', $lake->id)['geography']);
     }
 
     public function test_profile_sections_keep_classification_fish_reports_and_scientific_evidence_distinct(): void

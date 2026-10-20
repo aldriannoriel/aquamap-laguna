@@ -1,0 +1,273 @@
+{
+  "rivers": {
+    "San Isidro River": {
+      "municipality": "San Pedro City",
+      "value": 4.9,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 1 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "San Isidro River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Biñan River": {
+      "municipality": "Biñan City",
+      "value": 7.1,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 2 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Biñan River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Santa Rosa River": {
+      "municipality": "Santa Rosa City",
+      "value": 11.05,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 3 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Santa Rosa River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "San Cristobal River": {
+      "municipality": "Calamba City",
+      "value": 18.9,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 4 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "San Cristobal River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "San Juan River": {
+      "municipality": "Calamba City",
+      "value": 14.8,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 5 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "San Juan River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Bay River": {
+      "municipality": "Bay",
+      "value": 5.8,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 6 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Bay River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Calo River": {
+      "municipality": "Bay",
+      "value": 15.1,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 7 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Calo River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Prinza River": {
+      "municipality": "Calauan",
+      "value": 11.2,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 8 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Prinza River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Banca-Banca River": {
+      "municipality": "Victoria",
+      "value": 9.1,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 9 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Banca-Banca River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Pila River": {
+      "municipality": "Pila",
+      "value": 2.7,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 10 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Pila River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Santa Cruz River": {
+      "municipality": "Santa Cruz",
+      "value": 11,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 11 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Santa Cruz River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Balanac River": {
+      "municipality": "Pagsanjan",
+      "value": 10.7,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 12 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Balanac River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Bumbungan River": {
+      "municipality": "Pagsanjan",
+      "value": 4,
+      "status": "unverified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 13 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Pagsanjan River",
+      "note": "The table reports 4.00 km for Pagsanjan in Pagsanjan/Lumban. Its extent cannot be reconciled with the entire Bumbungan course; not verified as this river’s total length."
+    },
+    "Pangil River": {
+      "municipality": "Pangil",
+      "value": 7,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 14 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Pangil River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Siniloan River": {
+      "municipality": "Siniloan",
+      "value": 6.1,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 15 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Siniloan River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Romero River": {
+      "municipality": "Famy",
+      "value": 3.2,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 16 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Romero River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "San Antonio River": {
+      "municipality": "Santa Maria / Mabitac",
+      "value": 8.8,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 17 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "San Antonio River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Tigas River": {
+      "municipality": "Alaminos",
+      "value": 8.9,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 18 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Tigas River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Makpongo River": {
+      "municipality": "San Pablo City",
+      "value": 3.9,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 19 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Makpongo River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Balatuin River": {
+      "municipality": "San Pablo City",
+      "value": 9.1,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 20 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Balatuin River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Malaunod River": {
+      "municipality": "San Pablo City",
+      "value": 9.45,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 21 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Malaunod River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Onipa River": {
+      "municipality": "San Pablo City",
+      "value": 6,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 22 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Onipa River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Tarak River": {
+      "municipality": "San Pablo City",
+      "value": 5.8,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 23 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Tarak River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Maimpis River": {
+      "municipality": "Nagcarlan",
+      "value": 9,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 24 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Maimpis River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Dalitiwan River": {
+      "municipality": "Majayjay",
+      "value": 11.6,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 25 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Dalitiwan River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Botocan River": {
+      "municipality": "Luisiana",
+      "value": 3.9,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 26 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Botocan River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    },
+    "Matikiw River": {
+      "municipality": "Pakil",
+      "value": 5,
+      "status": "source_verified",
+      "source_url": "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i",
+      "reference": "Laguna PDPFP 2021–2030, Volume I, Table 33, printed p. 92, row 27 (PENRO/CENRO/PG-ENRO). Public document transcription; approximate lengths.",
+      "table_name": "Matikiw River",
+      "note": "Approximate source-reported length, not a surveyed total. The listed municipality is a reference locality, not the full river coverage. Source document is a third-party-hosted transcription; original government facsimile remains to be obtained."
+    }
+  },
+  "lakes": {
+    "Yambo Lake": {
+      "municipality": "San Pablo City",
+      "status": "source_verified",
+      "value": 30.5,
+      "source_url": "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full#T1",
+      "reference": "Bicaldo et al. (2024), Frontiers in Microbiology 15:1410666, Table 1; surface areas attributed there to LLDA (2014).",
+      "note": "Historical source-reported surface area, converted from m² to hectares (÷10,000). Not calculated from the displayed shoreline or a current survey. Published estimates can differ; Yambo’s Nagcarlan municipal page reports 28.5 ha."
+    },
+    "Pandin Lake": {
+      "municipality": "San Pablo City",
+      "status": "source_verified",
+      "value": 24,
+      "source_url": "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full#T1",
+      "reference": "Bicaldo et al. (2024), Frontiers in Microbiology 15:1410666, Table 1; surface areas attributed there to LLDA (2014).",
+      "note": "Historical source-reported surface area, converted from m² to hectares (÷10,000). Not calculated from the displayed shoreline or a current survey. Published estimates can differ; Yambo’s Nagcarlan municipal page reports 28.5 ha."
+    },
+    "Calibato Lake": {
+      "municipality": "San Pablo City",
+      "status": "source_verified",
+      "value": 43,
+      "source_url": "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full#T1",
+      "reference": "Bicaldo et al. (2024), Frontiers in Microbiology 15:1410666, Table 1; surface areas attributed there to LLDA (2014).",
+      "note": "Historical source-reported surface area, converted from m² to hectares (÷10,000). Not calculated from the displayed shoreline or a current survey. Published estimates can differ; Yambo’s Nagcarlan municipal page reports 28.5 ha."
+    }
+  }
+}
