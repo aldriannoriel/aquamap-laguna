@@ -28,10 +28,15 @@ class MapController extends Controller
 
         $courseCatalogue = RiverCourseCatalogue::load();
         $displayGeographies = $records->mapWithKeys(fn (WaterBody $lake): array => [$lake->id => RiverCourseCatalogue::resolve($lake, $courseCatalogue)])->all();
+        $evidence = json_decode(file_get_contents(database_path('data/water-body-evidence.json')), true, flags: JSON_THROW_ON_ERROR);
+        $waterTypeEvidence = $records->mapWithKeys(fn (WaterBody $lake): array => [
+            $lake->id => ExplorerProfile::waterType($evidence[$lake->name] ?? null, $lake->municipality, $lake->category),
+        ])->all();
 
         $lakes = $records
-            ->map(function (WaterBody $lake) use ($fields, $displayGeographies): array {
+            ->map(function (WaterBody $lake) use ($fields, $displayGeographies, $waterTypeEvidence): array {
                 $data = $lake->only($fields);
+                $data['water_type'] = $waterTypeEvidence[$lake->id]['type'] ?? null;
                 $data['description'] = filled($data['description']) ? trim($data['description']) : null;
                 $data['source_url'] = $this->publicSource($data['source_url']);
                 $data['category'] = $lake->category;
@@ -65,11 +70,10 @@ class MapController extends Controller
             return [$lake->id => $fish];
         })->all();
 
-        $evidence = json_decode(file_get_contents(database_path('data/water-body-evidence.json')), true, flags: JSON_THROW_ON_ERROR);
         $images = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR);
         $metrics = json_decode(file_get_contents(database_path('data/water-body-metrics.json')), true, flags: JSON_THROW_ON_ERROR);
         $replacements = json_decode(file_get_contents(database_path('data/waterfall-photos.json')), true, flags: JSON_THROW_ON_ERROR);
-        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $metrics, $displayGeographies, $evidence): array {
+        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $metrics, $displayGeographies, $waterTypeEvidence): array {
             $supplement = $images[$lake->name] ?? null;
             $image = $lake->image;
             if ($image === null && is_array($supplement) && ($supplement['municipality'] ?? null) === $lake->municipality) {
@@ -85,7 +89,7 @@ class MapController extends Controller
             }
 
             return [$lake->id => [
-                'water_type_evidence' => ExplorerProfile::waterType($evidence[$lake->name] ?? null, $lake->municipality, $lake->category),
+                'water_type_evidence' => $waterTypeEvidence[$lake->id],
                 'legacy_classification' => $lake->water_type,
                 'references' => ExplorerProfile::references($lake->research_references),
                 'image' => ExplorerProfile::image($image),

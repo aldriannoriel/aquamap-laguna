@@ -9,6 +9,7 @@ use Database\Seeders\ExplorerSeeder;
 use Database\Seeders\WaterBodySeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
 
 class DashboardRedesignTest extends TestCase
@@ -72,5 +73,59 @@ class DashboardRedesignTest extends TestCase
         $this->assertNull(ExplorerProfile::waterType($entry, $lake->municipality, 'river'));
         $entry['source_url'] = 'javascript:alert(1)';
         $this->assertNull(ExplorerProfile::waterType($entry, $lake->municipality, 'lake'));
+    }
+
+    public function test_public_json_and_profiles_share_reviewed_types_without_changing_legacy_data(): void
+    {
+        $this->seed(ExplorerSeeder::class);
+        $yambo = WaterBody::where('name', 'Yambo Lake')->sole();
+        $yambo->update(['water_type' => 'Class C legacy fixture']);
+        $river = WaterBody::where('category', 'river')->firstOrFail();
+        $river->update(['water_type' => 'freshwater']);
+        foreach ([['municipality' => 'Unrelated locality'], ['category' => 'river']] as $mismatch) {
+            $copy = $yambo->replicate();
+            $copy->forceFill($mismatch)->save();
+        }
+        $before = WaterBody::orderBy('id')->get()->keyBy('id')->toArray();
+
+        $response = $this->get(route('map.index'))->assertOk();
+
+        $document = new \DOMDocument;
+        $document->loadHTML($response->getContent(), LIBXML_NOERROR | LIBXML_NOWARNING);
+        $payload = json_decode($document->getElementById('lake-data')->textContent, true, flags: JSON_THROW_ON_ERROR);
+        foreach ($payload as $record) {
+            $expected = $record['municipality'] === 'San Pablo City' && $record['category'] === 'lake'
+                && in_array($record['name'], ['Yambo Lake', 'Pandin Lake', 'Calibato Lake'], true) ? 'freshwater' : null;
+            $profile = $response->viewData('profiles')[$record['id']];
+            $this->assertSame($expected, $record['water_type'], $record['name']);
+            $this->assertSame($record['water_type'], $profile['water_type_evidence']['type'] ?? null);
+            $this->assertSame($before[$record['id']]['water_type'], $profile['legacy_classification']);
+        }
+        $this->assertSame($before, WaterBody::orderBy('id')->get()->keyBy('id')->toArray());
+        $response->assertSee('Earlier catalogue classification: Class C legacy fixture');
+    }
+
+    #[TestWith(['freshwater', 'Freshwater'])]
+    #[TestWith(['brackish', 'Brackish Water'])]
+    #[TestWith(['saltwater', 'Saltwater'])]
+    #[TestWith(['Class C', 'Water type not yet verified'])]
+    #[TestWith([null, 'Water type not yet verified'])]
+    public function test_profile_supports_reviewed_salinity_types_and_explicit_unknowns(?string $type, string $label): void
+    {
+        $this->seed(WaterBodySeeder::class);
+        $response = $this->get(route('map.index'))->assertOk();
+        $lake = collect($response->viewData('lakes'))->firstWhere('name', 'Yambo Lake');
+        $profile = $response->viewData('profiles')[$lake['id']];
+        $entry = [
+            'status' => 'source_verified', 'municipality' => $lake['municipality'], 'category' => 'lake', 'type' => $type,
+            'source_url' => 'https://example.test/hydrology', 'reference' => 'Isolated classification fixture', 'note' => 'Synthetic test evidence only.',
+        ];
+        $profile['water_type_evidence'] = ExplorerProfile::waterType($entry, $lake['municipality'], 'lake');
+
+        $html = view('map.profile', ['lake' => $lake, 'profile' => $profile, 'categories' => $response->viewData('categories'), 'fishByLake' => []])->render();
+
+        $this->assertSame(in_array($type, ['freshwater', 'brackish', 'saltwater'], true) ? $type : null, $profile['water_type_evidence']['type'] ?? null);
+        $this->assertSame(1, preg_match('/<p data-water-type[^>]*>(.*?)<\/p>/s', $html, $matches));
+        $this->assertSame($label, trim($matches[1]));
     }
 }

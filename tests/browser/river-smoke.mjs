@@ -126,6 +126,30 @@ try {
         assert(!result.exceptionDetails, result.exceptionDetails?.text);
         return result.result.value;
     };
+    async function assertMetadataContrast(selector, state) {
+        const ratio = await evaluate(String.raw`(() => {
+            const text = document.querySelector(${JSON.stringify(selector)} + ' .water-row-meta');
+            const channels = color => color.match(/[\d.]+/g).map(Number);
+            const foreground = channels(getComputedStyle(text).color);
+            let node = text;
+            let background;
+            while (node) {
+                const color = channels(getComputedStyle(node).backgroundColor);
+                if ((color[3] ?? 1) === 1) { background = color; break; }
+                if (color[3] !== 0) throw new Error('Contrast check requires opaque backgrounds.');
+                node = node.parentElement;
+            }
+            if (!background) throw new Error('Missing metadata background.');
+            const luminance = color => color.slice(0, 3).map(value => {
+                const channel = value / 255;
+                return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+            }).reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+            const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+            return (values[0] + 0.05) / (values[1] + 0.05);
+        })()`);
+        assert(ratio >= 4.5, `${state} metadata contrast ${ratio.toFixed(2)}:1 must meet 4.5:1.`);
+        return ratio;
+    }
     async function navigate(url) {
         const navigation = await send('Page.navigate', { url: base + url });
         assert(!navigation.errorText, navigation.errorText);
@@ -163,6 +187,8 @@ try {
     }
     await send('Runtime.enable');
     await send('Page.enable');
+    await send('DOM.enable');
+    await send('CSS.enable');
     for (const [width, height] of [[1440, 1100], [1024, 900], [390, 844], [320, 740]]) {
         mobile = width < 768;
         await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile });
@@ -188,8 +214,20 @@ try {
             assert.equal(await evaluate('scrollY'), initialPage);
         }
         const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Balanac River','San Isidro River','Yambo Lake','Hidden Valley Springs','Pagsanjan Falls'].includes(item.name));
+        const contrastSelector = '[data-lake-id="'+samples[0].id+'"]';
+        const { root: documentNode } = await send('DOM.getDocument');
+        const { nodeId: contrastNode } = await send('DOM.querySelector', { nodeId: documentNode.nodeId, selector: contrastSelector });
+        const normalContrast = await assertMetadataContrast(contrastSelector, 'Normal');
+        await send('CSS.forcePseudoState', { nodeId: contrastNode, forcedPseudoClasses: ['hover'] });
+        const hoverContrast = await assertMetadataContrast(contrastSelector, 'Hovered');
+        await send('CSS.forcePseudoState', { nodeId: contrastNode, forcedPseudoClasses: [] });
         for (const lake of samples) {
             await click('[data-lake-id="'+lake.id+'"]');
+            if (lake.id === samples[0].id) {
+                assert.equal(await evaluate(`document.querySelector(${JSON.stringify(contrastSelector)}).getAttribute('aria-pressed')`), 'true');
+                const selectedContrast = await assertMetadataContrast(contrastSelector, 'Selected');
+                results.push(`${width}px metadata contrast: normal ${normalContrast.toFixed(2)}:1, hovered ${hoverContrast.toFixed(2)}:1, selected ${selectedContrast.toFixed(2)}:1.`);
+            }
             assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), lake.name);
             assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'), false);
             assert.equal(await evaluate('document.getElementById("water-detail-dialog").getAttribute("aria-modal")'), 'false');
