@@ -221,3 +221,24 @@ Habitat batch IDs: 15,4,13,2 — #15 Lumot Lake; #4 Mohicap Lake; #13 Palakpakin
 
 
 Habitat batch IDs: 1,55,3 — #1 Sampaloc Lake; #55 Tadlac Lake; #3 Yambo Lake. Coverage: Water Type 11/53; Possible Fish 11/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 10,47,39,36 — #10 Balanac River; #47 Balatuin River; #39 Banca-Banca River; #36 Bay River. Coverage: Water Type 15/53; Possible Fish 15/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 32,53,9,37 — #32 Biñan River; #53 Botocan River; #9 Bumbungan River; #37 Calo River. Coverage: Water Type 19/53; Possible Fish 19/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 52,51,46,48 — #52 Dalitiwan River; #51 Maimpis River; #46 Makpongo River; #48 Malaunod River. Coverage: Water Type 23/53; Possible Fish 23/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 54,49,41,40 — #54 Matikiw River; #49 Onipa River; #41 Pangil River; #40 Pila River. Coverage: Water Type 27/53; Possible Fish 27/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 38,43,44,34 — #38 Prinza River; #43 Romero River; #44 San Antonio River; #34 San Cristobal River. Coverage: Water Type 31/53; Possible Fish 31/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 31,35,18,17 — #31 San Isidro River; #35 San Juan River; #18 San Pedro River; #17 Santa Cruz River. Coverage: Water Type 35/53; Possible Fish 35/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 33,42,50,45,19 — #33 Santa Rosa River; #42 Siniloan River; #50 Tarak River; #45 Tigas River; #19 Tunasan River. Coverage: Water Type 40/53; Possible Fish 40/53. Checkpoint saved; validate before the local milestone commit.

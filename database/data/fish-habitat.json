@@ -638,6 +638,392 @@
         "ayungin": "Consider the sheltered freshwater fringe; food, substrate and seasonal conditions are not inferred from historical farmed-fish sampling. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen.",
         "goby": "Consider the sheltered freshwater fringe; food, substrate and seasonal conditions are not inferred from historical farmed-fish sampling. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
       }
+    },
+    "Balanac River": {
+      "municipality": "Pagsanjan",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Assess connected stream habitat and separate quiet pools; the selected Pagsanjan reaches do not establish conditions throughout Magdalena or the whole river.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "goby": "Assess connected stream habitat and separate quiet pools; the selected Pagsanjan reaches do not establish conditions throughout Magdalena or the whole river. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate.",
+        "loach": "Assess connected stream habitat and separate quiet pools; the selected Pagsanjan reaches do not establish conditions throughout Magdalena or the whole river. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "tilapia": "Assess connected stream habitat and separate quiet pools; the selected Pagsanjan reaches do not establish conditions throughout Magdalena or the whole river. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Assess connected stream habitat and separate quiet pools; the selected Pagsanjan reaches do not establish conditions throughout Magdalena or the whole river. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "Balatuin River": {
+      "municipality": "San Pablo City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Only conditional pool and margin habitat is considered; selected named reaches do not provide measured flow or substrate.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Only conditional pool and margin habitat is considered; selected named reaches do not provide measured flow or substrate. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Only conditional pool and margin habitat is considered; selected named reaches do not provide measured flow or substrate. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Only conditional pool and margin habitat is considered; selected named reaches do not provide measured flow or substrate. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Banca-Banca River": {
+      "municipality": "Victoria",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "The river course is not yet mapped. These few candidates apply only if quiet freshwater refuges exist, not to an invented channel description.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "The river course is not yet mapped. These few candidates apply only if quiet freshwater refuges exist, not to an invented channel description. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "The river course is not yet mapped. These few candidates apply only if quiet freshwater refuges exist, not to an invented channel description. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "The river course is not yet mapped. These few candidates apply only if quiet freshwater refuges exist, not to an invented channel description. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "Bay River": {
+      "municipality": "Bay",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Consider inland pools and covered margins; actual discharge and salinity near the receiving lake are unknown.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Consider inland pools and covered margins; actual discharge and salinity near the receiving lake are unknown. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Consider inland pools and covered margins; actual discharge and salinity near the receiving lake are unknown. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Consider inland pools and covered margins; actual discharge and salinity near the receiving lake are unknown. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Consider inland pools and covered margins; actual discharge and salinity near the receiving lake are unknown. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Biñan River": {
+      "municipality": "Biñan City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Candidates require usable inland refuge habitat; no water-quality or oxygen condition is inferred from the urban locality.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Candidates require usable inland refuge habitat; no water-quality or oxygen condition is inferred from the urban locality. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Candidates require usable inland refuge habitat; no water-quality or oxygen condition is inferred from the urban locality. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Candidates require usable inland refuge habitat; no water-quality or oxygen condition is inferred from the urban locality. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Candidates require usable inland refuge habitat; no water-quality or oxygen condition is inferred from the urban locality. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Botocan River": {
+      "municipality": "Luisiana",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "A narrow conditional stream-bottom assessment is used; rock substrate, passage and suitable pool refuges must be verified.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "A narrow conditional stream-bottom assessment is used; rock substrate, passage and suitable pool refuges must be verified. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "A narrow conditional stream-bottom assessment is used; rock substrate, passage and suitable pool refuges must be verified. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Bumbungan River": {
+      "municipality": "Pagsanjan",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Separate possible flowing gorge habitat from sheltered pools; the gorge label does not establish substrate, passage or uniform flow.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Separate possible flowing gorge habitat from sheltered pools; the gorge label does not establish substrate, passage or uniform flow. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Separate possible flowing gorge habitat from sheltered pools; the gorge label does not establish substrate, passage or uniform flow. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate.",
+        "tilapia": "Separate possible flowing gorge habitat from sheltered pools; the gorge label does not establish substrate, passage or uniform flow. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent."
+      }
+    },
+    "Calo River": {
+      "municipality": "Bay",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Consider only suitable slower pockets and covered bottom habitat in inland reaches; no mouth salinity or flow survey is available.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Consider only suitable slower pockets and covered bottom habitat in inland reaches; no mouth salinity or flow survey is available. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Consider only suitable slower pockets and covered bottom habitat in inland reaches; no mouth salinity or flow survey is available. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "goby": "Consider only suitable slower pockets and covered bottom habitat in inland reaches; no mouth salinity or flow survey is available. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Dalitiwan River": {
+      "municipality": "Majayjay",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Stream-associated candidates are conditional on suitable bottom refuge and connectivity; water temperature and velocity have not been measured.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Stream-associated candidates are conditional on suitable bottom refuge and connectivity; water temperature and velocity have not been measured. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Stream-associated candidates are conditional on suitable bottom refuge and connectivity; water temperature and velocity have not been measured. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Maimpis River": {
+      "municipality": "Nagcarlan",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Mapped coverage is incomplete or absent; assess only hypothetical quiet inland refuges and keep the candidate list small.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Mapped coverage is incomplete or absent; assess only hypothetical quiet inland refuges and keep the candidate list small. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Mapped coverage is incomplete or absent; assess only hypothetical quiet inland refuges and keep the candidate list small. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Mapped coverage is incomplete or absent; assess only hypothetical quiet inland refuges and keep the candidate list small. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "Makpongo River": {
+      "municipality": "San Pablo City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "No complete reach habitat survey exists; possible pool and bottom refuges must be located before any stronger compatibility claim.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "No complete reach habitat survey exists; possible pool and bottom refuges must be located before any stronger compatibility claim. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "No complete reach habitat survey exists; possible pool and bottom refuges must be located before any stronger compatibility claim. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "No complete reach habitat survey exists; possible pool and bottom refuges must be located before any stronger compatibility claim. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Malaunod River": {
+      "municipality": "San Pablo City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Course and habitat information are limited; these are conditional quiet-water candidates, not an assertion of actual slow flow.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Course and habitat information are limited; these are conditional quiet-water candidates, not an assertion of actual slow flow. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Course and habitat information are limited; these are conditional quiet-water candidates, not an assertion of actual slow flow. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Course and habitat information are limited; these are conditional quiet-water candidates, not an assertion of actual slow flow. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "Matikiw River": {
+      "municipality": "Pakil",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Distinguish a possible connected flowing reach from warm protected pools; neither habitat is confirmed by the mapped line alone.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Distinguish a possible connected flowing reach from warm protected pools; neither habitat is confirmed by the mapped line alone. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Distinguish a possible connected flowing reach from warm protected pools; neither habitat is confirmed by the mapped line alone. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate.",
+        "tilapia": "Distinguish a possible connected flowing reach from warm protected pools; neither habitat is confirmed by the mapped line alone. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent."
+      }
+    },
+    "Onipa River": {
+      "municipality": "San Pablo City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Only general inland pool and margin conditions are assessed; the mapped river identity provides no salinity or substrate measurement.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Only general inland pool and margin conditions are assessed; the mapped river identity provides no salinity or substrate measurement. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Only general inland pool and margin conditions are assessed; the mapped river identity provides no salinity or substrate measurement. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Only general inland pool and margin conditions are assessed; the mapped river identity provides no salinity or substrate measurement. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Pangil River": {
+      "municipality": "Pangil",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Different candidates require flowing stream refuges or quieter pools; passage near waterfall-connected reaches remains unknown.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Different candidates require flowing stream refuges or quieter pools; passage near waterfall-connected reaches remains unknown. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Different candidates require flowing stream refuges or quieter pools; passage near waterfall-connected reaches remains unknown. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate.",
+        "tilapia": "Different candidates require flowing stream refuges or quieter pools; passage near waterfall-connected reaches remains unknown. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Different candidates require flowing stream refuges or quieter pools; passage near waterfall-connected reaches remains unknown. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "Pila River": {
+      "municipality": "Pila",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Assess only any slower freshwater inland reaches with feeding substrate and cover; downstream lake influence is not uniform or measured.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Assess only any slower freshwater inland reaches with feeding substrate and cover; downstream lake influence is not uniform or measured. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Assess only any slower freshwater inland reaches with feeding substrate and cover; downstream lake influence is not uniform or measured. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Assess only any slower freshwater inland reaches with feeding substrate and cover; downstream lake influence is not uniform or measured. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "Assess only any slower freshwater inland reaches with feeding substrate and cover; downstream lake influence is not uniform or measured. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate."
+      }
+    },
+    "Prinza River": {
+      "municipality": "Calauan",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Use conditional pool, margin and sheltered bottom habitat; do not transfer lake conditions automatically into the river.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Use conditional pool, margin and sheltered bottom habitat; do not transfer lake conditions automatically into the river. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Use conditional pool, margin and sheltered bottom habitat; do not transfer lake conditions automatically into the river. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Use conditional pool, margin and sheltered bottom habitat; do not transfer lake conditions automatically into the river. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Use conditional pool, margin and sheltered bottom habitat; do not transfer lake conditions automatically into the river. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Romero River": {
+      "municipality": "Famy",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "A small preliminary set is used because channel flow, refuge cover and continuity are not established.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "A small preliminary set is used because channel flow, refuge cover and continuity are not established. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "A small preliminary set is used because channel flow, refuge cover and continuity are not established. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "A small preliminary set is used because channel flow, refuge cover and continuity are not established. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "San Antonio River": {
+      "municipality": "Santa Maria / Mabitac",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Any quiet covered freshwater refuge may be relevant; no detailed channel or water-quality survey is present.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Any quiet covered freshwater refuge may be relevant; no detailed channel or water-quality survey is present. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Any quiet covered freshwater refuge may be relevant; no detailed channel or water-quality survey is present. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Any quiet covered freshwater refuge may be relevant; no detailed channel or water-quality survey is present. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "San Cristobal River": {
+      "municipality": "Calamba City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Candidates depend on actual surviving refuge habitat; locality and freshwater classification do not establish safe oxygen or pollution conditions.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Candidates depend on actual surviving refuge habitat; locality and freshwater classification do not establish safe oxygen or pollution conditions. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Candidates depend on actual surviving refuge habitat; locality and freshwater classification do not establish safe oxygen or pollution conditions. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Candidates depend on actual surviving refuge habitat; locality and freshwater classification do not establish safe oxygen or pollution conditions. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Candidates depend on actual surviving refuge habitat; locality and freshwater classification do not establish safe oxygen or pollution conditions. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "San Isidro River": {
+      "municipality": "San Pedro City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Assess only suitable inland pools and margins; habitat availability and oxygen must be checked along each reach.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Assess only suitable inland pools and margins; habitat availability and oxygen must be checked along each reach. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Assess only suitable inland pools and margins; habitat availability and oxygen must be checked along each reach. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Assess only suitable inland pools and margins; habitat availability and oxygen must be checked along each reach. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Assess only suitable inland pools and margins; habitat availability and oxygen must be checked along each reach. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "San Juan River": {
+      "municipality": "Calamba City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Consider conditional sheltered reaches rather than a whole-course fish community; freshwater habitat quality is unknown.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Consider conditional sheltered reaches rather than a whole-course fish community; freshwater habitat quality is unknown. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Consider conditional sheltered reaches rather than a whole-course fish community; freshwater habitat quality is unknown. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Consider conditional sheltered reaches rather than a whole-course fish community; freshwater habitat quality is unknown. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Consider conditional sheltered reaches rather than a whole-course fish community; freshwater habitat quality is unknown. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "San Pedro River": {
+      "municipality": "San Pedro City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Selected named reaches support only a cautious pool/refuge assessment; downstream salinity and barriers are not surveyed.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Selected named reaches support only a cautious pool/refuge assessment; downstream salinity and barriers are not surveyed. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Selected named reaches support only a cautious pool/refuge assessment; downstream salinity and barriers are not surveyed. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Selected named reaches support only a cautious pool/refuge assessment; downstream salinity and barriers are not surveyed. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Santa Cruz River": {
+      "municipality": "Santa Cruz",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Assess flowing refuges and slower feeding areas separately; a long river can span contrasting habitats and none is assumed throughout its course.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Assess flowing refuges and slower feeding areas separately; a long river can span contrasting habitats and none is assumed throughout its course. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Assess flowing refuges and slower feeding areas separately; a long river can span contrasting habitats and none is assumed throughout its course. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate.",
+        "tilapia": "Assess flowing refuges and slower feeding areas separately; a long river can span contrasting habitats and none is assumed throughout its course. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Assess flowing refuges and slower feeding areas separately; a long river can span contrasting habitats and none is assumed throughout its course. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "Assess flowing refuges and slower feeding areas separately; a long river can span contrasting habitats and none is assumed throughout its course. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate."
+      }
+    },
+    "Santa Rosa River": {
+      "municipality": "Santa Rosa City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "The mapped Silang–Santa Rosa course includes upstream Cavite context; flow refuges and quiet pools require separate local checks.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "The mapped Silang–Santa Rosa course includes upstream Cavite context; flow refuges and quiet pools require separate local checks. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "The mapped Silang–Santa Rosa course includes upstream Cavite context; flow refuges and quiet pools require separate local checks. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate.",
+        "tilapia": "The mapped Silang–Santa Rosa course includes upstream Cavite context; flow refuges and quiet pools require separate local checks. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "The mapped Silang–Santa Rosa course includes upstream Cavite context; flow refuges and quiet pools require separate local checks. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "Siniloan River": {
+      "municipality": "Siniloan",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Stream-connected and quiet-pool candidates are separated; waterfall barriers and downstream lake conditions remain unresolved.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Stream-connected and quiet-pool candidates are separated; waterfall barriers and downstream lake conditions remain unresolved. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Stream-connected and quiet-pool candidates are separated; waterfall barriers and downstream lake conditions remain unresolved. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate.",
+        "tilapia": "Stream-connected and quiet-pool candidates are separated; waterfall barriers and downstream lake conditions remain unresolved. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Stream-connected and quiet-pool candidates are separated; waterfall barriers and downstream lake conditions remain unresolved. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "Tarak River": {
+      "municipality": "San Pablo City",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "No source-checked river course is installed; use only two conditional quiet-refuge candidates pending actual habitat information.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "No source-checked river course is installed; use only two conditional quiet-refuge candidates pending actual habitat information. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "No source-checked river course is installed; use only two conditional quiet-refuge candidates pending actual habitat information. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "Tigas River": {
+      "municipality": "Alaminos",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "The river course is not mapped. Covered quiet-water refuge is a condition to investigate, not an observed feature.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "hito": "The river course is not mapped. Covered quiet-water refuge is a condition to investigate, not an observed feature. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "The river course is not mapped. Covered quiet-water refuge is a condition to investigate, not an observed feature. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey."
+      }
+    },
+    "Tunasan River": {
+      "municipality": "San Pedro / Muntinlupa boundary area",
+      "category": "river",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Consider only inland freshwater refuges; the boundary-area name does not establish complete course conditions or lake-mouth salinity.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Consider only inland freshwater refuges; the boundary-area name does not establish complete course conditions or lake-mouth salinity. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Consider only inland freshwater refuges; the boundary-area name does not establish complete course conditions or lake-mouth salinity. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "goby": "Consider only inland freshwater refuges; the boundary-area name does not establish complete course conditions or lake-mouth salinity. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
     }
   }
 }
