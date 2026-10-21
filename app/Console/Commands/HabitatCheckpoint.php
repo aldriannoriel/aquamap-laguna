@@ -53,15 +53,17 @@ class HabitatCheckpoint extends Command
             $validation = is_file($validationPath) ? json_decode(file_get_contents($validationPath), true, flags: JSON_THROW_ON_ERROR) : null;
             $lastTests = $validation ? $validation['summary'].'; '.$validation['checked_on'] : 'Baseline 4f4f1b2: full 327 tests / 4,607 assertions; no new validation recorded yet.';
             $validated = $validation && ($validation['catalogue_hash'] ?? null) === hash_file('sha256', database_path('data/fish-habitat.json'));
+            $final = $possible === 53 && $validated && ($validation['complete'] ?? false) === true;
             $next = $this->option('next') ?: ($pending->isNotEmpty()
                 ? 'Inspect and validate the next 3–5 pending bodies, then apply only that batch and save this checkpoint again.'
-                : 'Run final preservation checks, Laravel tests, Pint, production build and desktop/mobile gallery verification; commit locally without pushing.');
+                : ($final ? 'Implementation complete. Preserve this checkpoint and local commits; no imports or migrations remain. Verified replacement photos may be added separately when available.'
+                    : 'Run final preservation checks, Laravel tests, Pint, production build and desktop/mobile gallery verification; commit locally without pushing.'));
             $batchIds = array_filter(explode(',', (string) $this->option('batch')), fn (string $id): bool => ctype_digit($id));
             $batch = $waters->whereIn('id', array_map(intval(...), $batchIds))->map(fn (WaterBody $water): string => '#'.$water->id.' '.$water->name)->implode('; ');
             $references = array_sum(array_map(fn (array $fish): int => count($fish['references']), $data['species']));
             $markdown = '# Fish & Habitat crash recovery checkpoint'."\n\n".'Updated: '.now('UTC')->toIso8601String()."\n\n"
                 .'## Actual state'."\n\n"
-                .'- Phase: '.($possible === 53 ? '53-body implementation complete; final validation/preservation review.' : 'Incremental implementation; completed batches retained.')."\n"
+                .'- Phase: '.($final ? '53-body implementation and final validation complete; documented photo placeholders remain.' : ($possible === 53 ? '53-body implementation complete; final validation/preservation review.' : 'Incremental implementation; completed batches retained.'))."\n"
                 .'- Git HEAD when saved: '.trim($head).'. A later checkpoint commit may contain this file; git log -1 is authoritative.'."\n"
                 .'- Last successful operation: inspected actual catalogue/relationships and saved this checkpoint'.($batch ? '; applied batch '.$batch : '').'.'."\n"
                 .'- Water Type reviewed/display coverage: '.$waterTypes.'/53; possible fish coverage: '.$possible.'/53; habitat explanation coverage: '.$explanations.'/53.'."\n"
@@ -89,7 +91,8 @@ class HabitatCheckpoint extends Command
                 }
             }
             $this->line(json_encode(['checkpoint' => 'docs/FISH_HABITAT_CHECKPOINT.md', 'water_type' => $waterTypes, 'possible_fish' => $possible,
-                'candidate_assignments' => $assignments, 'species_photos' => $photoCount, 'pending' => $pending->count()], JSON_THROW_ON_ERROR));
+                'candidate_assignments' => $assignments, 'species_photos' => $photoCount, 'pending' => $pending->count(),
+                'completed_names' => $waters->reject(fn (WaterBody $water): bool => $pending->contains('id', $water->id))->pluck('name')->values()->all()], JSON_THROW_ON_ERROR));
 
             return self::SUCCESS;
         } catch (\Throwable $exception) {

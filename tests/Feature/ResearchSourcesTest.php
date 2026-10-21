@@ -41,7 +41,7 @@ class ResearchSourcesTest extends TestCase
             }
             $uses += $library['source_uses'];
         }
-        $this->assertSame(483, $uses);
+        $this->assertSame(541, $uses);
         $this->assertSame($before, [WaterBody::all()->toArray(), FishSpecies::all()->toArray(), WaterBodyFish::all()->toArray()]);
         $response->assertSee('OpenStreetMap contributors, ODbL 1.0')->assertSee('Image attribution')
             ->assertSee('Plapla')->assertSee('Pagpapalaki ng tilapya')->assertSee('Naming evidence only');

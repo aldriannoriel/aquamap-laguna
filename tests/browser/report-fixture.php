@@ -1,6 +1,7 @@
 <?php
 
 // Test-only router/fixture. Never mounted by public/index.php or application routes.
+use App\Support\HabitatCatalogue;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\ExplorerSeeder;
 use Illuminate\Contracts\Console\Kernel;
@@ -60,6 +61,13 @@ if ($setup) {
     }
     if (getenv('AQUAMAP_BROWSER_FULL_CATALOGUE') === '1') {
         Artisan::call('lakes:import', ['--no-interaction' => true]);
+    }
+    if (getenv('AQUAMAP_BROWSER_HABITAT') === '1') {
+        $names = array_keys(HabitatCatalogue::load()['water_bodies']);
+        while ($names !== []) {
+            $size = count($names) <= 5 ? count($names) : (count($names) === 6 ? 3 : 4);
+            HabitatCatalogue::import(array_splice($names, 0, $size), true);
+        }
     }
     $rows = [];
     foreach (['water_bodies', 'fish_species', 'water_body_fish'] as $table) {

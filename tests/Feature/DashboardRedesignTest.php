@@ -67,7 +67,8 @@ class DashboardRedesignTest extends TestCase
         $lake = WaterBody::where('name', 'Yambo Lake')->sole();
         $this->assertSame('freshwater', $response->viewData('profiles')[$lake->id]['water_type_evidence']['type']);
         $river = WaterBody::where('category', 'river')->firstOrFail();
-        $this->assertNull($response->viewData('profiles')[$river->id]['water_type_evidence']);
+        $this->assertSame('general_geographic_assessment', $response->viewData('profiles')[$river->id]['water_type_evidence']['basis']);
+        $this->assertSame('freshwater', $response->viewData('profiles')[$river->id]['water_type_evidence']['type']);
         $entry = $evidence['Yambo Lake'];
         $this->assertNull(ExplorerProfile::waterType($entry, 'Unrelated municipality', 'lake'));
         $this->assertNull(ExplorerProfile::waterType($entry, $lake->municipality, 'river'));
@@ -93,9 +94,11 @@ class DashboardRedesignTest extends TestCase
         $document = new \DOMDocument;
         $document->loadHTML($response->getContent(), LIBXML_NOERROR | LIBXML_NOWARNING);
         $payload = json_decode($document->getElementById('lake-data')->textContent, true, flags: JSON_THROW_ON_ERROR);
+        $evidence = json_decode(file_get_contents(database_path('data/water-body-evidence.json')), true, flags: JSON_THROW_ON_ERROR);
         foreach ($payload as $record) {
-            $expected = $record['municipality'] === 'San Pablo City' && $record['category'] === 'lake'
-                && in_array($record['name'], ['Yambo Lake', 'Pandin Lake', 'Calibato Lake'], true) ? 'freshwater' : null;
+            $entry = $evidence[$record['name']] ?? [];
+            $expected = ($entry['municipality'] ?? null) === $record['municipality']
+                && ($entry['category'] ?? null) === $record['category'] ? 'freshwater' : null;
             $profile = $response->viewData('profiles')[$record['id']];
             $this->assertSame($expected, $record['water_type'], $record['name']);
             $this->assertSame($record['water_type'], $profile['water_type_evidence']['type'] ?? null);

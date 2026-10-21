@@ -159,6 +159,21 @@ class HabitatAssessmentTest extends TestCase
         $this->assertNull(ExplorerProfile::fishName($name, 'Oreochromis niloticus'));
     }
 
+    public function test_changed_stored_candidate_metadata_is_not_published_or_silently_overwritten(): void
+    {
+        $this->fixture();
+        HabitatCatalogue::import(self::FIRST_BATCH, true);
+        $water = WaterBody::where('name', 'Bunot Lake')->sole();
+        $link = WaterBodyFish::where('water_body_id', $water->id)->firstOrFail();
+        $link->forceFill(['explanation' => 'Stored metadata awaiting explicit review.'])->save();
+        $assessment = HabitatCatalogue::assessment($water->fresh()->load('fishSpecies'), HabitatCatalogue::load());
+        $this->assertFalse($assessment['complete']);
+        $this->assertCount(4, $assessment['candidates']);
+        $before = $this->snapshot();
+        $this->artisan('habitat:import', ['names' => self::FIRST_BATCH, '--apply' => true])->assertExitCode(1);
+        $this->assertSame($before, $this->snapshot());
+    }
+
     public function test_checkpoint_is_atomically_replaced_with_actual_coverage_without_database_changes(): void
     {
         $this->fixture();

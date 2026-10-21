@@ -27,7 +27,7 @@ class WaterBodyCardTest extends TestCase
         $response = $this->get(route('map.index'))->assertOk()->assertSee('id="water-detail-dialog"', false)
             ->assertSee('Close profile')->assertDontSee('Visible Pollution Reports')
             ->assertSee('Historical aquaculture')->assertSee('Potential habitat compatibility')->assertSee('Insufficient data')
-            ->assertSee('Research &amp; Sources', false)->assertSee('Water type not yet verified')->assertDontSee('Spring type:')
+            ->assertSee('Research &amp; Sources', false)->assertSee('General geographic assessment')->assertDontSee('Spring type:')
             ->assertSee('Barrera marquez')->assertSee('Dionisia.besas')->assertSee('Photo by');
         $this->assertDatabaseCount('water_bodies', 28);
         $this->assertCount(28, $response->viewData('lakes'));
@@ -168,8 +168,8 @@ class WaterBodyCardTest extends TestCase
         $this->assertSame('Profile', trim($xpath->evaluate('string(//button[@data-profile-tab="overview"])')));
         $this->assertSame('Water Type', trim($xpath->evaluate('string(//button[@data-profile-tab="classification"])')));
         $response->assertSee('Historical aquaculture')->assertSee('Plapla')->assertSee('Name source')
-            ->assertSee('Water type not yet verified')->assertSee('OpenStreetMap contributors')->assertSee('Image attribution');
-        $this->assertSame(26, $xpath->query('//template[starts-with(@id,"profile-")]//figure/img')->length);
+            ->assertSee('General geographic assessment')->assertSee('OpenStreetMap contributors')->assertSee('Image attribution');
+        $this->assertSame(26, $xpath->query('//template[starts-with(@id,"profile-")]//img[@data-water-image]')->length);
         $this->assertSame(2, $xpath->query('//template[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
     }
 

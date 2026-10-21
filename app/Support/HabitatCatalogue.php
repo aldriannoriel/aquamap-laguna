@@ -151,6 +151,10 @@ class HabitatCatalogue
             if (! $fish) {
                 continue;
             }
+            if ($fish->pivot->evidence_type === 'potential_habitat' && ($fish->pivot->explanation !== $explanation
+                || $fish->pivot->source_url !== $definition['source_url'] || $fish->pivot->compatibility_status !== 'preliminary')) {
+                continue;
+            }
             $image = ExplorerProfile::image($definition['image'] ?? null, 'fish');
             if ($image && ! is_file(public_path(ltrim($image['path'], '/')))) {
                 $image = null;

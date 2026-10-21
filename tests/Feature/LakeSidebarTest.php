@@ -59,7 +59,8 @@ class LakeSidebarTest extends TestCase
             ->assertSee('Map context &amp; data limits', false)->assertSee('class="report-fab"', false)
             ->assertDontSee('Existing isolated historical report');
         $record = collect($response->viewData('lakes'))->sole('id', $lake->id);
-        $this->assertNull($record['water_type']);
+        $this->assertSame('freshwater', $record['water_type']);
+        $this->assertSame('general_geographic_assessment', $response->viewData('profiles')[$lake->id]['water_type_evidence']['basis']);
         $this->assertSame('Polygon', $record['geography']['geometry']['type']);
         $this->assertSame([], $response->viewData('fishByLake')[$lake->id]);
         $this->assertNull($response->viewData('profiles')[$lake->id]['image']);

@@ -251,3 +251,10 @@ Habitat batch IDs: 21,22,24,27 — #21 Bunga Twin Falls; #22 Buntot Palos Falls;
 
 
 Habitat batch IDs: 7,25,6,8,20 — #7 Hulugan Falls; #25 Lanzones Falls; #6 Pagsanjan Falls; #8 Talay Falls; #20 Taytay Falls. Coverage: Water Type 53/53; Possible Fish 53/53. Checkpoint saved; validate before the local milestone commit.
+
+
+## Water Type and Fish Habitat completion: 2026-10-22
+
+All 13 batches are checkpointed: 53/53 Water Type, Possible Fish, individual explanations and research references; 11 lakes / 29 rivers / 13 waterfalls, nine species, 177 candidate assignments (174 additive potential-only links). Gallery stays exactly three columns, wraps five/eight candidates, and preserves historical aquaculture records separately. Four verified species photos are installed; five species have honest placeholders (native hito, kanduli, tank goby, loach goby, milkfish). HTTP 429 and rejected image identity/usability are recorded in FISH_HABITAT_CHECKPOINT.md. No missing candidate assessment remains.
+
+Full isolated SQLite :memory: suite: 335 tests / 6895 assertions; final checkpoint test 1 / 10; Pint and production Vite build passed; Edge all 53 profiles at 1440/390 px plus seven at 320 px passed; gallery screenshots visually inspected; tiles simulated locally; protected-data/.env preservation passed; no live mail. No duplicate species/relationships. All 55 original water rows are preserved except 46 authorized missing-type labels/timestamps; all original species/three links and eleven other protected tables match the pre-work snapshot. No production schema operation, GIS/report/referral edit, live email, credential change, unrelated project work or push. Local milestone commits: 1c4033d, fd86f0c, d89df48, cc5295a; identify the final validation/documentation commit with git log -1.

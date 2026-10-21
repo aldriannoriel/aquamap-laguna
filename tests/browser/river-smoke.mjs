@@ -9,6 +9,8 @@ import path from 'node:path';
 
 // Uses an installed browser and an isolated profile; no browser packages or downloads.
 const root = process.cwd();
+const habitat = process.argv.includes('--habitat');
+const habitatData = habitat ? JSON.parse(readFileSync('database/data/fish-habitat.json', 'utf8')) : null;
 function databaseSnapshot() {
     const check = spawnSync('php', [], {
         cwd: root, windowsHide: true, encoding: 'utf8',
@@ -43,7 +45,7 @@ const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
 const finalValidation = process.argv.includes('--final');
-const artifactDirectory = process.argv.includes('--supported-only') ? 'springs-removal/browser' : process.argv.includes('--lake-sidebar') ? 'lake-sidebar/browser' : finalValidation ? 'final-validation/browser' : process.argv.includes('--research') ? 'research-audit/browser' : process.argv.includes('--fish') ? 'fish-names/browser' : process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
+const artifactDirectory = habitat ? (process.argv.includes('--quick') ? 'fish-habitat/browser/quick' : 'fish-habitat/browser') : process.argv.includes('--supported-only') ? 'springs-removal/browser' : process.argv.includes('--lake-sidebar') ? 'lake-sidebar/browser' : finalValidation ? 'final-validation/browser' : process.argv.includes('--research') ? 'research-audit/browser' : process.argv.includes('--fish') ? 'fish-names/browser' : process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json', 'waterfall-expansion.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const imageReplacements = JSON.parse(readFileSync(path.join(root, 'database/data/waterfall-photos.json'), 'utf8'));
@@ -56,7 +58,7 @@ assert(fixtureDirectory.startsWith(`${path.resolve(root, 'storage/app/day4-brows
 for (const directory of ['', 'sessions', 'cache', 'photos']) {
     await mkdir(path.join(fixtureDirectory, directory), { recursive: true });
 }
-const fixtureEnvironment = { ...process.env, APP_ENV: 'testing', AQUAMAP_REPORT_FIXTURE: fixtureDirectory, AQUAMAP_BROWSER_FULL_CATALOGUE: '1', AQUAMAP_BROWSER_RIVERS: '1' };
+const fixtureEnvironment = { ...process.env, APP_ENV: 'testing', AQUAMAP_REPORT_FIXTURE: fixtureDirectory, AQUAMAP_BROWSER_FULL_CATALOGUE: '1', AQUAMAP_BROWSER_RIVERS: '1', AQUAMAP_BROWSER_HABITAT: habitat ? '1' : '0' };
 const fixtureRouter = path.join(root, 'tests/browser/report-fixture.php');
 const setup = spawnSync('php', [fixtureRouter, 'setup'], { cwd: root, env: fixtureEnvironment, windowsHide: true, encoding: 'utf8' });
 assert.equal(setup.status, 0, 'Isolated map fixture setup failed.');
@@ -115,6 +117,12 @@ try {
             else resolve(message.result);
         }
         if (message.method === 'Runtime.exceptionThrown') failures.push(message.params.exceptionDetails.text);
+        if (habitat && message.method === 'Fetch.requestPaused') {
+            // Local neutral tiles avoid bulk requests to the provider during 53-profile UI checks.
+            send('Fetch.fulfillRequest', { requestId: message.params.requestId, responseCode: 200,
+                responseHeaders: [{ name: 'Content-Type', value: 'image/png' }, { name: 'Access-Control-Allow-Origin', value: '*' }],
+                body: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4////fwAJ+wP9KobjigAAAABJRU5ErkJggg==' }).catch(error => failures.push(error.message));
+        }
     });
     send = (method, params = {}) => new Promise((resolve, reject) => {
         const id = ++nextId;
@@ -195,8 +203,9 @@ try {
     await send('Page.enable');
     await send('DOM.enable');
     await send('CSS.enable');
+    if (habitat) await send('Fetch.enable', { patterns: [{ urlPattern: '*tile.openstreetmap.org/*' }] });
     const requestedWidth = process.argv.find(argument => argument.startsWith('--width='))?.split('=')[1];
-    const viewports = (process.argv.includes('--research') && !finalValidation ? [[1440, 1100], [390, 844]] : [[1440, 1100], [1024, 900], [390, 844], [320, 740]])
+    const viewports = (habitat ? [[1440, 1100], [390, 844], [320, 740]] : process.argv.includes('--research') && !finalValidation ? [[1440, 1100], [390, 844]] : [[1440, 1100], [1024, 900], [390, 844], [320, 740]])
         .filter(([width]) => !requestedWidth || width === Number(requestedWidth));
     assert(viewports.length, 'Choose a supported viewport width.');
     for (const [width, height] of viewports) {
@@ -243,7 +252,7 @@ try {
             assert.equal(await evaluate('scrollY'), initialPage);
         }
         const fishLakes = ['Pandin Lake', 'Sampaloc Lake', 'Yambo Lake'];
-        const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Tadlac Lake','Balanac River','San Isidro River','Yambo Lake','Pagsanjan Falls'].includes(item.name) || (process.argv.includes('--fish') && fishLakes.includes(item.name)) || (process.argv.includes('--research') && ['Balon-Balon Falls','Bunot Lake','Calibato Lake'].includes(item.name)));
+        const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Tadlac Lake','Balanac River','San Isidro River','Yambo Lake','Pagsanjan Falls'].includes(item.name) || (habitat && ['Bunot Lake','Laguna de Bay'].includes(item.name)) || (process.argv.includes('--fish') && fishLakes.includes(item.name)) || (process.argv.includes('--research') && ['Balon-Balon Falls','Bunot Lake','Calibato Lake'].includes(item.name)));
         const contrastSelector = '[data-lake-id="'+samples[0].id+'"]';
         const { root: documentNode } = await send('DOM.getDocument');
         const { nodeId: contrastNode } = await send('DOM.querySelector', { nodeId: documentNode.nodeId, selector: contrastSelector });
@@ -292,11 +301,67 @@ try {
                 assert(photoResponse.ok,lake.name+': photo asset must load');
                 await photoResponse.arrayBuffer();
             }
+            if (habitat) {
+                await click('[data-profile-tab=classification]');
+                assert.equal(await evaluate('document.querySelector("#selected-lake [data-water-type]").textContent.trim()'), 'Freshwater');
+                assert.match(await evaluate('document.querySelector("#selected-lake [data-water-type-basis]").textContent'), /General geographic assessment|Verified information/);
+                await click('[data-profile-tab=fish]');
+                const keys = Object.keys(habitatData.water_bodies[lake.name].candidates);
+                await evaluate('document.querySelector("#selected-lake [data-possible-fish-gallery]").scrollIntoView({block:"start"})');
+                // Lazy images may be below the short mobile panel; request decoding explicitly in the fixture.
+                const gallery = await evaluate(`(async () => {
+                    const panel = document.querySelector('#selected-lake');
+                    const grid = panel.querySelector('[data-possible-fish-gallery]');
+                    const cards = [...grid.querySelectorAll('[data-possible-fish-card]')];
+                    const images = [...grid.querySelectorAll('img')];
+                    for (const img of images) { img.loading = 'eager'; await img.decode(); }
+                    return { columns: getComputedStyle(grid).gridTemplateColumns.split(' ').length,
+                        overflow: grid.scrollWidth > grid.clientWidth,
+                        cards: cards.map(card => { const thumb = card.querySelector('.possible-fish-thumb').getBoundingClientRect(); return { x:thumb.x, y:thumb.y, width:thumb.width, height:thumb.height, centered:getComputedStyle(card.querySelector('figcaption')).textAlign }; }),
+                        photos: images.map(img => ({ src:img.getAttribute('src'), loaded:img.complete && img.naturalWidth > 0 })),
+                        placeholders: grid.querySelectorAll('[data-fish-placeholder]').length,
+                        reasonsClosed: !panel.querySelector('[data-fish-reasons]').open,
+                        documented: panel.querySelectorAll('[data-fish-card]').length };
+                })()`);
+                assert.equal(gallery.columns, 3, lake.name+': exactly three columns');
+                assert.equal(gallery.overflow, false, lake.name+': gallery overflow');
+                assert.equal(gallery.cards.length, keys.length);
+                assert.equal(gallery.placeholders, keys.filter(key => !habitatData.species[key].image || !existsSync(path.join(root, 'public', habitatData.species[key].image.path))).length);
+                assert(gallery.photos.every(photo => photo.loaded && photo.src.startsWith('/images/fish/')));
+                gallery.cards.forEach((card, index) => {
+                    assert(Math.abs(card.width-card.height) < 1 && card.width > 0);
+                    assert.equal(card.centered, 'center');
+                    if (index >= 3) assert(card.y > gallery.cards[index-3].y);
+                    if (index % 3) assert(Math.abs(card.y-gallery.cards[index-1].y) < 1);
+                });
+                assert(gallery.reasonsClosed);
+                assert.equal(gallery.documented, fishLakes.includes(lake.name) ? 1 : 0);
+                await click('#selected-lake [data-fish-reasons] > summary');
+                assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-reasons]").open'), true);
+                assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-fish-explanation]").length'), keys.length);
+                assert.equal(await evaluate('[...document.querySelectorAll("#selected-lake [data-fish-explanation] a")].every(a => a.href.startsWith("https://") && a.rel.includes("noopener"))'), true);
+                await click('#selected-lake [data-fish-reasons] > summary');
+                assert.equal(await evaluate('document.querySelector("#selected-lake [data-fish-reasons]").open'), false);
+                if (fishLakes.includes(lake.name)) {
+                    await click('#selected-lake [data-documented-fish] > summary');
+                    const text = await evaluate('document.querySelector("#selected-lake [data-documented-fish]").textContent');
+                    assert(text.includes('2017') && text.includes('2019') && text.includes('Historical aquaculture'));
+                    await click('#selected-lake [data-documented-fish] > summary');
+                }
+                if (['Bunot Lake','Laguna de Bay','Pagsanjan Falls'].includes(lake.name)) {
+                    await evaluate('document.querySelector("#selected-lake [data-possible-fish-gallery]").scrollIntoView({block:"start"})');
+                    await screenshot(width+'-habitat-'+lake.name.split(' ')[0]+'.png');
+                }
+                await click('[data-profile-tab=research]');
+                assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-research-group]").length'), 6);
+                await click('[data-profile-tab=overview]');
+            }
             if (process.argv.includes('--fish')) {
                 await click('[data-profile-tab=fish]');
                 const cards = await evaluate('document.querySelectorAll("#selected-lake [data-fish-card]").length');
                 assert.equal(cards, fishLakes.includes(lake.name) ? 1 : 0, lake.name+': existing occurrence links only.');
                 if (cards) {
+                    await evaluate('document.querySelector("#selected-lake [data-documented-fish]").open = true');
                     const fish = await evaluate(`(() => {
                         const card = document.querySelector('#selected-lake [data-fish-card]');
                         const source = card.querySelector('[data-fish-name-source]');
@@ -369,7 +434,7 @@ try {
                 }
                 await click('[data-profile-tab=classification]');
                 const type=await evaluate('document.querySelector("#selected-lake [data-water-type]").textContent');
-                assert.equal(type.trim(),lake.name==='Yambo Lake'?'Freshwater':'Water type not yet verified');
+                assert.equal(type.trim(),{freshwater:'Freshwater',brackish:'Brackish Water',saltwater:'Saltwater'}[lake.water_type] ?? 'Water type not yet verified');
                 await click('[data-profile-tab=overview]');
                 assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'),true);
             }
@@ -493,7 +558,7 @@ try {
         if (finalValidation) assert.equal(await evaluate('getComputedStyle(document.activeElement).outlineStyle !== "none" && parseFloat(getComputedStyle(document.activeElement).outlineWidth) >= 2'), true, 'Keyboard tab focus must be visible.');
         await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
         assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'),true);
-        results.push(width+'px: '+samples.length+' direct profiles, source geometry/photos/measurements, four bottom sections, privacy, independent list scrolling, filters/empty state, wheel zoom with open card, keyboard/Escape and fixed report action passed.'+(process.argv.includes('--fish') ? ' Three historical fish profiles: English/Filipino/scientific names, safe name sources, two Research citations and unassessed suitability passed; no fish assigned elsewhere.' : ''));
+        results.push(width+'px: '+samples.length+' direct profiles, source geometry/photos/measurements, four bottom sections, privacy, independent list scrolling, filters/empty state, wheel zoom with open card, keyboard/Escape and fixed report action passed.'+(habitat ? ' Three-column square galleries, five/eight-candidate wrapping, image decoding/placeholders, expandable reasons, references and separate historical records passed. Tiles simulated locally.' : '')+(process.argv.includes('--fish') ? ' Three historical fish profiles: English/Filipino/scientific names, safe name sources, two Research citations and unassessed suitability passed.' : ''));
         await navigate('/reports/create');
         assert.equal(await evaluate('document.getElementById("photo").required'),true);
         const choices=await evaluate('JSON.parse(document.getElementById("incident-lakes").textContent)');

@@ -1,11 +1,11 @@
 # Fish & Habitat crash recovery checkpoint
 
-Updated: 2026-10-21T16:26:37+00:00
+Updated: 2026-10-21T16:38:14+00:00
 
 ## Actual state
 
-- Phase: 53-body implementation complete; final validation/preservation review.
-- Git HEAD when saved: d89df48. A later checkpoint commit may contain this file; git log -1 is authoritative.
+- Phase: 53-body implementation and final validation complete; documented photo placeholders remain.
+- Git HEAD when saved: cc5295a. A later checkpoint commit may contain this file; git log -1 is authoritative.
 - Last successful operation: inspected actual catalogue/relationships and saved this checkpoint.
 - Water Type reviewed/display coverage: 53/53; possible fish coverage: 53/53; habitat explanation coverage: 53/53.
 - Inventory: 53 supported; {"waterfall":13,"river":29,"lake":11}; 55 stored including two preserved hidden legacy properties.
@@ -13,7 +13,7 @@ Updated: 2026-10-21T16:26:37+00:00
 - Fish photographs installed: 4/9 species. Missing photos use labelled placeholders, never another species image.
 - References: 9 species-habitat references reviewed; every complete candidate has an explanation, requirements, limitations and source links. Existing research/naming/occurrence citations remain.
 - Database changes: only explicit additive habitat batches and missing water_type labels. No water body added/deleted, schema operation, report/agency/referral/GIS/photo modification or live email.
-- Last successful tests: 8 habitat tests / 2279 assertions passed for batch 13; 2026-10-22. Current catalogue matches recorded feature validation.
+- Last successful tests: Full isolated SQLite :memory: suite: 335 tests / 6895 assertions; final checkpoint test 1 / 10; Pint and production Vite build passed; Edge all 53 profiles at 1440/390 px plus seven at 320 px passed; gallery screenshots visually inspected; tiles simulated locally; protected-data/.env preservation passed; no live mail; 2026-10-22. Current catalogue matches recorded feature validation.
 
 ## Completed and pending IDs/names
 
@@ -133,7 +133,7 @@ Wikimedia returned HTTP 429 after five originals; no further image requests were
 
 ## Exact next action
 
-All 53 populated. Complete full tests, production build, desktop/mobile browser and preservation checks before final commit.
+Implementation complete. Preserve this checkpoint and local commits; no imports or migrations remain. Verified replacement photos may be added separately when available.
 
 ## Recovery protocol
 
@@ -142,11 +142,22 @@ Read this file, git status/diff and actual rows before resuming. Files/database 
 ## Modified files when saved
 
 ```text
-M app/Console/Commands/HabitatCheckpoint.php
+M .agents/architecture/architecture.md
+ M AGENTS.md
+ M app/Console/Commands/HabitatCheckpoint.php
  M app/Support/HabitatCatalogue.php
- M database/data/fish-habitat.json
- M database/data/water-body-evidence.json
+ M docs/ARCHITECTURE.md
+ M docs/CURRENT_STATE.md
  M docs/EXPANSION_PROGRESS.md
  M docs/FISH_HABITAT_CHECKPOINT.md
+ M docs/PROJECT_CONTEXT.md
+ M docs/RESEARCH_SOURCES.md
+ M tests/Feature/DashboardRedesignTest.php
+ M tests/Feature/ExplorerTest.php
  M tests/Feature/HabitatAssessmentTest.php
+ M tests/Feature/LakeSidebarTest.php
+ M tests/Feature/ResearchSourcesTest.php
+ M tests/Feature/WaterBodyCardTest.php
+ M tests/browser/report-fixture.php
+ M tests/browser/river-smoke.mjs
 ```
