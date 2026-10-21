@@ -31,6 +31,8 @@ class ReviewReportRequest extends FormRequest
             'rejection_reason' => ['exclude_unless:status,rejected', 'required', 'string', 'max:2000'],
             'resolution_basis' => ['exclude_unless:status,resolved', 'required', 'string', 'max:4000'],
             'closure_reason' => ['exclude_unless:status,closed', 'required', 'string', 'max:2000'],
+            'reopen_reason' => ['exclude_unless:expected_status,closed', 'required', 'string', 'max:2000'],
+            'follow_up_attempts' => ['exclude_unless:status,closed', 'nullable', 'string', 'max:2000'],
         ];
     }
 
@@ -39,7 +41,8 @@ class ReviewReportRequest extends FormRequest
         return ['rejection_reason.required' => 'Explain why this report is being rejected.',
             'review_note.required_if' => 'Resolution remarks are required.',
             'resolution_basis.required' => 'Provide a documented resolution basis or supporting evidence reference.',
-            'closure_reason.required' => 'Explain why this forwarded report is being closed without resolution.'];
+            'closure_reason.required' => 'Explain why this forwarded report is being closed without resolution.',
+            'reopen_reason.required' => 'Explain the new information supporting reopening this closed case.'];
     }
 
     protected function getRedirectUrl(): string

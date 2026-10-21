@@ -26,6 +26,9 @@ class ReportController extends Controller
         } elseif ($queue === 'processed') {
             $query->processed();
         }
+        if (isset($filters['category'])) {
+            $query->category($filters['category']);
+        }
         foreach (['lake' => 'water_body_id', 'type' => 'pollution_type', 'status' => 'status'] as $filter => $column) {
             if (isset($filters[$filter])) {
                 $query->where($column, $filters[$filter]);

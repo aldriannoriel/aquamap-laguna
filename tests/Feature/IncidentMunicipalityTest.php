@@ -54,6 +54,57 @@ class IncidentMunicipalityTest extends TestCase
             'expected_status' => $report->status];
     }
 
+    public function test_combined_review_records_manual_routing_and_confirms_once_without_sending_on_preview_or_cancellation(): void
+    {
+        [$report, $admin] = $this->fixture();
+        $magdalena = $this->agency('Magdalena');
+        $original = $report->fresh()->getAttributes();
+        $url = route('admin.referrals.review', $report);
+        $data = [...$this->selection($report, $magdalena), 'include_photo' => 0];
+        $this->postJson($url, $data)->assertUnauthorized();
+        $this->actingAs(User::factory()->create())->postJson($url, $data)->assertForbidden();
+        $this->actingAs($admin)->postJson($url, [...$data, 'routing_reason' => '   '])->assertUnprocessable()->assertJsonValidationErrors('routing_reason');
+        $this->postJson($url, [...$data, 'point_key' => str_repeat('0', 64)])->assertConflict();
+        $preview = $this->postJson($url, $data)->assertOk()->assertJsonPath('recipient', 'Magdalena / '.Referral::TEST_RECIPIENT);
+        $this->assertStringContainsString('Incident municipality (admin selected): Magdalena', $preview->json('text'));
+        $this->postJson($url, $data)->assertOk()->assertJsonPath('hash', $preview->json('hash'));
+        $this->assertDatabaseCount('report_reviews', 1);
+        $this->assertSame($original, $report->fresh()->getAttributes());
+        $this->assertDatabaseCount('referrals', 0);
+        Queue::assertNothingPushed();
+        Mail::assertNothingSent();
+        $approval = ['agency_id' => $magdalena->id, 'include_photo' => 0, 'review_hash' => $preview->json('hash'), 'approved' => 1];
+        $this->post(route('admin.referrals.store', $report), $approval)->assertSessionHasNoErrors();
+        $this->post(route('admin.referrals.store', $report), $approval)->assertSessionHasNoErrors();
+        $this->assertSame('pending', $report->fresh()->category);
+        $this->assertSame('queued', Referral::sole()->status);
+        Queue::assertPushed(SendReferral::class, 1);
+        (new SendReferral(Referral::sole()->id))->handle();
+        $this->assertSame('forwarded', $report->fresh()->category);
+        $this->assertSame('verified', $report->fresh()->status);
+        Mail::assertSent(EnvironmentalReferral::class, 1);
+        $this->assertNull(Referral::sole()->inbox_confirmed_at);
+    }
+
+    public function test_combined_review_invalidates_an_older_preview_after_reason_or_municipality_changes(): void
+    {
+        [$report, $admin] = $this->fixture();
+        $magdalena = $this->agency('Magdalena');
+        $pagsanjan = $this->agency('Pagsanjan');
+        $url = route('admin.referrals.review', $report);
+        $this->actingAs($admin);
+        $first = $this->postJson($url, [...$this->selection($report, $pagsanjan), 'include_photo' => 0])->assertOk();
+        $this->postJson($url, [...$this->selection($report, $magdalena, 'Corrected after reviewing the incident point.'), 'include_photo' => 0])->assertOk();
+        $this->post(route('admin.referrals.store', $report), ['agency_id' => $pagsanjan->id, 'include_photo' => 0,
+            'review_hash' => $first->json('hash'), 'approved' => 1])->assertSessionHasErrors('agency_id');
+        $report->forceFill(['latitude' => 14.2])->save();
+        $this->postJson($url, [...$this->selection($report, $magdalena), 'expected_status' => 'verified', 'include_photo' => 0])->assertConflict();
+        $this->assertDatabaseCount('report_reviews', 2);
+        $this->assertDatabaseCount('referrals', 0);
+        Queue::assertNothingPushed();
+        Mail::assertNothingSent();
+    }
+
     public function test_report_four_requires_explicit_incident_selection_and_routes_to_magdalena_without_changing_the_water_body(): void
     {
         [$report, $admin] = $this->fixture();

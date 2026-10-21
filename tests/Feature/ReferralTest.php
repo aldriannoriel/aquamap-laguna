@@ -267,7 +267,7 @@ class ReferralTest extends TestCase
         $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', $a->id);
         foreach (['Unknown', 'Majayjay / Liliw access area'] as $locality) {
             $other->forceFill(['municipality' => $locality])->save();
-            $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', $a->id)->assertSee('Using the saved incident municipality selection.');
+            $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', $a->id)->assertSee('Choose the incident municipality and explain your selection.');
             $this->get(route('admin.referrals.preview', $r))->assertSessionHasErrors('agency_id');
             $this->get(route('admin.referrals.preview', [$r, 'agency_id' => $a->id]))->assertOk();
         }

@@ -29,6 +29,8 @@ Route::prefix('admin')->name('admin.')->middleware(AdminPrivacy::class)->group(f
         Route::post('/reports/{pollutionReport}/delivery/{referral}/retry', [ReferralController::class, 'retry'])->name('referrals.retry');
         Route::post('/reports/{pollutionReport}/delivery/{referral}/confirm', [ReferralController::class, 'confirm'])->name('referrals.confirm');
         Route::get('/reports/{pollutionReport}/referral', [ReferralController::class, 'preview'])->name('referrals.preview');
+        Route::post('/reports/{pollutionReport}/referral/preview', [ReferralController::class, 'review'])
+            ->middleware('throttle:admin-reviews')->name('referrals.review');
         Route::post('/reports/{pollutionReport}/referral', [ReferralController::class, 'store'])->name('referrals.store');
         Route::get('/', DashboardController::class)->name('dashboard');
         Route::post('/logout', [SessionController::class, 'destroy'])->name('logout');

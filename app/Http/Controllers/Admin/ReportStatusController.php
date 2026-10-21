@@ -41,8 +41,8 @@ class ReportStatusController extends Controller
                 $review->review_note = match ($report->status) {
                     'rejected' => 'Rejection reason:'."\n".$data['rejection_reason'],
                     'resolved' => 'Remarks:'."\n".$data['review_note']."\n\n".'Documented resolution basis / supporting evidence:'."\n".$data['resolution_basis'],
-                    'closed' => 'Closure reason (not resolved):'."\n".$data['closure_reason'].(filled($data['review_note'] ?? null) ? "\n\n".'Remarks:'."\n".$data['review_note'] : ''),
-                    default => $data['review_note'] ?? null,
+                    'closed' => 'Closure reason (not resolved):'."\n".$data['closure_reason'].(filled($data['follow_up_attempts'] ?? null) ? "\n\n".'Follow-up attempts:'."\n".$data['follow_up_attempts'] : '').(filled($data['review_note'] ?? null) ? "\n\n".'Remarks:'."\n".$data['review_note'] : ''),
+                    default => $previous === 'closed' ? 'Reopened — new information:'."\n".$data['reopen_reason'] : ($data['review_note'] ?? null),
                 };
                 $report->reviews()->save($review);
             });
@@ -53,7 +53,7 @@ class ReportStatusController extends Controller
 
             return redirect()->route('admin.reports.show', $pollutionReport)
                 ->withErrors(['status' => 'The review could not be saved. No status change was recorded. Please try again.'])
-                ->withInput($request->only(['review_note', 'rejection_reason', 'resolution_basis', 'closure_reason']));
+                ->withInput($request->only(['review_note', 'rejection_reason', 'resolution_basis', 'closure_reason', 'follow_up_attempts', 'reopen_reason']));
         }
 
         return redirect()->route('admin.reports.show', $pollutionReport)->with('review_saved', true);

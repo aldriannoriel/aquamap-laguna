@@ -180,7 +180,7 @@ try {
     await login('admin-fixture@example.test');
     await waitFor(()=>evaluate('!!document.querySelector("[data-count=total]")'),'Administrator login failed.');
     assert.equal(await evaluate('document.querySelector("[data-count=total]").textContent'),'18');
-    assert.equal(await evaluate('document.querySelector("[data-count=pending]").textContent'),'15');
+    assert.equal(await evaluate('document.querySelector("[data-count=pending]").textContent'),'16');
     assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
     await screenshot('desktop-dashboard.png');
     await navigate('/admin/reports','!!document.getElementById("report-filters")');

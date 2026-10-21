@@ -101,15 +101,15 @@ class AdminReportsTest extends TestCase
         $this->assertDatabaseCount('water_bodies', 28);
     }
 
-    public function test_dashboard_counts_each_status_and_includes_unknown_legacy_rows_only_in_total(): void
+    public function test_dashboard_maps_unforwarded_and_unknown_legacy_statuses_to_pending_without_rewriting_them(): void
     {
         foreach (['pending', 'pending', 'verified', 'rejected', 'resolved', 'legacy_unknown'] as $status) {
             $this->report(['status' => $status]);
         }
         $this->actingAs($this->admin())->get(route('admin.dashboard'))->assertOk()
-            ->assertViewHas('counts', ['total' => 6, 'pending' => 2, 'verified' => 1, 'under_review' => 0,
-                'in_progress' => 0, 'rejected' => 1, 'resolved' => 1, 'closed' => 0])
+            ->assertViewHas('counts', ['total' => 6, 'pending' => 4, 'forwarded' => 0, 'resolved' => 1, 'rejected' => 1, 'closed' => 0])
             ->assertHeader('Cache-Control', 'no-store, private');
+        $this->assertDatabaseHas('pollution_reports', ['status' => 'legacy_unknown']);
     }
 
     public function test_filters_search_dates_intersections_and_pagination_retrieve_only_matching_records(): void
@@ -337,7 +337,63 @@ class AdminReportsTest extends TestCase
         $this->patch($url, ['status' => 'closed', 'expected_status' => 'verified', 'closure_reason' => 'Merged into municipality case FIXTURE-03.'])->assertSessionHasNoErrors();
         $this->assertSame('closed', $report->fresh()->status);
         $this->assertStringContainsString("Closure reason (not resolved):\nMerged into municipality case FIXTURE-03.", ReportReview::sole()->review_note);
-        $this->patch($url, ['status' => 'under_review', 'expected_status' => 'closed'])->assertSessionHasErrors('status');
+        $this->patch($url, ['status' => 'under_review', 'expected_status' => 'closed'])->assertSessionHasErrors('reopen_reason');
+    }
+
+    public function test_five_categories_partition_reports_and_filter_on_smtp_acceptance_instead_of_approval(): void
+    {
+        $admin = $this->admin();
+        $pending = $this->report(['status' => 'verified']);
+        $queued = $this->forwarded($pending, $admin);
+        $queued->forceFill(['status' => 'queued', 'sent_at' => null])->save();
+        $expected = ['pending' => [$pending->id]];
+        foreach (['verified', 'under_review', 'in_progress', 'resolved', 'rejected', 'closed'] as $status) {
+            $report = $this->report(['status' => $status]);
+            $this->forwarded($report, $admin);
+            $expected[in_array($status, ['resolved', 'rejected', 'closed'], true) ? $status : 'forwarded'][] = $report->id;
+        }
+        $attributes = PollutionReport::all()->map->getAttributes()->all();
+        $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk()
+            ->assertViewHas('counts', ['total' => 7, 'pending' => 1, 'forwarded' => 3, 'resolved' => 1, 'rejected' => 1, 'closed' => 1]);
+        foreach ($expected as $category => $ids) {
+            rsort($ids);
+            $this->get(route('admin.reports.index', ['category' => $category]))->assertOk()
+                ->assertViewHas('reports', fn ($reports) => $reports->pluck('id')->all() === $ids);
+        }
+        $this->assertSame($attributes, PollutionReport::all()->map->getAttributes()->all());
+        $this->get(route('admin.reports.index', ['category' => 'invented']))->assertSessionHasErrors('category');
+    }
+
+    public function test_closed_cases_reopen_only_with_admin_reason_and_saved_forwarding_and_preserve_closure_and_email(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $admin = $this->admin();
+        $report = $this->report(['status' => 'verified']);
+        $delivery = $this->forwarded($report, $admin);
+        $deliveryBefore = $delivery->fresh()->getAttributes();
+        $url = route('admin.reports.status', $report);
+        $this->actingAs($admin)->patch($url, ['status' => 'closed', 'expected_status' => 'verified',
+            'closure_reason' => 'Administrative transfer without confirmed cleanup.', 'follow_up_attempts' => 'Contacted municipality twice.'])->assertSessionHasNoErrors();
+        $closure = ReportReview::sole()->getAttributes();
+        $this->assertStringContainsString('Contacted municipality twice.', $closure['review_note']);
+        $data = ['status' => 'under_review', 'expected_status' => 'closed', 'reopen_reason' => 'New inspection evidence received.'];
+        $this->actingAs(User::factory()->create())->patch($url, $data)->assertForbidden();
+        $this->actingAs($admin)->patch($url, [...$data, 'status' => 'resolved', 'review_note' => 'Invalid shortcut.', 'resolution_basis' => 'Invalid.'])->assertSessionHasErrors('status');
+        $this->patch($url, [...$data, 'reopen_reason' => '   '])->assertSessionHasErrors('reopen_reason');
+        $this->patch($url, $data)->assertSessionHasNoErrors();
+        $this->assertSame('under_review', $report->fresh()->status);
+        $this->assertSame('forwarded', $report->fresh()->category);
+        $this->assertSame($closure, ReportReview::first()->getAttributes());
+        $this->assertSame($admin->id, ReportReview::latest('id')->first()->administrator_id);
+        $this->assertStringContainsString('New inspection evidence received.', ReportReview::latest('id')->first()->review_note);
+        $this->patch($url, $data)->assertSessionHasErrors('status');
+        $this->assertDatabaseCount('report_reviews', 2);
+        $this->assertSame($deliveryBefore, $delivery->fresh()->getAttributes());
+        $unforwarded = $this->report(['status' => 'closed']);
+        $this->patch(route('admin.reports.status', $unforwarded), $data)->assertSessionHasErrors('status');
+        Mail::assertNothingSent();
+        Queue::assertNothingPushed();
     }
 
     public function test_audit_failure_rolls_back_the_status_change(): void

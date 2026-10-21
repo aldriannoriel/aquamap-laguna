@@ -10,12 +10,11 @@ class DashboardController extends Controller
 {
     public function __invoke(): View
     {
-        $grouped = PollutionReport::query()->selectRaw('status, COUNT(*) AS aggregate')->groupBy('status')->pluck('aggregate', 'status');
-        $counts = ['total' => (int) $grouped->sum()];
-        foreach (PollutionReport::STATUSES as $status => $label) {
-            $counts[$status] = (int) ($grouped[$status] ?? 0);
+        $counts = ['total' => PollutionReport::query()->count()];
+        foreach (PollutionReport::CATEGORIES as $category => $label) {
+            $counts[$category] = PollutionReport::query()->category($category)->count();
         }
 
-        return view('admin.dashboard', ['counts' => $counts, 'actionCount' => PollutionReport::actionRequired()->count()]);
+        return view('admin.dashboard', ['counts' => $counts]);
     }
 }

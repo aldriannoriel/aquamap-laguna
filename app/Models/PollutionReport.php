@@ -13,10 +13,12 @@ class PollutionReport extends Model
     public const STATUSES = ['pending' => 'Pending', 'verified' => 'Verified', 'under_review' => 'Under Review',
         'in_progress' => 'In Progress', 'rejected' => 'Rejected', 'resolved' => 'Resolved', 'closed' => 'Closed'];
 
+    public const CATEGORIES = ['pending' => 'Pending', 'forwarded' => 'Forwarded', 'resolved' => 'Resolved', 'rejected' => 'Rejected', 'closed' => 'Closed'];
+
     public const TRANSITIONS = ['pending' => ['verified', 'rejected', 'under_review', 'in_progress', 'resolved', 'closed'],
         'verified' => ['rejected', 'under_review', 'in_progress', 'resolved', 'closed'],
         'under_review' => ['in_progress', 'resolved', 'closed'], 'in_progress' => ['under_review', 'resolved', 'closed'],
-        'rejected' => [], 'resolved' => [], 'closed' => []];
+        'rejected' => [], 'resolved' => [], 'closed' => ['under_review']];
 
     public const TYPES = [
         'plastic_waste' => 'Plastic waste',
@@ -54,10 +56,24 @@ class PollutionReport extends Model
 
     public function scopeActionRequired(Builder $query): Builder
     {
-        return $query->where(function (Builder $query): void {
-            $query->whereHas('referral', fn (Builder $q) => $q->whereNotIn('status', ['accepted', 'cancelled'])->whereNull('sent_at'))
-                ->orWhere(fn (Builder $q) => $q->whereIn('status', ['pending', 'verified'])->whereDoesntHave('referral'));
-        });
+        return $query->category('pending');
+    }
+
+    public function scopeCategory(Builder $query, string $category): Builder
+    {
+        if (in_array($category, ['resolved', 'rejected', 'closed'], true)) {
+            return $query->where('status', $category);
+        }
+
+        $query->whereNotIn('status', ['resolved', 'rejected', 'closed']);
+
+        return $category === 'forwarded' ? $query->forwarded() : $query->whereDoesntHave('referral',
+            fn (Builder $delivery) => $delivery->where(fn (Builder $sent) => $sent->where('status', 'accepted')->orWhereNotNull('sent_at')));
+    }
+
+    public function getCategoryAttribute(): string
+    {
+        return in_array($this->status, ['resolved', 'rejected', 'closed'], true) ? $this->status : ($this->forwarded() ? 'forwarded' : 'pending');
     }
 
     public function scopeForwarded(Builder $query): Builder
@@ -68,10 +84,8 @@ class PollutionReport extends Model
 
     public function scopeProcessed(Builder $query): Builder
     {
-        return $query->where(fn (Builder $reports) => $reports->forwarded()->orWhere(fn (Builder $closed) => $closed
-            ->whereIn('status', ['rejected', 'resolved', 'closed'])
-            ->where(fn (Builder $delivery) => $delivery->whereDoesntHave('referral')
-                ->orWhereHas('referral', fn (Builder $referral) => $referral->where('status', 'cancelled')))));
+        return $query->where(fn (Builder $reports) => $reports->whereIn('status', ['rejected', 'resolved', 'closed'])
+            ->orWhere(fn (Builder $sent) => $sent->forwarded()));
     }
 
     public function forwarded(): bool

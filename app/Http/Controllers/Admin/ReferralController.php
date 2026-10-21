@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Agency;
 use App\Models\PollutionReport;
 use App\Models\Referral;
+use App\Support\MunicipalityRouting;
 use App\Support\ReferralWorkflow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,21 @@ use Illuminate\View\View;
 
 class ReferralController extends Controller
 {
-    public function preview(Request $request, PollutionReport $pollutionReport): View
+    public function review(Request $request, PollutionReport $pollutionReport): View|JsonResponse
+    {
+        $data = $request->validate(['agency_id' => ['required', 'integer', 'exists:agencies,id'],
+            'routing_reason' => ['required', 'string', 'max:2000'], 'point_key' => ['required', 'string', 'size:64'],
+            'expected_status' => ['required', 'in:pending,verified'], 'include_photo' => ['required', 'boolean']]);
+
+        return DB::transaction(function () use ($request, $pollutionReport, $data): View|JsonResponse {
+            MunicipalityRouting::select($pollutionReport, Agency::findOrFail($data['agency_id']), $request->user(),
+                $data['routing_reason'], $data['point_key'], $data['expected_status']);
+
+            return $this->preview($request, $pollutionReport->refresh());
+        });
+    }
+
+    public function preview(Request $request, PollutionReport $pollutionReport): View|JsonResponse
     {
         $data = $request->validate(['agency_id' => ['required', 'integer', 'exists:agencies,id'], 'include_photo' => ['nullable', 'boolean']]);
         $agency = Agency::findOrFail($data['agency_id']);
@@ -26,13 +41,21 @@ class ReferralController extends Controller
             ReferralWorkflow::assertIncidentRecipient($pollutionReport, $agency);
         }
 
-        return view('admin.referrals.preview', ['report' => $pollutionReport, 'agency' => $agency,
+        $preview = ['report' => $pollutionReport, 'agency' => $agency,
             'recipient' => $existing?->recipient_snapshot ?? ReferralWorkflow::recipient($agency),
             'reference' => $existing?->reference ?? 'Assigned on approval',
             'details' => $existing?->payload ?? ReferralWorkflow::payload($pollutionReport, $photo),
             'includePhoto' => $existing?->include_photo ?? $photo,
             'reviewHash' => $existing ? ReferralWorkflow::existingHash($existing) : ReferralWorkflow::reviewHash($pollutionReport, $agency, $photo),
-            'ready' => ReferralWorkflow::ready()]);
+            'ready' => ReferralWorkflow::ready()];
+        if ($request->expectsJson()) {
+            return response()->json(['hash' => $preview['reviewHash'],
+                'text' => view('mail.referral-text', ['details' => $preview['details'], 'reference' => $preview['reference']])->render(),
+                'municipality' => $preview['recipient']['municipality'],
+                'recipient' => $preview['recipient']['municipality'].' / '.$preview['recipient']['email']]);
+        }
+
+        return view('admin.referrals.preview', $preview);
     }
 
     public function store(Request $request, PollutionReport $pollutionReport): RedirectResponse
