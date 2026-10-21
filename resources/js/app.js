@@ -98,6 +98,8 @@ if (mapElement) {
         const profile = document.getElementById('profile-' + lake.id).cloneNode(true);
         profile.removeAttribute('id');
         profile.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
+        profile.querySelectorAll('[data-research-source]').forEach((element) => { element.id = element.dataset.researchSource + '-selected'; });
+        profile.querySelectorAll('[data-citation-jump]').forEach((link) => { link.hash += '-selected'; });
         profile.querySelector('h2').remove();
         document.getElementById('selected-lake-heading').textContent = lake.name;
         profile.querySelectorAll('[data-profile-section]').forEach((panel) => {
@@ -235,6 +237,21 @@ if (mapElement) {
     buttons.forEach((button) => button.addEventListener('click', () => selectLake(lakes.find((lake) => lake.id === Number(button.dataset.lakeId)))));
     filters.forEach((button) => button.addEventListener('click', () => { category = button.dataset.category; applyFilters(); }));
     search.addEventListener('input', applyFilters);
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('[data-citation-jump]');
+        if (!link) return;
+        const section = link.closest('[data-profile-section="research"]');
+        const source = section.querySelector('[data-research-source="' + link.dataset.citationJump + '"]');
+        if (!source) return;
+        event.preventDefault();
+        let ancestor = source;
+        while (ancestor && ancestor !== section) {
+            if (ancestor.tagName === 'DETAILS') ancestor.open = true;
+            ancestor = ancestor.parentElement;
+        }
+        source.querySelector('details').open = true;
+        source.querySelector('a').focus();
+    });
     reset.disabled = false;
     reset.addEventListener('click', () => { category = 'all'; search.value = ''; applyFilters(); });
     applyFilters();

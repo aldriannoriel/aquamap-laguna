@@ -1,0 +1,32 @@
+{
+  "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full": {
+    "title": "The methane-oxidizing microbial communities of three maar lakes in tropical monsoon Asia",
+    "publisher": "Iona Eunice C. Bicaldo et al. / Frontiers in Microbiology",
+    "published_on": "2024-07-09",
+    "water_bodies": ["Yambo Lake", "Pandin Lake", "Calibato Lake"]
+  },
+  "https://nfrdi.da.gov.ph/tpjf/vol32_2/research_article_ortiz_et_al_32220240111.pdf": {
+    "title": "Phytoplankton Dynamics and Ecological Capacity of the Seven Crater Lakes of San Pablo City, Philippines",
+    "publisher": "Rosalie Jane C. Ortiz et al. / The Philippine Journal of Fisheries, NFRDI",
+    "published_on": "2025",
+    "group": "history",
+    "water_bodies": ["Sampaloc Lake", "Pandin Lake", "Yambo Lake", "Calibato Lake", "Bunot Lake", "Mohicap Lake", "Palakpakin Lake"]
+  },
+  "https://link.springer.com/article/10.1007/s00128-019-02685-z": {
+    "title": "A Preliminary Survey of Estrogenic Effects in Cultured Adult Male Nile Tilapia (Oreochromis niloticus) in the Seven Lakes of San Pablo City, Philippines",
+    "publisher": "Clau John A. Mabansag et al. / Bulletin of Environmental Contamination and Toxicology",
+    "published_on": "2019-07-27",
+    "group": "history",
+    "water_bodies": ["Sampaloc Lake", "Pandin Lake", "Yambo Lake", "Calibato Lake", "Bunot Lake", "Mohicap Lake", "Palakpakin Lake"]
+  },
+  "https://www.fao.org/fishery/docs/CDrom/aquaculture/I1129m/file/en/en_niletilapia.htm": {
+    "title": "Oreochromis niloticus (Nile tilapia), Cultured Aquatic Species Fact Sheets",
+    "publisher": "J. E. Rakocy / Food and Agriculture Organization of the United Nations",
+    "published_on": "2009"
+  },
+  "https://www.scribd.com/document/844066862/Laguna-Pdpfp-2021-2030-Volume-i": {
+    "title": "Laguna Provincial Development and Physical Framework Plan 2021–2030, Volume I, Table 33, printed p. 92",
+    "publisher": "Provincial Government of Laguna; third-party document transcription hosted on Scribd",
+    "group": "measurements"
+  }
+}

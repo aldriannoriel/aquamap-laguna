@@ -83,17 +83,25 @@ class ExplorerProfile
         return $result;
     }
 
-    public static function references(mixed $value): array
+    public static function references(mixed $value, bool $allowMissingMetadata = false): array
     {
         $references = [];
         foreach (is_array($value) ? array_slice($value, 0, 20) : [] as $reference) {
-            if (! is_array($reference) || ! self::url($reference['url'] ?? null)
-                || ! is_string($reference['title'] ?? null) || ! filled($reference['title'])
-                || ! is_string($reference['publisher'] ?? null) || ! filled($reference['publisher'])) {
+            if (! is_array($reference) || ! self::url($reference['url'] ?? null)) {
+                continue;
+            }
+            foreach (['title', 'publisher'] as $field) {
+                if (isset($reference[$field]) && ! is_string($reference[$field])) {
+                    continue 2;
+                }
+            }
+            $title = is_string($reference['title'] ?? null) && filled($reference['title']) ? $reference['title'] : null;
+            $publisher = is_string($reference['publisher'] ?? null) && filled($reference['publisher']) ? $reference['publisher'] : null;
+            if (! $allowMissingMetadata && ($title === null || $publisher === null)) {
                 continue;
             }
             $references[] = [
-                'title' => $reference['title'], 'publisher' => $reference['publisher'], 'url' => $reference['url'],
+                'title' => $title, 'publisher' => $publisher, 'url' => $reference['url'],
                 'published_on' => is_string($reference['published_on'] ?? null) && filled($reference['published_on']) ? $reference['published_on'] : null,
             ];
         }

@@ -42,7 +42,7 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = process.argv.includes('--fish') ? 'fish-names/browser' : process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
+const artifactDirectory = process.argv.includes('--research') ? 'research-audit/browser' : process.argv.includes('--fish') ? 'fish-names/browser' : process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json', 'waterfall-expansion.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const imageReplacements = JSON.parse(readFileSync(path.join(root, 'database/data/waterfall-photos.json'), 'utf8'));
@@ -165,7 +165,7 @@ try {
             await evaluate('document.getElementById("water-sidebar").open = true');
             await pause(100);
         }
-        const point = await evaluate(`(() => { const element = document.querySelector(${JSON.stringify(selector)}); if (!element) throw new Error('Missing control'); (element.closest('#lake-map') || element).scrollIntoView({block:'center'}); const r = element.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
+        const point = await evaluate(`(() => { const element = document.querySelector(${JSON.stringify(selector)}); if (!element) throw new Error('Missing control'); (element.closest('#lake-map') || element).scrollIntoView({block:'center'}); const r = element.getClientRects()[0] || element.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2}; })()`);
         await pause(100);
         if (mobile) {
             await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
@@ -189,7 +189,8 @@ try {
     await send('Page.enable');
     await send('DOM.enable');
     await send('CSS.enable');
-    for (const [width, height] of [[1440, 1100], [1024, 900], [390, 844], [320, 740]]) {
+    const viewports = process.argv.includes('--research') ? [[1440, 1100], [390, 844]] : [[1440, 1100], [1024, 900], [390, 844], [320, 740]];
+    for (const [width, height] of viewports) {
         mobile = width < 768;
         await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile });
         await send('Emulation.setTouchEmulationEnabled', { enabled: mobile });
@@ -214,7 +215,7 @@ try {
             assert.equal(await evaluate('scrollY'), initialPage);
         }
         const fishLakes = ['Pandin Lake', 'Sampaloc Lake', 'Yambo Lake'];
-        const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Balanac River','San Isidro River','Yambo Lake','Hidden Valley Springs','Pagsanjan Falls'].includes(item.name) || (process.argv.includes('--fish') && fishLakes.includes(item.name)));
+        const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Balanac River','San Isidro River','Yambo Lake','Hidden Valley Springs','Pagsanjan Falls'].includes(item.name) || (process.argv.includes('--fish') && fishLakes.includes(item.name)) || (process.argv.includes('--research') && ['Al Fresco Springs Resort','Balon-Balon Falls','Bunot Lake','Calibato Lake'].includes(item.name)));
         const contrastSelector = '[data-lake-id="'+samples[0].id+'"]';
         const { root: documentNode } = await send('DOM.getDocument');
         const { nodeId: contrastNode } = await send('DOM.querySelector', { nodeId: documentNode.nodeId, selector: contrastSelector });
@@ -250,7 +251,7 @@ try {
             if(lake.name==='Balanac River') {
                 assert(overview.includes('19.272 km')&&overview.includes('10.70 km'));
                 assert.equal(lake.geography.geometry.coordinates.length,20);
-                assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-course-sources] a").length'),20);
+                assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-course-source]").length'),20);
             }
             if(lake.name==='Hidden Valley Springs')assert(overview.includes('spring source')||overview.includes('spring-source'));
             const expectedImage=await evaluate('document.querySelector("#selected-lake [data-water-image]")?.getAttribute("src") || null');
@@ -294,11 +295,33 @@ try {
                     const citations = await evaluate(`(() => {
                         const group = document.querySelector('#selected-lake [data-fish-name-evidence]').closest('details');
                         group.open = true;
-                        return [...group.querySelectorAll('[data-fish-name-reference]')].map(link => ({url:link.href,text:link.parentElement.textContent}));
+                        return [...group.querySelectorAll('[data-fish-name-reference]')].map(link => ({url:link.href,text:link.closest('[data-research-card]').textContent}));
                     })()`);
                     assert.equal(citations.length, 2);
                     assert(citations.every(citation => citation.url.startsWith('https://') && citation.text.includes('SEAFDEC Aquaculture Department')));
                     assert(citations[0].text.includes('2001') && citations[1].text.includes('2019'));
+                }
+                await click('[data-profile-tab=overview]');
+            }
+            if (process.argv.includes('--research')) {
+                await click('[data-profile-tab=research]');
+                const library = await evaluate(String.raw`(() => {
+                    const panel = document.querySelector('#selected-lake [data-profile-section=research]');
+                    const urls = [...panel.querySelectorAll('[data-source-document]')].map(link => link.href.split('#')[0].replace(/\/$/, ''));
+                    return { groups: panel.querySelectorAll('[data-research-group]').length, urls,
+                        ids: [...panel.querySelectorAll('[data-research-source]')].map(source => source.id),
+                        attribution: panel.textContent.includes('OpenStreetMap contributors, ODbL 1.0') };
+                })()`);
+                assert.equal(library.groups, 6);
+                assert.equal(new Set(library.urls).size, library.urls.length, lake.name+': one citation per document.');
+                assert(library.ids.every(id => id.endsWith('-selected')));
+                if (lake.geography?.license_url) assert(library.attribution);
+                if (lake.name === 'Yambo Lake') {
+                    await evaluate('document.querySelector("#selected-lake [data-research-group=hydrology]").open=true');
+                    await click('#selected-lake [data-research-group=hydrology] [data-citation-jump]');
+                    assert.equal(await evaluate('document.activeElement.matches("[data-source-document]") && document.activeElement.closest("[data-research-card]").querySelector("details").open'), true);
+                    assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
+                    await screenshot(width+'-research.png');
                 }
                 await click('[data-profile-tab=overview]');
             }

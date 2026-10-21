@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FishSpecies;
 use App\Models\WaterBody;
 use App\Support\ExplorerProfile;
+use App\Support\ResearchSources;
 use App\Support\RiverCourseCatalogue;
 use App\Support\WaterBodyMetrics;
 use Illuminate\Contracts\View\View;
@@ -93,7 +94,7 @@ class MapController extends Controller
             return [$lake->id => [
                 'water_type_evidence' => $waterTypeEvidence[$lake->id],
                 'legacy_classification' => $lake->water_type,
-                'references' => ExplorerProfile::references($lake->research_references),
+                'references' => ExplorerProfile::references($lake->research_references, allowMissingMetadata: true),
                 'image' => ExplorerProfile::image($image),
                 'reported_length' => $lake->category === 'river' ? WaterBodyMetrics::reported($metrics['rivers'][$lake->name] ?? null, $lake->municipality) : null,
                 'length_note' => $lake->category === 'river' && $lake->name === 'Bumbungan River'
@@ -105,6 +106,11 @@ class MapController extends Controller
                 'surface_area' => $lake->category === 'lake' ? WaterBodyMetrics::reported($metrics['lakes'][$lake->name] ?? null, $lake->municipality) : null,
             ]];
         })->all();
+
+        $sourceMetadata = json_decode(file_get_contents(database_path('data/research-source-metadata.json')), true, flags: JSON_THROW_ON_ERROR);
+        foreach ($lakes as $lake) {
+            $profiles[$lake['id']]['research'] = ResearchSources::build($lake, $profiles[$lake['id']], $fishByLake[$lake['id']], $sourceMetadata);
+        }
 
         return view('map.index', ['lakes' => $lakes, 'fishByLake' => $fishByLake, 'profiles' => $profiles, 'categories' => WaterBody::PUBLIC_CATEGORIES]);
     }

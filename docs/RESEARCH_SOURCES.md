@@ -1,5 +1,15 @@
 # Research sources
 
+## Remaining Batch 3: citation audit (2026-10-21)
+
+All **54 profiles** were reviewed against c59862b: **497 source uses → 341 document citations**, consolidating **156 duplicate displays** while retaining each claim, query version, fragment/page, original OSM revision and attribution. Source categories are Geography and GIS; Physical measurements; Water type and hydrology; Fish and habitat; Historical ecological evidence; Photography and licensing. A shared document appears once with cross-references from its other categories. Existing catalogue caveats are explicitly distinguished from additional source findings.
+
+The audit reached **246 of 248 original URLs**, including the local permission declaration; the Senate bill record and AllTrails photo listing still returned HTTP 403 after one retry. They are retained as unresolved access, not declared invalid. No confirmed broken URL or incorrect current-profile assignment was established. Known lake-paper scope now rejects a mismatched-profile citation without changing stored references. **10 citation entries lack supplied author/organization metadata and 318 lack publication years**; these are explicit fallbacks, not fabricated dates. Four existing photo credits still qualify unidentified/unspecified creators. Map revisions, capture dates, plan periods and source-check dates remain separate from publication years.
+
+Metadata enrichment rechecked the publisher pages for [Bicaldo et al. (2024)](https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full), [Mabansag et al. (2019)](https://link.springer.com/article/10.1007/s00128-019-02685-z), the NFRDI publisher/index for the existing Ortiz et al. (2025) reference, and the existing FAO/SEAFDEC sources documented below. Full source titles, first author/organization and known publication dates are presentation metadata in research-source-metadata.json; no water type, fish occurrence, measurement or geometry is changed. Both Plapla references and all photograph/OSM licenses remain.
+
+See [RESEARCH_AUDIT.md](RESEARCH_AUDIT.md) for the 54-profile inventory, source limitations, unresolved URLs and rerun instructions; [research-source-audit.json](research-source-audit.json) contains every dated URL result and per-profile count. The link checker is an explicit guarded maintenance task, never a public request. Batch 4 remains unapproved.
+
 ## Remaining Batch 2: Filipino fish names (2026-10-21)
 
 The verified project database contains **one existing species**, Nile tilapia (Oreochromis niloticus), with three historical aquaculture links only (Sampaloc/Pandin/Yambo). **One has a verified Filipino name; zero existing species remain without one.** English/scientific names and all stored species/links remain unchanged. The existing [FAO 2009 fact sheet](https://www.fao.org/fishery/docs/CDrom/aquaculture/I1129m/file/en/en_niletilapia.htm) was rechecked and explicitly pairs the English name Nile tilapia with Oreochromis niloticus.

@@ -47,7 +47,7 @@ class ExplorerTest extends TestCase
         $this->seed(ExplorerSeeder::class);
         $response = $this->get(route('map.index'))->assertOk()->assertSee('All Water Bodies')->assertDontSee('Hot Springs / Natural Springs')
             ->assertSee('Al Fresco Springs Resort')->assertSee('Hidden Valley Springs')->assertSee('Water type not yet verified')
-            ->assertSee('Publication date not provided')->assertSee('not a survey');
+            ->assertSee('Publication year: Not provided.')->assertSee('not a survey');
         $records = collect($response->viewData('lakes'))->keyBy('name');
         $this->assertSame(['lake' => 10, 'river' => 5, 'spring' => 2, 'waterfall' => 13], collect($response->viewData('lakes'))->countBy('category')->sortKeys()->all());
         $this->assertSame('Polygon', $records['Sampaloc Lake']['geography']['geometry']['type']);
