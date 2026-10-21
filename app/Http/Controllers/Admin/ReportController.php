@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ReportFilterRequest;
 use App\Models\Agency;
 use App\Models\PollutionReport;
+use App\Models\Referral;
 use App\Models\WaterBody;
 use App\Support\MunicipalityRouting;
 use App\Support\ReferralWorkflow;
@@ -47,6 +48,7 @@ class ReportController extends Controller
 
         return view('admin.reports.index', [
             'reports' => $query->latest('id')->paginate(15)->appends($filters),
+            'legacyDeliveries' => Referral::with('events')->whereNull('pollution_report_id')->latest('id')->paginate(10, ['*'], 'delivery_page')->withQueryString(),
             'filters' => $filters, 'queue' => $queue, 'lakes' => WaterBody::query()->supported()->orderBy('name')->get(['id', 'name']),
         ]);
     }
@@ -58,11 +60,33 @@ class ReportController extends Controller
         $recipients = Agency::with('waterBodies:id')->where('active', true)->orderBy('municipality')->get()
             ->filter(fn (Agency $agency): bool => ReferralWorkflow::eligible($agency, $pollutionReport));
         $matches = $recipients->where('municipality', MunicipalityRouting::exact($pollutionReport->waterBody->municipality));
+        $referral = $pollutionReport->referral?->load('events');
+        $options = [];
+        if ($referral && $referral->status === 'queued' && ! $referral->deliveryApproved() && in_array($pollutionReport->status, ['pending', 'verified'], true)) {
+            $options[(string) $referral->agency_id] = [($referral->include_photo ? '1' : '0') => ['hash' => ReferralWorkflow::existingHash($referral),
+                'text' => view('mail.referral-text', ['details' => $referral->payload, 'reference' => $referral->reference])->render(),
+                'recipient' => $referral->recipient_snapshot['name'].' / '.$referral->recipient_snapshot['email']]];
+        } elseif (! $referral && $recipients->isNotEmpty() && in_array($pollutionReport->status, ['pending', 'verified'], true)
+            && $pollutionReport->waterBody()->supported()->exists()) {
+            $payloads = [0 => ReferralWorkflow::payload($pollutionReport, false)];
+            if (is_string($pollutionReport->photo_path) && preg_match('/\A[A-Za-z0-9_-]+\.(jpe?g|png|webp)\z/i', $pollutionReport->photo_path)
+                && Storage::disk('pollution-reports')->exists($pollutionReport->photo_path)) {
+                $payloads[1] = ReferralWorkflow::payload($pollutionReport, true);
+            }
+            foreach ($recipients as $recipient) {
+                foreach ($payloads as $photo => $details) {
+                    $options[(string) $recipient->id][(string) $photo] = [
+                        'hash' => ReferralWorkflow::fingerprint($details, ReferralWorkflow::recipient($recipient)),
+                        'text' => view('mail.referral-text', ['details' => $details, 'reference' => 'Assigned on approval'])->render(),
+                        'recipient' => $recipient->municipality.' / '.$recipient->email];
+                }
+            }
+        }
 
         return view('admin.reports.show', ['report' => $pollutionReport,
             'recipients' => $recipients,
-            'suggestedRecipient' => $matches->count() === 1 ? $matches->first()->id : null,
-            'referral' => $pollutionReport->referral,
+            'suggestedRecipient' => $referral && ! $referral->deliveryApproved() ? $referral->agency_id : ($matches->count() === 1 ? $matches->first()->id : null),
+            'referral' => $referral, 'sendOptions' => $options, 'ready' => ReferralWorkflow::ready(),
         ]);
     }
 

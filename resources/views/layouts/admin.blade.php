@@ -18,7 +18,6 @@
                         <a href="{{ route('admin.dashboard') }}" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif>Overview</a>
                         <a href="{{ route('admin.reports.index', ['queue'=>'action']) }}" @if(request()->routeIs('admin.reports.*')) aria-current="page" @endif>Manage reports</a>
                         <a href="{{ route('admin.agencies.index') }}">Agency directory</a>
-                        <a href="{{ route('admin.referrals.index') }}">Referrals &amp; email test</a>
                     </nav>
                     <form method="POST" action="{{ route('admin.logout') }}">@csrf<button id="admin-logout" class="secondary-button" type="submit">Sign out</button></form>
                 </div>

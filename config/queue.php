@@ -34,7 +34,7 @@ return [
             'driver' => 'database',
             'connection' => null,
             'table' => 'jobs',
-            'queue' => 'referrals',
+            'queue' => 'municipality-referrals',
             'retry_after' => 180,
             'after_commit' => false,
         ],

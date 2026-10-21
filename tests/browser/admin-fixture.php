@@ -98,6 +98,10 @@ if ($setup) {
         $image = imagecreatetruecolor(32, 32);
         imagepng($image, $directory.'/photos/fixture-evidence.png');
         imagedestroy($image);
+        $tile = imagecreatetruecolor(256, 256);
+        imagefill($tile, 0, 0, imagecolorallocate($tile, 238, 247, 248));
+        imagepng($tile, $directory.'/basemap.png');
+        imagedestroy($tile);
     }
     for ($i = 0; $i < 18; $i++) {
         $report = new PollutionReport;
@@ -119,7 +123,7 @@ if ($setup) {
     echo json_encode(['isolated' => true, 'lakes' => DB::table('water_bodies')->count(), 'targetLake' => WaterBody::orderBy('id')->value('id')]);
 } elseif (PHP_SAPI === 'cli') {
     if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1' && ($argv[1] ?? '') === 'deliver-referrals') {
-        Artisan::call('queue:work', ['connection' => 'referrals', '--queue' => 'referrals', '--stop-when-empty' => true,
+        Artisan::call('queue:work', ['connection' => 'referrals', '--queue' => config('referrals.queue'), '--stop-when-empty' => true,
             '--sleep' => 0, '--tries' => 3, '--timeout' => 45]);
         echo json_encode(['accepted' => Referral::where('status', 'accepted')->count()]);
         exit;

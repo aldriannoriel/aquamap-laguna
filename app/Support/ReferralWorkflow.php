@@ -7,6 +7,7 @@ use App\Models\Agency;
 use App\Models\PollutionReport;
 use App\Models\Referral;
 use App\Models\ReferralEvent;
+use App\Models\ReportReview;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -75,7 +76,17 @@ class ReferralWorkflow
 
     public static function reviewHash(PollutionReport $report, Agency $agency, bool $photo): string
     {
-        return hash('sha256', json_encode([self::payload($report, $photo), self::recipient($agency)], JSON_THROW_ON_ERROR));
+        return self::fingerprint(self::payload($report, $photo), self::recipient($agency));
+    }
+
+    public static function fingerprint(array $payload, array $recipient): string
+    {
+        return hash('sha256', json_encode([$payload, $recipient], JSON_THROW_ON_ERROR));
+    }
+
+    public static function existingHash(Referral $referral): string
+    {
+        return hash('sha256', json_encode([$referral->reference, $referral->payload, $referral->recipient_snapshot, $referral->include_photo], JSON_THROW_ON_ERROR));
     }
 
     public static function record(Referral $referral, string $event): void
@@ -91,39 +102,34 @@ class ReferralWorkflow
             $report = PollutionReport::whereKey($report->id)->lockForUpdate()->firstOrFail();
             $existing = Referral::where('pollution_report_id', $report->id)->first();
             if ($existing) {
+                if ($existing->status === 'queued' && ! $existing->deliveryApproved()) {
+                    abort_unless(in_array($report->status, ['pending', 'verified'], true), 422, 'This report is closed and cannot be sent.');
+                    abort_unless($existing->attempts === 0 && $existing->sending_at === null && $existing->sent_at === null, 409, 'Review the prior delivery attempt before approving again.');
+                    abort_unless(hash_equals(self::existingHash($existing), $reviewHash), 409, 'Review the preserved approval snapshot before sending.');
+                    self::record($existing, Referral::DELIVERY_APPROVAL);
+                    self::record($existing, 'municipality_delivery_confirmed_by_admin_'.$admin->id);
+                    Queue::connection('referrals')->push(new SendReferral($existing->id), '', config('referrals.queue'));
+                }
+
                 return $existing;
             }
-            abort_unless($report->status === 'verified', 422, 'Verify this report before approving a referral.');
+            abort_unless(in_array($report->status, ['pending', 'verified'], true), 422, 'This report is closed and cannot be sent.');
             $agency = Agency::whereKey($agency->id)->lockForUpdate()->firstOrFail();
             abort_unless(self::eligible($agency, $report), 422, 'Choose an active municipality recipient or a verified routing assignment.');
             abort_unless(hash_equals(self::reviewHash($report, $agency, $photo), $reviewHash), 409, 'The report or recipient changed. Preview the email again.');
+            if ($report->status === 'pending') {
+                $report->forceFill(['status' => 'verified'])->save();
+                $review = new ReportReview;
+                $review->forceFill(['administrator_id' => $admin->id, 'previous_status' => 'pending',
+                    'new_status' => 'verified', 'review_note' => 'Approved for municipality referral.']);
+                $report->reviews()->save($review);
+            }
             $r = Referral::forceCreate(['reference' => (string) Str::uuid(), 'dedupe_key' => 'report:'.$report->id,
                 'pollution_report_id' => $report->id, 'agency_id' => $agency->id, 'approved_by' => $admin->id, 'approved_at' => now(),
                 'recipient_snapshot' => self::recipient($agency), 'payload' => self::payload($report, $photo), 'include_photo' => $photo, 'status' => 'queued', 'queued_at' => now()]);
             self::record($r, 'admin_approved_and_queued');
-            Queue::connection('referrals')->push(new SendReferral($r->id), '', 'referrals');
-
-            return $r;
-        });
-    }
-
-    public static function test(User $admin, string $token): Referral
-    {
-        self::assertReady();
-
-        return DB::transaction(function () use ($admin, $token): Referral {
-            User::whereKey($admin->id)->lockForUpdate()->firstOrFail();
-            $key = 'test:'.$token;
-            $existing = Referral::where('dedupe_key', $key)->first();
-            if ($existing) {
-                return $existing;
-            }
-            $r = Referral::forceCreate(['reference' => (string) Str::uuid(), 'dedupe_key' => $key, 'approved_by' => $admin->id, 'approved_at' => now(),
-                'recipient_snapshot' => ['name' => 'AquaMap Laguna test inbox', 'email' => Referral::TEST_RECIPIENT, 'verification_status' => 'test'],
-                'payload' => ['test' => true, 'description' => 'Administrator-triggered delivery test. No community report or private evidence is included.'],
-                'include_photo' => false, 'status' => 'queued', 'queued_at' => now()]);
-            self::record($r, 'admin_test_approved_and_queued');
-            Queue::connection('referrals')->push(new SendReferral($r->id), '', 'referrals');
+            self::record($r, Referral::DELIVERY_APPROVAL);
+            Queue::connection('referrals')->push(new SendReferral($r->id), '', config('referrals.queue'));
 
             return $r;
         });
@@ -135,9 +141,13 @@ class ReferralWorkflow
         DB::transaction(function () use ($referral): void {
             $r = Referral::whereKey($referral->id)->lockForUpdate()->firstOrFail();
             abort_unless($r->retryable(), 409, 'This outcome cannot be retried safely. Check the provider before any resend.');
+            abort_unless($r->pollution_report_id !== null, 409, 'Legacy diagnostic messages are retained without sending.');
+            if (! $r->deliveryApproved()) {
+                self::record($r, Referral::DELIVERY_APPROVAL);
+            }
             $r->forceFill(['status' => 'queued', 'claim_token' => null, 'sending_at' => null, 'error_code' => null, 'failed_at' => null, 'queued_at' => now()])->save();
             self::record($r, 'admin_safe_retry_queued');
-            Queue::connection('referrals')->push(new SendReferral($r->id), '', 'referrals');
+            Queue::connection('referrals')->push(new SendReferral($r->id), '', config('referrals.queue'));
         });
     }
 

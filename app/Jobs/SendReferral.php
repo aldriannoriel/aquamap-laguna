@@ -27,11 +27,19 @@ class SendReferral implements ShouldQueue
     public function __construct(public int $referralId)
     {
         $this->onConnection('referrals');
-        $this->onQueue('referrals');
+        $this->onQueue(config('referrals.queue'));
     }
 
     public function handle(): void
     {
+        $approval = Referral::find($this->referralId);
+        if ($approval && ! $approval->deliveryApproved()) {
+            if ($this->job !== null) {
+                $this->release(86400);
+            }
+
+            return;
+        }
         $token = (string) Str::uuid();
         $r = DB::transaction(function () use ($token): ?Referral {
             $r = Referral::whereKey($this->referralId)->lockForUpdate()->first();
@@ -92,6 +100,9 @@ class SendReferral implements ShouldQueue
                 && preg_match('/Expected response code "[0-9,\/ ]+" but got code "([45][0-9]{2})"/', $exception->getMessage(), $matches)) {
                 $code = in_array($matches[1], ['530', '534', '535'], true) ? 'smtp_auth_rejected' : 'smtp_rejected';
             }
+            if ($exception instanceof TransportExceptionInterface && preg_match('/\A(?:Connection could not be established with host |Unable to connect with STARTTLS\.|TLS required but neither TLS or STARTTLS are in use\.)/', $exception->getMessage())) {
+                $code = 'smtp_connection_failed';
+            }
             DB::transaction(function () use ($r, $code): void {
                 $current = Referral::whereKey($r->id)->lockForUpdate()->firstOrFail();
                 if ($current->status !== 'sending') {
@@ -105,10 +116,12 @@ class SendReferral implements ShouldQueue
 
     public function failed(?Throwable $exception): void
     {
-        $r = Referral::find($this->referralId);
-        if ($r && in_array($r->status, ['queued', 'preparing', 'sending'], true)) {
-            $r->forceFill(['status' => $r->sending_at ? 'uncertain' : 'failed', 'error_code' => 'worker_interrupted', 'failed_at' => now()])->save();
-            ReferralWorkflow::record($r, 'worker_interrupted');
-        }
+        DB::transaction(function (): void {
+            $r = Referral::whereKey($this->referralId)->lockForUpdate()->first();
+            if ($r && in_array($r->status, ['queued', 'preparing', 'sending'], true)) {
+                $r->forceFill(['status' => $r->sending_at ? 'uncertain' : 'failed', 'error_code' => 'worker_interrupted', 'failed_at' => now()])->save();
+                ReferralWorkflow::record($r, 'worker_interrupted');
+            }
+        });
     }
 }

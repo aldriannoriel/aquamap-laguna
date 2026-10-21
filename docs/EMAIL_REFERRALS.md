@@ -1,75 +1,69 @@
-# Email referrals and private report locations
+# Municipality referrals and Gmail delivery
 
-Updated 2026-10-21 against 4826f5e. Seven existing provisional recipients were normalized to municipality/city names without changing their testing email aquamaplaguna@gmail.com, locality, notes, active state or routing. These entries do not verify government office identity or jurisdiction. No new schema or recipients were added to the installed database.
+Updated 2026-10-21 against b167ce5. Seven municipality/city recipients remain provisional entries at aquamaplaguna@gmail.com; these labels do not verify government office identity or jurisdiction. Sender credentials and installed schema are unchanged.
 
-## Missing-email diagnosis
+## Diagnosis and verified delivery
 
-The inspected database had one pending and one verified report, zero referrals, zero queued jobs and zero failed jobs. Sanitized referral failure markers were absent from the application log. Record decision only saves moderation and audit history: it never dispatches email. No recorded SMTP attempt exists to diagnose as an authentication/provider failure. Configuration presence was checked without printing values; it does not verify credentials.
+Five database jobs on queue referrals had zero attempts, no reservations and no failures. The running worker listened elsewhere, so those jobs never reached SMTP. Installed Laravel/Symfony supports the configured Gmail SMTP/STARTTLS connection on port 587; the transport now requires TLS. Credentials were inspected without printing values.
 
-The installed framework's standard composer dev worker listens to the default queue, while approved referrals use the dedicated referrals connection/queue. AppServiceProvider now registers a separate development worker. Existing dev sessions must be restarted to include it. An externally managed/local server still needs the dedicated worker below. No real worker or live email was started during this fix.
+Fresh approvals use database connection referrals and queue municipality-referrals across dispatch, configuration and startup. All five original jobs (one report, four diagnostics) stay unchanged and paused on referrals. Do not start an old-queue worker, bulk retry or delete them. A report-bound municipality_delivery_confirmed event gates sending. Explicit admin reapproval can queue the old real report snapshot/reference on the new queue without changing its old job. Diagnostics cannot be sent.
 
-## Gmail sender setup
+After the correct worker started, the user explicitly sent a new report referral and reapproved the old real report snapshot. Both were SMTP accepted on attempt one with no error. The user confirmed Gmail receipt in chat; the reapproved report also records a separate matching in-app receiver-confirmation event and actor. The newer report's optional receipt audit remains unset. All five original job rows are still unchanged. Automated tests use Mail::fake() and do not establish real delivery.
 
-Use an account you control. Enable 2-Step Verification and create an app password if the account supports it. Gmail app passwords require 2-Step Verification and may be unavailable under account policy; do not weaken that policy. See [Google's app-password instructions](https://support.google.com/mail/answer/185833?hl=en) and [Google SMTP setup](https://support.google.com/a/answer/176600?hl=en). Verify any alternate From address with the sending provider; the testing recipient is not automatically a verified sender.
+## Start the server and worker
 
-Set these values only in the local ignored .env, substituting the actual sender. Never paste credentials into chat, an agency record, a ticket, logs or source control:
+From the project root, choose one process setup. Restart workers after code or mail-configuration changes.
+
+Windows server plus supervised municipality worker:
+
+    powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\serve-local.ps1
+
+If a server is already running, start only the supervised worker:
+
+    powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\serve-local.ps1 -WorkerOnly
+
+Add -Check to inspect commands without starting processes. -Port changes the server port. The script restarts an exited worker and stops its owned children on Ctrl+C. Private logs stay under ignored storage/app/direct-referrals/. The server retains the Laravel router and 5 MB upload / 8 MB request limits.
+
+Alternatively, composer run dev includes the registered municipality worker with the standard development processes. Dedicated foreground worker:
+
+    php artisan queue:work referrals --queue=municipality-referrals --tries=3 --timeout=45
+
+Reservation: 180 seconds; SMTP timeout: 20 seconds. This worker consumes newly approved referrals, leaving the five old jobs alone. Do not use queue:retry all; the report's confirmed safe retry preserves the immutable snapshot, total attempts and audit.
+
+## Gmail configuration
+
+Preserve working credentials in ignored .env. Only if sending fails, check these settings locally; never paste passwords into chat, agency records, logs or Git:
 
     MAIL_MAILER=smtp
     REFERRAL_MAILER=smtp
-    MAIL_SCHEME=smtps
+    MAIL_SCHEME=smtp
     MAIL_HOST=smtp.gmail.com
-    MAIL_PORT=465
-    MAIL_USERNAME="your-sender@gmail.com"
-    MAIL_PASSWORD="your-new-app-password-without-spaces"
-    MAIL_FROM_ADDRESS="your-sender@gmail.com"
+    MAIL_PORT=587
+    MAIL_USERNAME="your-existing-sender@gmail.com"
+    MAIL_PASSWORD="your-app-password-without-spaces"
+    MAIL_FROM_ADDRESS="your-existing-sender@gmail.com"
     MAIL_FROM_NAME="AquaMap Laguna"
 
-An SMTP provider with a verified sender can also supply the smtp host, scheme, port and credentials. Live referrals explicitly use the configured SMTP mailer and reject log/array/failover sending. The UI reports configuration presence only; it does not validate credentials or prove delivery.
+Do not replace working values with these placeholders. Gmail requires an eligible account with 2-Step Verification and an app password; see [Google app-password setup](https://support.google.com/mail/answer/185833?hl=en). An alternative implicit-TLS setup uses MAIL_SCHEME=smtps and port 465. Live referrals require encrypted SMTP and reject log/array/failover sending. Keep APP_KEY stable for encrypted snapshots.
 
-A native dotenv parser displayed an unquoted local app password during setup. The quoting was fixed without printing it again. Revoke that password and replace it with a new app password before live use. No credential value is recorded in this document or committed. Keep APP_KEY unchanged: approved referral content is encrypted with the application key.
+After an intentional correction, run php artisan config:clear and restart the worker. UI readiness never exposes passwords. Authentication, connection/TLS, provider rejection and preparation errors have credential-free remedies. Unknown submission outcomes require provider/inbox investigation before any resend.
 
-After configuration, run php artisan config:clear and restart the dedicated local worker:
+## Admin workflow and history
 
-    php artisan queue:work referrals --queue=referrals --tries=3 --timeout=45
+In Manage Reports, review concern, private evidence and incident coordinates. Send to Municipality selects one active recipient for an exact verified municipality, covering multiple bodies without individual assignments. Unknown/boundary localities require manual selection. Verified routing overrides remain available; no jurisdiction is invented.
 
-Keep it running while processing approved mail, or restart composer dev to include the registered referral worker alongside the standard worker/server/Vite. Starting a worker processes already approved queued messages; it does not approve reports. The dedicated database queue reserves jobs for 180 seconds; SMTP timeout is 20 seconds. No live worker was started by automated verification.
+Review the dialog's actual recipient, complete text, precise location and optional photo permission, then confirm. Pending-report verification, moderation audit, unique encrypted snapshot and database job commit atomically. A fingerprint rejects changed report/recipient/photo content. Repeat approval returns the existing referral. Legacy confirmation preserves the original content/reference/recipient even after directory edits.
 
-## Explicit inbox verification
+Queued means waiting for a worker; Sending means claimed/prepared or submitting. Sent / accepted by SMTP appears only after acceptance; it does not prove inbox receipt or government action. Open report details poll delivery state and show authoritative acceptance/failure. Accepted referrals move from Action required to Processed / Referral History. Rejection/closure records moderation without email under existing terminal-state rules. Email never resolves an environmental concern automatically.
 
-1. Sign in as an existing administrator, then open Referrals & email test.
-2. Check the explicit approval box and press Send live test email. This queues one test addressed only to aquamaplaguna@gmail.com, without report details or evidence.
-3. Let the dedicated worker process it. Accepted by transport means SMTP acknowledgement, not inbox receipt.
-4. Check that Gmail inbox and Spam for the exact reference. Only after locating it, enter the reference and confirm receipt in the admin page. This records administrator-confirmed receipt separately from transport acceptance.
-5. Provider/inbox receipt never means an agency read, investigated or acted. No report is automatically resolved.
+After personally finding the exact reference in the receiver inbox, an administrator can submit Confirm receiver inbox receipt on the report. This creates a separate idempotent audit. The old Referrals & email test page, navigation and live-test endpoint are removed. Preserved diagnostics appear read-only in Manage Reports; no jobs/history are deleted.
 
-**Actual inbox delivery is not verified by automated tests.** Tests use Mail fakes or an isolated null transport. No live test is sent by migrations, initialization or tests. Do not infer actual receipt from browser-test screenshots.
+Unique keys, locks and claim tokens prevent duplicate processing. Preparation retries are bounded. Explicit SMTP rejection or recognized connection/STARTTLS failure before submission permits confirmed manual retry with the same snapshot; attempts/events survive. Unknown outcomes stay Uncertain and cannot be blindly resent. SMTP cannot guarantee exactly-once delivery after ambiguous acknowledgement. failed_jobs remains available for investigation; report-level errors are sanitized.
 
-## Agency directory and referrals
+## Directory, privacy and recovery
 
-Agency CRUD is administrator-only. A canonical municipality identity hash uses the existing unique database index, independent of display name or active state. One municipality has one editable recipient; inactive entries are edited/enabled instead of duplicated. Supported choices are exact locality labels present in retained data; boundary/qualified labels cannot become invented municipality entries. The same test email can serve multiple municipalities. Explicit supported water-body assignments are optional routing overrides, not proof of jurisdiction. Deletion needs confirmation; snapshots/history survive. Deleting a recipient does not retract or cancel an already approved email.
+Agency Directory CRUD retains one canonical municipality identity independent of name/active state. Multiple municipalities may share the testing inbox. The explicit agencies:initialize marker never recreates deliberately deleted entries. Initialization/normalization never runs from page requests, migrations or automatic seeders. No directory updates were needed here.
 
-The guarded agencies:initialize command's durable marker prevents repeated execution from recreating deleted entries. Fresh, uninitialized installations use exact supported municipalities, all provisionally addressed to the test receiver. Existing initialized installations are not repopulated. The explicit --normalize option only renames legacy provisional entries and recalculates their municipality keys; it aborts on duplicate/ambiguous locality or barangay scope and never creates entries. It was applied twice after a private directory backup; the second run changed nothing. Neither action runs from migrations, DatabaseSeeder or page requests.
+Snapshots/events survive directory edits/deletion. Reporter contacts and public evidence URLs are excluded from mail. Approved attachments use confined private paths, size/type/pixel/hash checks and JPEG re-encoding to strip metadata; original photos stay intact. Coordinates, evidence, contacts and audits remain administrator-only. GPS/manual/drag controls and reporting protections remain unchanged.
 
-Review a report privately and mark it Verified through Record decision. Its confirmation explicitly states that no email was sent. The report page suggests one active recipient only for an exact municipality match, covering multiple bodies without individual pivots. Unknown/cross-boundary labels leave the select blank and require deliberate manual selection. Explicit verified routing overrides remain available. Preview the recipient, content and optional photo; Approve & Send then requires a second confirmation. A fingerprint rejects changed report/recipient/photo content.
-
-Delivery follows Pending review / Ready for referral approval, Approved for referral / queued, Sending, then Sent or Failed. Moderation status and its audit remain separate: email never automatically resolves an observation. Queued confirmation says Referral queued for sending. Refresh delivery status after the worker runs to see SMTP acceptance or a sanitized failure. Sent acknowledgement explicitly distinguishes inbox confirmation. Manage reports opens Action required, which includes queued/failed/uncertain outcomes and excludes accepted mail. Processed / referral history contains accepted referrals; All reports and private details retain the complete record. Terminal moderation never hides an unresolved delivery failure.
-
-A unique per-report referral and transaction locks prevent repeated approval from queueing another email. Referral snapshot and database queue insertion commit in the same database transaction; the worker cannot see the uncommitted job. Queue payloads contain the referral ID only. Recipient snapshots, encrypted content, approving admin, timestamps, message ID when available and sanitized event codes remain private.
-
-Only safe preparation failures retry automatically, up to three total attempts with backoff. Explicit SMTP 4xx/5xx rejection is Failed, shows a credential-free remedy and permits confirmed manual retry; authentication rejection is distinguished. Total attempt count and timestamped events survive retries. Network/unknown transport exceptions remain Uncertain and cannot resend through the normal action. SMTP cannot guarantee exactly-once delivery after ambiguous acknowledgement. Check provider records/inbox before further action; accepted/uncertain/sending records cannot use safe retry. Interrupted preparation can be reclaimed after its lease, but stale claim tokens cannot send. Button disabling supplements report/referral locks and database uniqueness; refresh/double approval never queues another report email.
-
-Approved photos use confined private paths, size/type/pixel checks and a source hash. JPEG re-encoding strips embedded metadata; original private evidence is retained unchanged. Reporter name/email and public evidence URLs are never included. The admin must review user-written descriptions and photo-sharing permission before approval.
-
-## Locations and privacy
-
-Public reporters may tap/click a map, drag the problem pin, or select the map center by keyboard. Use My Current Location requests GPS only after a click. GPS first shows a candidate and device accuracy; another explicit confirmation assigns it as the problem point. Denial, timeout, missing GPS or insecure context preserves manual selection. GPS requires HTTPS or localhost. Changing the selected water body never substitutes its reference point for the incident point.
-
-Coordinates, optional landmark/barangay, observation date and device accuracy are validated on the server. Unknown observation date stays unknown; no barangay is inferred. Location metadata is excluded from model serialization and the public map never queries reports. Precise pins appear only in authorized admin report views and approved private referrals. All required photo, timer, honeypot, rate-limit, session-duplicate and moderation protections remain.
-
-## Recovery and validation
-
-A verified schema/row-count MySQL dump and original-column table hashes were preserved under ignored storage/app/referrals/ before two forward-only additive migrations. Restore was not tested. Existing reports gained nullable metadata columns; no prior values were backfilled. The five new tables are agencies, agency_water_body, agency_directory_initializations, referrals and referral_events. New foreign keys restrict retained water-body/report deletion; removing an agency nulls its referral link while keeping snapshots/events.
-
-The initial feature's backup remains under storage/app/referrals/. This fix's directory backup, integrity/preservation proof, diagnosis, JUnit and fake-mail browser results are under ignored storage/app/referral-fix/. Only seven agency names/identity keys/update timestamps changed; retained domain data, routes, email settings and initialization marker remained identical. No migration or deletion occurred. Current verification results are in CURRENT_STATE.md.
-
-Implementation references: [Laravel Mail](https://laravel.com/framework/docs/13.x/mail), [Laravel queues](https://laravel.com/framework/docs/13.x/queues). No dependency was added. Springs/Resorts remain stored but excluded; their deletion still requires separate approval. Patola and Alpine.js are outside this feature.
+CURRENT_STATE.md and ignored storage/app/direct-referrals/ hold validation/recovery evidence. Retained-data hashes and the five original jobs were verified; the user's live approval accounts for new moderation/referral/audit data. Earlier verified SQL/schema backups remain under storage/app/referrals/. No migration, deletion, import or credential update ran here. Keep private artifacts out of Git. Legacy Spring/Resort deletion requires separate approval; Patola and Alpine.js remain outside scope.

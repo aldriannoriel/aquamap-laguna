@@ -31,4 +31,5 @@
         @endforelse
     </div>
     <div class="mt-6">{{ $reports->links() }}</div>
+<details class="mt-7 rounded-xl border border-line bg-white p-5"><summary class="font-semibold">Preserved legacy delivery history ({{ $legacyDeliveries->total() }})</summary>@forelse($legacyDeliveries as $delivery)@include('admin.reports.delivery', ['allowActions'=>false])@empty<p class="mt-3 text-sm text-muted">No legacy delivery records.</p>@endforelse<div class="mt-4">{{ $legacyDeliveries->links() }}</div></details>
 @endsection
