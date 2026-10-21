@@ -242,3 +242,12 @@ Habitat batch IDs: 31,35,18,17 — #31 San Isidro River; #35 San Juan River; #18
 
 
 Habitat batch IDs: 33,42,50,45,19 — #33 Santa Rosa River; #42 Siniloan River; #50 Tarak River; #45 Tigas River; #19 Tunasan River. Coverage: Water Type 40/53; Possible Fish 40/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 23,30,29,26 — #23 Aliw Falls; #30 Ambon-Ambon Falls; #29 Balon-Balon Falls; #26 Bukal Falls. Coverage: Water Type 44/53; Possible Fish 44/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 21,22,24,27 — #21 Bunga Twin Falls; #22 Buntot Palos Falls; #24 Buruwisan Falls; #27 Dampalit Falls. Coverage: Water Type 48/53; Possible Fish 48/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 7,25,6,8,20 — #7 Hulugan Falls; #25 Lanzones Falls; #6 Pagsanjan Falls; #8 Talay Falls; #20 Taytay Falls. Coverage: Water Type 53/53; Possible Fish 53/53. Checkpoint saved; validate before the local milestone commit.

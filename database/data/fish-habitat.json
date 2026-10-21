@@ -1024,6 +1024,158 @@
         "dalag": "Consider only inland freshwater refuges; the boundary-area name does not establish complete course conditions or lake-mouth salinity. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
         "goby": "Consider only inland freshwater refuges; the boundary-area name does not establish complete course conditions or lake-mouth salinity. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
       }
+    },
+    "Aliw Falls": {
+      "municipality": "Luisiana (tourism locality; Cavinti boundary context)",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Only connected stream-bottom refuges and quieter downstream pools are considered; the waterfall face itself is not fish habitat.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Only connected stream-bottom refuges and quieter downstream pools are considered; the waterfall face itself is not fish habitat. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Only connected stream-bottom refuges and quieter downstream pools are considered; the waterfall face itself is not fish habitat. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Ambon-Ambon Falls": {
+      "municipality": "Pangil",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Assess accessible stream and pool habitat at the Pangil site only; this is not a transfer from identically named falls elsewhere.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Assess accessible stream and pool habitat at the Pangil site only; this is not a transfer from identically named falls elsewhere. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Assess accessible stream and pool habitat at the Pangil site only; this is not a transfer from identically named falls elsewhere. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Balon-Balon Falls": {
+      "municipality": "Cavinti",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Keep one conditional flowing-stream candidate because pool habitat, passage and temperature information are insufficient.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Keep one conditional flowing-stream candidate because pool habitat, passage and temperature information are insufficient. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges."
+      }
+    },
+    "Bukal Falls": {
+      "municipality": "Majayjay / Liliw access area",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "A conservative stream candidate is used; do not assume a warm lake assemblage or a measured cold-water temperature.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "A conservative stream candidate is used; do not assume a warm lake assemblage or a measured cold-water temperature. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges."
+      }
+    },
+    "Bunga Twin Falls": {
+      "municipality": "Nagcarlan",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Consider separate accessible stream refuges and calmer pool-bottom zones; no fish presence or unobstructed passage is established.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Consider separate accessible stream refuges and calmer pool-bottom zones; no fish presence or unobstructed passage is established. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Consider separate accessible stream refuges and calmer pool-bottom zones; no fish presence or unobstructed passage is established. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Buntot Palos Falls": {
+      "municipality": "Pangil",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Only suitable accessible connected-stream habitat is considered; no population above the waterfall or barrier passage is assumed.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Only suitable accessible connected-stream habitat is considered; no population above the waterfall or barrier passage is assumed. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges."
+      }
+    },
+    "Buruwisan Falls": {
+      "municipality": "Siniloan",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Candidates apply to appropriate stream refuges and calmer connected pools, not the plunge impact zone; seasonal flow is unmeasured.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Candidates apply to appropriate stream refuges and calmer connected pools, not the plunge impact zone; seasonal flow is unmeasured. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Candidates apply to appropriate stream refuges and calmer connected pools, not the plunge impact zone; seasonal flow is unmeasured. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Dampalit Falls": {
+      "municipality": "Los Baños",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Assess stream-bottom refuge and quieter pool edges conditionally; oxygen, passage and pool persistence remain unknown.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Assess stream-bottom refuge and quieter pool edges conditionally; oxygen, passage and pool persistence remain unknown. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Assess stream-bottom refuge and quieter pool edges conditionally; oxygen, passage and pool persistence remain unknown. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Hulugan Falls": {
+      "municipality": "Luisiana",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "The assessment is limited to suitable connected stream and downstream pool refuges; steep drops do not prove upstream fish access.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "The assessment is limited to suitable connected stream and downstream pool refuges; steep drops do not prove upstream fish access. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "The assessment is limited to suitable connected stream and downstream pool refuges; steep drops do not prove upstream fish access. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Lanzones Falls": {
+      "municipality": "Siniloan",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Consider only usable stream refuges or sheltered pool substrate; neither barrier passage nor current conditions is verified.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Consider only usable stream refuges or sheltered pool substrate; neither barrier passage nor current conditions is verified. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Consider only usable stream refuges or sheltered pool substrate; neither barrier passage nor current conditions is verified. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Pagsanjan Falls": {
+      "municipality": "Cavinti",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Use suitable connected gorge-stream and quiet-pool habitat only; boat-route geography does not verify fish, flow or salinity.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Use suitable connected gorge-stream and quiet-pool habitat only; boat-route geography does not verify fish, flow or salinity. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Use suitable connected gorge-stream and quiet-pool habitat only; boat-route geography does not verify fish, flow or salinity. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Talay Falls": {
+      "municipality": "Luisiana",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Assess appropriate pool edges and connected stream bottom separately from falling water; no local substrate or fish survey is available.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Assess appropriate pool edges and connected stream bottom separately from falling water; no local substrate or fish survey is available. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges.",
+        "goby": "Assess appropriate pool edges and connected stream bottom separately from falling water; no local substrate or fish survey is available. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Taytay Falls": {
+      "municipality": "Majayjay",
+      "category": "waterfall",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Keep one conditional stream candidate; water temperature, hard-bottom refuge and passage need verification before broader fish estimates.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "loach": "Keep one conditional stream candidate; water temperature, hard-bottom refuge and passage need verification before broader fish estimates. Loach goby is a candidate only where there is an accessible flowing stream reach with rock refuges."
+      }
     }
   }
 }
