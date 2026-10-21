@@ -21,6 +21,8 @@ if (mapElement) {
     let selectedId = null;
     let category = 'all';
     let map;
+    let zoomInProgress = false;
+    let fitAfterZoom = false;
     let opener;
     const normalize = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
     const matchesSearch = (lake) => normalize([lake.name, lake.municipality, ...lake.aliases].join(' ')).includes(normalize(search.value.trim()));
@@ -60,6 +62,7 @@ if (mapElement) {
     function clearSelection(restoreFocus = false) {
         const previousOpener = opener;
         selectedId = null;
+        fitAfterZoom = false;
         dialog.hidden = true;
         selected.replaceChildren();
         styleSelection();
@@ -78,6 +81,10 @@ if (mapElement) {
     function fitSelection(lake) {
         const marker = markers.get(lake.id);
         if (!map || !marker || !map.hasLayer(marker)) return;
+        if (zoomInProgress) {
+            fitAfterZoom = true;
+            return;
+        }
         const geometry = features.get(lake.id);
         const frame = mapElement.getBoundingClientRect();
         const card = dialog.getBoundingClientRect();
@@ -160,6 +167,15 @@ if (mapElement) {
     }
     if (lakes.some((lake) => lake.geography)) {
         map = L.map(mapElement, { zoomControl: false, scrollWheelZoom: false, wheelDebounceTime: 70, wheelPxPerZoomLevel: 100, zoomSnap: 0.25, zoomDelta: 0.5 });
+        map.on('zoomstart', () => { zoomInProgress = true; });
+        map.on('zoomend', () => {
+            zoomInProgress = false;
+            if (!fitAfterZoom) return;
+            fitAfterZoom = false;
+            requestAnimationFrame(() => {
+                if (selectedId !== null) fitSelection(lakes.find(lake => lake.id === selectedId));
+            });
+        });
         L.control.zoom({ position: 'topright', zoomInTitle: 'Zoom in', zoomOutTitle: 'Zoom out' }).addTo(map);
         L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
         const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {

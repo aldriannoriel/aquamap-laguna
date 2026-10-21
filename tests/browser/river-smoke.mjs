@@ -42,7 +42,8 @@ function sharedCacheSnapshot() {
 const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = process.argv.includes('--research') ? 'research-audit/browser' : process.argv.includes('--fish') ? 'fish-names/browser' : process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
+const finalValidation = process.argv.includes('--final');
+const artifactDirectory = finalValidation ? 'final-validation/browser' : process.argv.includes('--research') ? 'research-audit/browser' : process.argv.includes('--fish') ? 'fish-names/browser' : process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json', 'waterfall-expansion.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const imageReplacements = JSON.parse(readFileSync(path.join(root, 'database/data/waterfall-photos.json'), 'utf8'));
@@ -123,9 +124,14 @@ try {
     });
     const evaluate = async (expression) => {
         const result = await send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
-        assert(!result.exceptionDetails, result.exceptionDetails?.text);
+        assert(!result.exceptionDetails, result.exceptionDetails?.exception?.description ?? result.exceptionDetails?.text);
         return result.result.value;
     };
+    const mapScale = () => evaluate(`(() => {
+        const [a, b] = ['Balanac River', 'Yambo Lake'].map(title => [...document.querySelectorAll('.lake-marker')].find(node => node.title === title).getBoundingClientRect());
+        return Math.hypot(a.x-b.x, a.y-b.y);
+    })()`);
+    const waitForZoomEnd = () => waitFor(() => evaluate('!document.querySelector(".leaflet-zoom-anim")'), 'Map zoom animation did not settle.');
     async function assertMetadataContrast(selector, state) {
         const ratio = await evaluate(String.raw`(() => {
             const text = document.querySelector(${JSON.stringify(selector)} + ' .water-row-meta');
@@ -189,11 +195,16 @@ try {
     await send('Page.enable');
     await send('DOM.enable');
     await send('CSS.enable');
-    const viewports = process.argv.includes('--research') ? [[1440, 1100], [390, 844]] : [[1440, 1100], [1024, 900], [390, 844], [320, 740]];
+    const requestedWidth = process.argv.find(argument => argument.startsWith('--width='))?.split('=')[1];
+    const viewports = (process.argv.includes('--research') && !finalValidation ? [[1440, 1100], [390, 844]] : [[1440, 1100], [1024, 900], [390, 844], [320, 740]])
+        .filter(([width]) => !requestedWidth || width === Number(requestedWidth));
+    assert(viewports.length, 'Choose a supported viewport width.');
     for (const [width, height] of viewports) {
+        let pinchVerified = false;
         mobile = width < 768;
         await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile });
-        await send('Emulation.setTouchEmulationEnabled', { enabled: mobile });
+        await send('Emulation.resetPageScaleFactor');
+        await send('Emulation.setTouchEmulationEnabled', { enabled: mobile, maxTouchPoints: mobile ? 5 : 1 });
         await navigate('/map');
         await waitFor(() => evaluate('document.querySelectorAll(".lake-marker").length === 42'), 'Expected 42 sourced map locations and 12 unmapped rivers.');
         const lakes = await evaluate('JSON.parse(document.getElementById("lake-data").textContent)');
@@ -204,6 +215,18 @@ try {
         assert.equal(await evaluate('!!document.getElementById("map-selection")'), false);
         assert.equal(await evaluate('document.querySelectorAll(".report-fab").length'), 1);
         assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
+        if (finalValidation) {
+            assert.equal(await evaluate('[...document.querySelectorAll("h1,h2,h3")].some(node => /introduction/i.test(node.textContent))'), false);
+            assert.equal(await evaluate('document.querySelector(".map-context > p").nextElementSibling.id'), 'research-notes');
+            assert.equal(await evaluate('document.getElementById("water-search").labels.length'), 1);
+            assert.equal(await evaluate('getComputedStyle(document.querySelector(".report-fab")).position'), 'fixed');
+            for (const [category, count] of Object.entries({ all: 54, lake: 10, river: 29, waterfall: 13, spring: 2 })) {
+                await click('[data-category="'+category+'"]');
+                assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'), count);
+                assert.equal(await evaluate('document.querySelector("[data-category='+category+'] [data-category-count]").textContent.trim()'), String(count));
+            }
+            await click('#reset-map');
+        }
         if (!mobile) {
             const layout = await evaluate('(()=>{const s=document.getElementById("water-sidebar").getBoundingClientRect(),m=document.querySelector(".explorer-map").getBoundingClientRect(),l=document.getElementById("water-list");return {left:s.left,mapLeft:m.left,top:s.top,mapTop:m.top,ratio:s.width/(s.width+m.width),scroll:l.scrollHeight>l.clientHeight,overflow:getComputedStyle(l).overflowY};})()');
             assert(layout.left < layout.mapLeft);
@@ -234,6 +257,11 @@ try {
             assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'), false);
             assert.equal(await evaluate('document.getElementById("water-detail-dialog").getAttribute("aria-modal")'), 'false');
             assert.equal(await evaluate('getComputedStyle(document.documentElement).overflowY === "hidden"'), false);
+            if (finalValidation) {
+                const displayedType = await evaluate('document.querySelector("#selected-lake [data-water-type]").textContent.trim()');
+                assert.equal(displayedType, { freshwater: 'Freshwater', brackish: 'Brackish Water', saltwater: 'Saltwater' }[lake.water_type] ?? 'Water type not yet verified', lake.name+': JSON/profile classification agreement.');
+                assert.equal(await evaluate('[...document.querySelectorAll("#profile-tabs button, #close-water-detail, .report-fab, .leaflet-control-zoom a")].every(node => {const r=node.getBoundingClientRect();return r.width>=24 && r.height>=24 && !!(node.getAttribute("aria-label") || node.title || node.textContent.trim());})'), true, 'Primary controls need accessible names and AA minimum target sizes.');
+            }
             const shape = lake.geography && lake.geography.geometry.type !== 'Point';
             assert.equal(await evaluate('document.querySelectorAll(".selected-water-course").length > 0'), !!shape);
             if (shape) {
@@ -346,7 +374,8 @@ try {
         }
         await click('[data-category=river]');
         assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'),29);
-        await evaluate('(()=>{const s=document.getElementById("water-search");s.value="Binan";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
+        await click('#water-search');
+        await send('Input.insertText', { text: 'Binan' });
         assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'),1);
         await evaluate('(()=>{const s=document.getElementById("water-search");s.value="no matching place fixture";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
         assert.equal(await evaluate('document.getElementById("filter-empty").hidden'),false);
@@ -360,10 +389,87 @@ try {
         await send('Input.dispatchMouseEvent',{type:'mouseWheel',...point,deltaX:0,deltaY:-240});
         await waitFor(()=>evaluate('document.querySelector(".selected-water-course").getBoundingClientRect().width > '+(beforeWheel+1)),'Focused wheel zoom must work with the profile open.');
         assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'),false);
+        if (finalValidation) {
+            await pause(350);
+            await waitForZoomEnd();
+            const beforeSmallWheel = await mapScale();
+            for (let step = 0; step < 8; step++) {
+                await send('Input.dispatchMouseEvent', { type: 'mouseWheel', ...point, deltaX: 0, deltaY: -1.5 });
+                await pause(10);
+            }
+            await waitFor(async () => await mapScale() > beforeSmallWheel+1, 'Small-delta wheel sequence must zoom with the profile open.');
+            await pause(300);
+            await waitForZoomEnd();
+            if (mobile) {
+                await click('[data-lake-id="'+river.id+'"]');
+                await evaluate('document.querySelector(".explorer-map").scrollIntoView({block:"start"})');
+                await pause(100);
+                const center = await evaluate(`(() => {
+                    const r = document.getElementById('lake-map').getBoundingClientRect();
+                    for (const y of [r.top+60, r.top+100, r.top+140]) {
+                        for (const x of [r.left+r.width/2, r.right-85, r.left+85]) {
+                            if ([-25, 25].every(offset => {
+                                const node = document.elementFromPoint(x+offset, y);
+                                return node?.closest('#lake-map') && !node.closest('.leaflet-marker-icon, .leaflet-interactive, .leaflet-control');
+                            })) return { x, y };
+                        }
+                    }
+                    throw new Error('No unobstructed pinch start points.');
+                })()`);
+                const beforePinch = await mapScale();
+                await evaluate(`window.finalTouchEvents = []; for (const type of ['touchstart', 'touchcancel']) document.addEventListener(type, event => window.finalTouchEvents.push({type, touches:event.touches.length, onMap:!!event.target.closest('#lake-map'), trusted:event.isTrusted}), {capture:true, passive:true});`);
+                const fingers = distance => [{ x: center.x-distance, y: center.y, id: 1 }, { x: center.x+distance, y: center.y, id: 2 }];
+                await send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: fingers(25) });
+                for (let step = 1; step <= 8; step++) {
+                    await send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: fingers(25+step*5) });
+                    await pause(20);
+                }
+                await send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+                const touchEvents = await evaluate('window.finalTouchEvents');
+                const starts = touchEvents.filter(event => event.type === 'touchstart');
+                if (starts.some(event => event.touches === 2) && starts.every(event => event.onMap && event.trusted)) {
+                    await waitFor(async () => await mapScale() > beforePinch+1, 'Two-finger CDP pinch must zoom after genuine map-target input.');
+                    pinchVerified = true;
+                } else {
+                    results.push(`${width}px pinch NOT VERIFIED: simulated touch delivery missed the map despite clear DOM start points. Events: ${JSON.stringify(touchEvents)}. No application pinch conclusion from this attempt.`);
+                }
+                await pause(300);
+                await waitForZoomEnd();
+            }
+            await click('[data-lake-id="'+river.id+'"]');
+            await evaluate('document.querySelector(".explorer-map").scrollIntoView({block:"start"});document.getElementById("lake-map").focus({preventScroll:true})');
+            const resizeZoomPoint = await evaluate('(()=>{const r=document.getElementById("lake-map").getBoundingClientRect();return {x:r.right-80,y:r.top+90};})()');
+            await send('Input.dispatchMouseEvent', { type: 'mouseWheel', ...resizeZoomPoint, deltaX: 0, deltaY: -120 });
+            await waitFor(() => evaluate('!!document.querySelector(".leaflet-zoom-anim")'), 'Expected an active zoom before testing concurrent layout resize.');
+            for (const resizedWidth of [width + (mobile ? 40 : -80), width]) {
+                await send('Emulation.setDeviceMetricsOverride', { width: resizedWidth, height, deviceScaleFactor: 1, mobile });
+                try {
+                    await waitFor(() => evaluate('(()=>{const m=document.getElementById("lake-map").getBoundingClientRect(),s=document.querySelector(".leaflet-overlay-pane svg"),p=document.querySelector(".selected-water-course").getBoundingClientRect();return Math.abs(Number(s.getAttribute("width"))-m.width*1.2)<4 && p.left>=m.left+15 && p.right<=m.right-15 && p.top>=m.top+15 && p.bottom<=m.bottom-15;})()'), 'Leaflet renderer and selected extent must follow live layout resizing.');
+                } catch (error) {
+                    const bounds = await evaluate('(()=>{const rect=selector=>document.querySelector(selector).getBoundingClientRect().toJSON();return {map:rect("#lake-map"),path:rect(".selected-water-course"),card:rect("#water-detail-dialog"),svg:document.querySelector(".leaflet-overlay-pane svg").getAttribute("width")};})()');
+                    throw new Error(error.message+' '+JSON.stringify(bounds));
+                }
+                assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), river.name);
+                assert.equal(await evaluate('document.documentElement.scrollWidth <= innerWidth'), true);
+            }
+            results.push(`${width}px: category counts, accessible control names/24px targets, JSON/profile types, small-delta CDP wheel and live Leaflet resize passed.${mobile && pinchVerified ? ' Two-finger CDP pinch passed.' : ''} Physical trackpad/touch hardware is not verified.`);
+        }
         await click('#close-water-detail');
         await evaluate('document.querySelector(".report-fab").focus({preventScroll:true})');
         assert.equal(await evaluate('document.getElementById("lake-map").dispatchEvent(new WheelEvent("wheel",{deltaY:120,bubbles:true,cancelable:true}))'),true,'Unfocused map must allow normal page scrolling.');
         await click('#reset-map');
+        if (finalValidation) {
+            await evaluate('(()=>{const s=document.getElementById("water-search");s.value="Balanac River";s.dispatchEvent(new Event("input",{bubbles:true}));document.querySelector("#lake-map path[role=button]").focus();})()');
+            await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
+            await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
+            assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), 'Balanac River');
+            await click('#close-water-detail');
+            await evaluate('(()=>{const s=document.getElementById("water-search");s.value="Hidden Valley Springs";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
+            await click('.lake-marker[title="Hidden Valley Springs"]');
+            assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), 'Hidden Valley Springs');
+            await click('#close-water-detail');
+            await click('#reset-map');
+        }
         await evaluate('(()=>{const s=document.getElementById("water-search");s.value="Pagsanjan Falls";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
         await click('.lake-marker[title="Pagsanjan Falls"]');
         assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'),'Pagsanjan Falls');
@@ -371,6 +477,7 @@ try {
         await send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
         await send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowRight',code:'ArrowRight',windowsVirtualKeyCode:39});
         assert.equal(await evaluate('document.activeElement.dataset.profileTab'),'classification');
+        if (finalValidation) assert.equal(await evaluate('getComputedStyle(document.activeElement).outlineStyle !== "none" && parseFloat(getComputedStyle(document.activeElement).outlineWidth) >= 2'), true, 'Keyboard tab focus must be visible.');
         await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
         assert.equal(await evaluate('document.getElementById("water-detail-dialog").hidden'),true);
         results.push(width+'px: '+samples.length+' direct profiles, source geometry/photos/measurements, four bottom sections, privacy, independent list scrolling, filters/empty state, wheel zoom with open card, keyboard/Escape and fixed report action passed.'+(process.argv.includes('--fish') ? ' Three historical fish profiles: English/Filipino/scientific names, safe name sources, two Research citations and unassessed suitability passed; no fish assigned elsewhere.' : ''));

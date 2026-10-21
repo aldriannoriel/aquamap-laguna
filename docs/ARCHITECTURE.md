@@ -1,4 +1,4 @@
-﻿# Architecture
+# Architecture
 
 The current verified system map is maintained in [project-local architecture memory](../.agents/architecture/architecture.md).
 
@@ -9,5 +9,7 @@ Remaining Batch 1 against f165b0b shares one validated Water Type evidence resul
 Remaining Batch 2 against 30a77d5 adds a read-only fish-name-evidence.json supplement, validated by exact scientific name, reviewed status, Filipino language and safe citations. Existing fish cards display sourced Plapla for Oreochromis niloticus or Not yet verified; both new naming citations appear in Research & Sources. Species/occurrence rows, classification and suitability semantics are unchanged.
 
 Remaining Batch 3 against c59862b adds ResearchSources, a pure projection of existing public evidence into six groups with one citation per document/profile and accessible cross-references. It retains distinct claims, query versions, page/table locations, revisions and licensing. Reviewed metadata enriches existing citations only; missing metadata uses explicit fallbacks. The separate guarded maintenance link checker performs no public-request network calls. RESEARCH_AUDIT.md and research-source-audit.json record all 54 profiles and dated link outcomes.
+
+Remaining Batch 4 against 04d4623 fixes a reproduced zoom/resize race: app.js tracks public Leaflet zoomstart/zoomend events and defers a requested selection fit until zoom ends. Clear selection cancels pending work; normal wheel/pinch zoom does not refit automatically. The final browser runner checks live resizing during active zoom, small wheel deltas and trusted horizontal multi-touch within the exposed map. No data/schema/dependency changes are required. See [FINAL_VALIDATION.md](FINAL_VALIDATION.md) for phase evidence, results and physical-device limits.
 
 See [RESEARCH_SOURCES.md](RESEARCH_SOURCES.md) for geographic provenance and scientific limitations, and [CURRENT_STATE.md](CURRENT_STATE.md) for execution results and planned work.
