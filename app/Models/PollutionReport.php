@@ -24,11 +24,11 @@ class PollutionReport extends Model
         'other' => 'Other visible environmental concern',
     ];
 
-    protected $hidden = ['reporter_name', 'reporter_email', 'photo_path'];
+    protected $hidden = ['reporter_name', 'reporter_email', 'photo_path', 'latitude', 'longitude', 'landmark', 'location_accuracy_m'];
 
     protected function casts(): array
     {
-        return ['latitude' => 'decimal:7', 'longitude' => 'decimal:7'];
+        return ['latitude' => 'decimal:7', 'longitude' => 'decimal:7', 'observed_on' => 'date', 'location_accuracy_m' => 'decimal:2'];
     }
 
     public function waterBody(): BelongsTo

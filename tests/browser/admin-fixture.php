@@ -2,6 +2,7 @@
 
 // Test-only router/fixture. Never mounted by public/index.php or application routes.
 use App\Models\PollutionReport;
+use App\Models\Referral;
 use App\Models\User;
 use App\Models\WaterBody;
 use Database\Seeders\DatabaseSeeder;
@@ -11,6 +12,8 @@ use Illuminate\Foundation\Bootstrap\LoadConfiguration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Symfony\Component\Mailer\Transport\NullTransport;
 
 $root = dirname(__DIR__, 2);
 $directory = realpath(getenv('AQUAMAP_REPORT_FIXTURE') ?: '');
@@ -44,6 +47,12 @@ $app->afterBootstrapping(LoadConfiguration::class, function () use ($directory, 
     ]);
 });
 $app->make(Kernel::class)->bootstrap();
+if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1') {
+    config(['referrals.mailer' => 'smtp', 'mail.mailers.smtp.host' => 'smtp.example.test',
+        'mail.mailers.smtp.username' => 'fixture@example.test', 'mail.mailers.smtp.password' => 'fixture-only',
+        'mail.from.address' => 'fixture@example.test']);
+    Mail::extend('smtp', fn () => new NullTransport);
+}
 DB::purge('sqlite');
 if (DB::connection()->getDriverName() !== 'sqlite'
     || DB::connection()->getDatabaseName() !== ($setup ? ':memory:' : $directory.'/browser.sqlite')) {
@@ -86,6 +95,11 @@ if ($setup) {
         $user->save();
     }
     file_put_contents($directory.'/photos/fixture-evidence.png', base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6Z3UAAAAASUVORK5CYII='));
+    if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1') {
+        $image = imagecreatetruecolor(32, 32);
+        imagepng($image, $directory.'/photos/fixture-evidence.png');
+        imagedestroy($image);
+    }
     for ($i = 0; $i < 18; $i++) {
         $report = new PollutionReport;
         $report->water_body_id = WaterBody::orderBy('id')->firstOrFail()->id;
@@ -93,6 +107,11 @@ if ($setup) {
         $report->description = $i === 0 ? 'Synthetic browser review target. Never a real incident.' : 'Synthetic isolated browser fixture '.($i + 1);
         $report->status = [1 => 'verified', 2 => 'rejected', 3 => 'resolved'][$i] ?? 'pending';
         if ($i === 0) {
+            if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1') {
+                $report->latitude = 14.1234567;
+                $report->longitude = 121.2345678;
+                $report->landmark = 'Synthetic private landmark';
+            }
             $report->reporter_email = 'synthetic-reporter@example.test';
             $report->photo_path = 'fixture-evidence.png';
         }
@@ -100,6 +119,12 @@ if ($setup) {
     }
     echo json_encode(['isolated' => true, 'lakes' => DB::table('water_bodies')->count(), 'targetLake' => WaterBody::orderBy('id')->value('id')]);
 } elseif (PHP_SAPI === 'cli') {
+    if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1' && ($argv[1] ?? '') === 'deliver-referrals') {
+        Artisan::call('queue:work', ['connection' => 'referrals', '--queue' => 'referrals', '--stop-when-empty' => true,
+            '--sleep' => 0, '--tries' => 3, '--timeout' => 45]);
+        echo json_encode(['accepted' => Referral::where('status', 'accepted')->count()]);
+        exit;
+    }
     $reports = DB::table('pollution_reports')->get();
     echo json_encode([
         'reports' => $reports->count(),

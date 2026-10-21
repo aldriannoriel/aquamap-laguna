@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ReportFilterRequest;
+use App\Models\Agency;
 use App\Models\PollutionReport;
+use App\Models\Referral;
 use App\Models\WaterBody;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
@@ -45,7 +47,11 @@ class ReportController extends Controller
     {
         $pollutionReport->load(['waterBody:id,name,municipality', 'reviews.administrator:id,name']);
 
-        return view('admin.reports.show', ['report' => $pollutionReport]);
+        return view('admin.reports.show', ['report' => $pollutionReport,
+            'recipients' => Agency::where('active', true)->whereHas('waterBodies', fn ($q) => $q->whereKey($pollutionReport->water_body_id))
+                ->orderBy('verification_status', 'desc')->orderBy('municipality')->get(),
+            'referral' => Referral::where('pollution_report_id', $pollutionReport->id)->first(),
+        ]);
     }
 
     public function photo(PollutionReport $pollutionReport): StreamedResponse

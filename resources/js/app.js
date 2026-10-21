@@ -1,6 +1,7 @@
 import L from 'leaflet';
 import './report-categories';
 import './incident-map';
+import './admin-report-map';
 
 const mapElement = document.getElementById('lake-map');
 if (mapElement) {

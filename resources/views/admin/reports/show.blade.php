@@ -12,6 +12,12 @@
                 <p class="mt-2 text-xs leading-5 text-muted">Submitted {{ $report->created_at->format('M j, Y H:i:s') }} {{ config('app.timezone') }}</p>
                 <h3 class="mt-5 text-sm font-semibold">Observation</h3><p id="report-description" class="mt-2 text-sm leading-7 break-words whitespace-pre-wrap">{{ $report->description }}</p>
                 <h3 class="mt-5 text-sm font-semibold">Reported incident location</h3>
+                @if($report->latitude !== null && $report->longitude !== null)
+                    <div id="private-report-map" class="mt-3 h-72 rounded-lg border border-line" role="region" aria-label="Private reported problem location" data-latitude="{{ $report->latitude }}" data-longitude="{{ $report->longitude }}"></div>
+                @endif
+                <p class="mt-3 text-sm">Landmark / barangay supplied by reporter: {{ $report->landmark ?: 'Not provided' }}.</p>
+                <p class="mt-2 text-sm">Observation date: {{ $report->observed_on?->format('Y-m-d') ?: 'Not provided' }}.</p>
+                @if($report->location_accuracy_m !== null)<p class="mt-2 text-sm">Device-reported GPS accuracy: {{ $report->location_accuracy_m }} metres; not surveyed accuracy.</p>@endif
                 <p class="mt-2 text-sm leading-6">@if($report->latitude !== null && $report->longitude !== null)Latitude {{ $report->latitude }}, longitude {{ $report->longitude }}@else No incident point was provided. @endif</p>
                 <p class="mt-2 text-xs leading-5 text-muted">Incident points are reporter-selected and unverified. Lake reference datum and precision remain unconfirmed. A lake reference point is never substituted for an incident location.</p>
                 <h3 class="mt-5 text-sm font-semibold">Private photo evidence</h3>
@@ -38,6 +44,18 @@
             </section>
         </div>
         <section class="rounded-xl border border-line bg-white p-5 sm:p-6" aria-labelledby="review-heading">
+            <div class="mb-6 border-b border-line pb-6">
+                <h2 class="text-lg font-semibold">Environmental referral</h2>
+                @if($referral)<p class="mt-3 text-sm">Referral {{ $referral->reference }} / {{ $referral->status }}. Repeated approval does not send again.</p><a class="mt-3 inline-block text-water underline" href="{{ route('admin.referrals.index') }}">View referral history</a>
+                @elseif($recipients->isNotEmpty())
+                    <p class="mt-3 text-xs text-muted">Suggestions use explicit water-body assignments and locality labels. They do not establish barangay jurisdiction. Verify the report before sending.</p>
+                    <form method="GET" action="{{ route('admin.referrals.preview', $report) }}" class="mt-4 space-y-4">
+                        <div><label for="agency_id" class="form-label">Suggested recipient / change recipient</label><select id="agency_id" name="agency_id" class="form-input" required>@foreach($recipients as $recipient)<option value="{{ $recipient->id }}">{{ $recipient->name }} / {{ $recipient->verification_status }} / {{ $recipient->email }}</option>@endforeach</select></div>
+                        @if($report->photo_path)<label class="flex gap-3 text-sm"><input type="checkbox" name="include_photo" value="1"><span>Include the supporting photo only if sharing is permitted and appropriate.</span></label>@endif
+                        <button class="secondary-button">Preview email</button>
+                    </form>
+                @else<p class="mt-3 text-sm">No active recipient is assigned to this water body. <a class="text-water underline" href="{{ route('admin.agencies.create') }}">Add a provisional or verified recipient</a>.</p>@endif
+            </div>
             <h2 id="review-heading" class="text-lg font-semibold">Review decision</h2>
             @if($available = \App\Models\PollutionReport::TRANSITIONS[$report->status] ?? [])
                 <form id="review-form" method="POST" action="{{ route('admin.reports.status', $report) }}" class="mt-4 space-y-4">

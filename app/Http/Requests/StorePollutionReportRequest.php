@@ -39,8 +39,11 @@ class StorePollutionReportRequest extends FormRequest
             'water_body_id' => ['bail', 'required', 'integer', Rule::exists(WaterBody::class, 'id')->whereIn('category', $categories)->where('site_type', 'water_body')->whereNull('spring_type')],
             'pollution_type' => ['required', 'string', Rule::in(array_keys(PollutionReport::TYPES))],
             'description' => ['required', 'string', 'max:5000'],
-            'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'required_with:latitude', 'numeric', 'between:-180,180'],
+            'latitude' => ['nullable', 'required_with:longitude,location_accuracy_m', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'required_with:latitude,location_accuracy_m', 'numeric', 'between:-180,180'],
+            'location_accuracy_m' => ['nullable', 'numeric', 'between:0,100000'],
+            'landmark' => ['nullable', 'string', 'max:200'],
+            'observed_on' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:'.now('Asia/Manila')->toDateString()],
             'photo' => ['bail', 'required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:5120'],
             'reporter_name' => ['nullable', 'string', 'max:255'],
             'reporter_email' => ['nullable', 'string', 'email', 'max:254'],
@@ -68,6 +71,7 @@ class StorePollutionReportRequest extends FormRequest
     {
         $input = array_filter($this->only([
             'water_body_id', 'water_body_category', 'pollution_type', 'description', 'latitude', 'longitude', 'reporter_name', 'reporter_email',
+            'landmark', 'observed_on', 'location_accuracy_m',
         ]), fn (mixed $value): bool => is_scalar($value) || $value === null);
         $token = $this->input('report_form_token');
         if (is_string($token) && strlen($token) <= 2048) {

@@ -59,6 +59,9 @@ class PollutionReportController extends Controller
             $report->reporter_email = $data['reporter_email'] ?? null;
             $report->latitude = $data['latitude'] ?? null;
             $report->longitude = $data['longitude'] ?? null;
+            $report->landmark = $data['landmark'] ?? null;
+            $report->observed_on = $data['observed_on'] ?? null;
+            $report->location_accuracy_m = $data['location_accuracy_m'] ?? null;
             $report->photo_path = $photoPath;
             $report->status = 'pending';
             $report->save();

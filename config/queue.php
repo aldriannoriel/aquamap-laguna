@@ -30,6 +30,14 @@ return [
     */
 
     'connections' => [
+        'referrals' => [
+            'driver' => 'database',
+            'connection' => null,
+            'table' => 'jobs',
+            'queue' => 'referrals',
+            'retry_after' => 180,
+            'after_commit' => false,
+        ],
 
         'sync' => [
             'driver' => 'sync',

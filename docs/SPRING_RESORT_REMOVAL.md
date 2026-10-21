@@ -34,3 +34,6 @@ Verification checked all 14 table definitions and every table's INSERT-row count
 5. Keep every shared citation and photo asset, the inactive image supplement, private evidence and backup. Asset deletion is outside this approval scope. Verify 53 stored supported bodies, 41 mapped locations and unchanged retained research/GIS/fish/report data, then record a separate local recovery checkpoint.
 
 Until approval, the database remains at 55 stored records; public map/report choices expose only 53 (11 lakes, 29 rivers, 13 waterfalls). Reverting the code commit restores prior presentation without a database restore. Current validation results and artifact locations are in `CURRENT_STATE.md`.
+
+
+2026-10-21 referral extension: agency_water_body now restricts water-body deletion; referrals restricts report deletion and preserves approved snapshots when an agency is deleted. Initial routing excludes legacy IDs 11/28. Recheck these additional foreign-key dependencies before any separately approved deletion. Both legacy records remain untouched.

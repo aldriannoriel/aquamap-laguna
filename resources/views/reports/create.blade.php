@@ -102,9 +102,17 @@
                 <p id="incident-status" role="status" class="mt-2 text-xs leading-5 text-muted">No incident location selected.</p>
                 <p id="incident-tiles" class="mt-2 text-xs text-muted" role="status" hidden>Map tiles could not load. Leave the point blank if you cannot identify the location.</p>
                 <div class="mt-3 flex flex-wrap gap-2">
+                    <button type="button" id="use-current-location" class="secondary-button">Use My Current Location</button>
+                    <button type="button" id="use-gps-location" class="secondary-button" hidden>Use this GPS point as the problem location</button>
                     <button type="button" id="use-map-center" class="secondary-button" disabled>Use map center as incident point</button>
                     <button type="button" id="clear-incident" class="secondary-button" disabled>Clear incident point</button>
                 </div>
+                <p id="gps-status" role="status" class="mt-3 text-sm text-muted">GPS requires HTTPS or localhost and is requested only when you press the location button. Your current location may differ from the problem location.</p>
+                <p id="incident-coordinates" class="mt-3 text-sm font-semibold">No coordinates selected.</p>
+                <input type="hidden" id="location_accuracy_m" name="location_accuracy_m" value="{{ old('location_accuracy_m') }}">
+                @error('location_accuracy_m')<p class="form-error">{{ $message }}</p>@enderror
+                <div class="mt-4"><label for="landmark" class="form-label">Nearby landmark or barangay (optional)</label><input id="landmark" name="landmark" maxlength="200" class="form-input" value="{{ old('landmark') }}"><p class="mt-2 text-xs text-muted">Enter only a location you know. Barangay names are never inferred from coordinates.</p>@error('landmark')<p class="form-error">{{ $message }}</p>@enderror</div>
+                <div class="mt-4"><label for="observed_on" class="form-label">Observation date (optional)</label><input id="observed_on" name="observed_on" type="date" max="{{ now('Asia/Manila')->toDateString() }}" class="form-input" value="{{ old('observed_on') }}">@error('observed_on')<p class="form-error">{{ $message }}</p>@enderror</div>
                 @foreach (['latitude', 'longitude'] as $coordinate)
                     <input type="hidden" id="{{ $coordinate }}" name="{{ $coordinate }}" value="{{ old($coordinate) }}">
                     <p id="{{ $coordinate }}-error" class="form-error">@error($coordinate){{ $message }}@enderror</p>

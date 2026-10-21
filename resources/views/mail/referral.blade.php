@@ -1,0 +1,1 @@
+<!DOCTYPE html><html lang="en"><body style="font-family:Arial,sans-serif;color:#143f45;line-height:1.6;max-width:680px;margin:24px auto;padding:16px"><h1 style="font-size:22px">AquaMap Laguna</h1><pre style="font:inherit;white-space:pre-wrap;overflow-wrap:anywhere">@include('mail.referral-text')</pre></body></html>
