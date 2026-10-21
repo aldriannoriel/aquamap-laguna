@@ -1,6 +1,6 @@
 # Municipality referrals and Gmail delivery
 
-Updated 2026-10-21 for delivery against b167ce5 and independent report follow-up against 3f59ae0. Seven municipality/city recipients remain provisional entries at aquamaplaguna@gmail.com; these labels do not verify government office identity or jurisdiction. Sender credentials and installed schema are unchanged.
+Updated 2026-10-21 for delivery against b167ce5, report follow-up against 3f59ae0 and retired diagnostic UI cleanup against ca8db85. Seven municipality/city recipients remain provisional entries at aquamaplaguna@gmail.com; these labels do not verify government office identity or jurisdiction. Sender credentials and installed schema are unchanged.
 
 ## Diagnosis and verified delivery
 
@@ -56,7 +56,7 @@ Review the dialog's actual recipient, complete text, precise location and option
 
 Queued means waiting for a worker; Sending means claimed/prepared or submitting. Sent / accepted by SMTP appears only after acceptance; it does not prove inbox receipt or government action. Open report details poll delivery state and show authoritative acceptance/failure. Accepted referrals move to Forwarded / Processed Reports, where Report status and Email delivery are displayed separately. This grouping follows SMTP acceptance; report resolution status is unchanged until an explicit follow-up decision. Email never resolves an environmental concern automatically.
 
-After personally finding the exact reference in the receiver inbox, an administrator can submit Confirm receiver inbox receipt on the report. This creates a separate idempotent audit. The old Referrals & email test page, navigation and live-test endpoint are removed. Preserved diagnostics appear read-only in Manage Reports; no jobs/history are deleted.
+After personally finding the exact reference in the receiver inbox, an administrator can submit Confirm receiver inbox receipt on the report. This creates a separate idempotent audit. The old Referrals & email test page, navigation and live-test endpoint are removed. Retired diagnostic records remain stored but are hidden from every normal admin report/referral/processed view. The shared delivery view requires a real report, as do sending and retry approval; no jobs/history are deleted.
 
 Reject Report requires a reason and is available only before forwarding, while any existing referral is safely cancellable. Report/referral row locks atomically append the rejection audit, cancel queued/preparing or definitively failed delivery and record its event. Submitting/uncertain/accepted mail cannot be rejected. Cancelled snapshots/events remain readable and cannot send or retry. Forwarded reports instead support Under Review, In Progress, Resolved or separate administrative Closed. Resolved requires remarks and a documented inspection/municipality response/case reference or other supporting basis; the original concern photo and sent email alone do not establish resolution. Closed requires a distinct closure reason and makes no resolution claim. These decisions append labelled notes to existing audit rows, queue no mail and preserve original evidence/timestamps. Historical decisions are not backfilled. Rejected/Resolved/Closed are terminal.
 

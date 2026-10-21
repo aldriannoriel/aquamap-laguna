@@ -55,7 +55,7 @@ function sharedCacheSnapshot() {
 const originalCache=sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'report-workflow/browser';
+const artifactDirectory = 'legacy-delivery-ui/browser';
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
@@ -224,6 +224,17 @@ try {
     await navigate('/admin/login','!!document.getElementById("admin-sign-in")');await login('admin-fixture@example.test');
     await waitFor(()=>evaluate('document.querySelector("[aria-label=\\"Administrator navigation\\"]")!==null'),'Admin sign-in did not complete.');
     assert.equal(await evaluate('document.body.textContent.includes("Referrals & email test")'),false);
+    await navigate('/admin','!!document.querySelector("[data-count=total]")');
+    assert.equal(await evaluate('document.querySelector("[data-count=total]").textContent'),'18');
+    for (const queue of ['all','action','processed']) {
+        await navigate('/admin/reports?queue='+queue,'!!document.getElementById("admin-report-list")');
+        const text = await evaluate('document.body.textContent');
+        assert.equal(text.includes('Preserved legacy delivery history'),false);
+        assert.equal(text.includes('Retired diagnostic browser'),false);
+        for (const reference of fixtureInfo.legacyReferences) assert.equal(text.includes(reference),false);
+        if (queue === 'processed') assert.equal(await evaluate('document.querySelectorAll("#admin-report-list article").length'),2);
+    }
+    await screenshot('real-reports-only-desktop.png',true);
     await navigate('/admin/agencies/create','!!document.getElementById("verification_status")');
     await field('name','Browser municipality recipient');await field('municipality','San Pablo City');await field('email','aquamaplaguna@gmail.com');
     await click('main form .primary-button');
@@ -259,6 +270,7 @@ try {
     await navigate('/admin/reports?queue=action&q=Synthetic%20browser%20review%20target','!!document.getElementById("admin-report-list")');
     assert.equal(await evaluate('document.querySelector("article[data-report-id=\\"1\\"]")===null'),true);
     await navigate('/admin/reports?queue=processed&q=Synthetic%20browser%20review%20target','!!document.getElementById("admin-report-list")');
+    assert.equal(await evaluate('document.body.textContent.includes("Preserved legacy delivery history")'),false);
     assert.equal(await evaluate('document.querySelector("article[data-report-id=\\"1\\"]")!==null'),true);
     await screenshot('processed.png',true);
     await navigate('/admin/reports/1','!!document.getElementById("report-follow-up-form")');
@@ -315,6 +327,13 @@ try {
     await navigate('/admin/reports/1','document.body.textContent.includes("Browser municipality recipient")');
     assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
     await screenshot('history-mobile.png',true);
+    await navigate('/admin/reports?queue=processed','!!document.getElementById("admin-report-list")');
+    assert.equal(await evaluate('document.body.textContent.includes("Preserved legacy delivery history")'),false);
+    assert.equal(await evaluate('document.body.textContent.includes("Retired diagnostic browser")'),false);
+    assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
+    assert.equal(fixtureCommand('deliver-referrals').retiredQueued,1);
+    await screenshot('real-reports-only-mobile.png',true);
+    results.push('Retired queued/accepted/failed diagnostics are hidden from all report lists and processed history; real referral history remains visible, real-report totals stay correct and queued diagnostics stay unsent.');
     results.push('Desktop/mobile: confirmed direct send, duplicate prevention, isolated worker, distinct report/email statuses, forwarded grouping, Under Review/In Progress, required rejection reason, required resolution remarks/basis, final-state history and unchanged accepted referral passed. Municipality CRUD/snapshots and private map controls passed. Mail::fake() and simulated tiles/GPS only; no real email sent.');
 
     assert.deepEqual(failures, [], 'Browser JavaScript exceptions occurred.');

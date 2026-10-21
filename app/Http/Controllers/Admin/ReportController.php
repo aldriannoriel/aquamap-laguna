@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ReportFilterRequest;
 use App\Models\Agency;
 use App\Models\PollutionReport;
-use App\Models\Referral;
 use App\Models\WaterBody;
 use App\Support\MunicipalityRouting;
 use App\Support\ReferralWorkflow;
@@ -47,7 +46,6 @@ class ReportController extends Controller
 
         return view('admin.reports.index', [
             'reports' => $query->latest('id')->paginate(15)->appends($filters),
-            'legacyDeliveries' => Referral::with('events')->whereNull('pollution_report_id')->latest('id')->paginate(10, ['*'], 'delivery_page')->withQueryString(),
             'filters' => $filters, 'queue' => $queue, 'lakes' => WaterBody::query()->supported()->orderBy('name')->get(['id', 'name']),
         ]);
     }

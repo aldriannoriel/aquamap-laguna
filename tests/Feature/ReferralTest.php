@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Tests\TestCase;
@@ -328,6 +329,66 @@ class ReferralTest extends TestCase
         Queue::assertPushed(SendReferral::class, 1);
         Mail::assertNothingSent();
         $this->assertContains('php artisan queue:work referrals --queue=municipality-referrals --tries=3 --timeout=45', array_column(DevCommands::commands(), 'command'));
+    }
+
+    public function test_diagnostic_history_is_hidden_but_real_referrals_and_all_stored_records_remain(): void
+    {
+        $report = $this->report();
+        $real = $this->approve($report, $this->agency($report));
+        (new SendReferral($real->id))->handle();
+        $admin = $this->admin();
+        $diagnostics = [];
+        foreach (['queued', 'accepted', 'failed'] as $status) {
+            $diagnostics[] = Referral::forceCreate(['reference' => fake()->uuid(), 'dedupe_key' => 'retired-test:'.$status,
+                'approved_by' => $admin->id, 'approved_at' => now(), 'queued_at' => now(), 'status' => $status,
+                'payload' => ['test' => true, 'description' => 'Retired diagnostic must stay hidden.'],
+                'recipient_snapshot' => ['name' => 'Retired diagnostic receiver', 'email' => Referral::TEST_RECIPIENT], 'include_photo' => false]);
+        }
+        $before = DB::table('referrals')->orderBy('id')->get()->toJson();
+        $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk()->assertViewHas('counts.total', 1)
+            ->assertDontSee('Preserved legacy delivery history');
+        foreach (['action', 'processed', 'all'] as $queue) {
+            $response = $this->get(route('admin.reports.index', ['queue' => $queue, 'delivery_page' => 99]))->assertOk()
+                ->assertDontSee('Preserved legacy delivery history')->assertDontSee('Retired diagnostic receiver')
+                ->assertViewHas('reports', fn ($reports) => $reports->total() === ($queue === 'action' ? 0 : 1));
+            foreach ($diagnostics as $diagnostic) {
+                $response->assertDontSee($diagnostic->reference);
+                $this->assertSame('', trim(view('admin.reports.delivery', ['delivery' => $diagnostic])->render()));
+            }
+        }
+        $this->get(route('admin.reports.show', $report))->assertOk()->assertSee($real->reference)
+            ->assertSee('transport_accepted')->assertSee('Delivery history');
+        $this->assertSame($before, DB::table('referrals')->orderBy('id')->get()->toJson());
+        $this->assertDatabaseCount('referrals', 4);
+        $this->assertDatabaseCount('pollution_reports', 1);
+        Mail::assertSent(EnvironmentalReferral::class, 1);
+    }
+
+    public function test_retired_diagnostic_cannot_send_or_retry_even_with_an_approval_event(): void
+    {
+        $report = $this->report();
+        $admin = $this->admin();
+        $diagnostic = Referral::forceCreate(['reference' => fake()->uuid(), 'dedupe_key' => 'retired-test:approval',
+            'approved_by' => $admin->id, 'approved_at' => now(), 'queued_at' => now(), 'status' => 'queued',
+            'payload' => ['test' => true, 'description' => 'Retired diagnostic fixture.'],
+            'recipient_snapshot' => ['name' => 'Retired diagnostic', 'email' => Referral::TEST_RECIPIENT], 'include_photo' => false]);
+        ReferralWorkflow::record($diagnostic, Referral::DELIVERY_APPROVAL);
+        $before = $diagnostic->fresh()->getAttributes();
+        (new SendReferral($diagnostic->id))->handle();
+        $this->assertSame($before, $diagnostic->fresh()->getAttributes());
+        $this->actingAs($admin)->post(route('admin.referrals.retry', [$report, $diagnostic]), ['approved' => 1])->assertNotFound();
+        $diagnostic->forceFill(['status' => 'failed'])->save();
+        $before = $diagnostic->fresh()->getAttributes();
+        try {
+            ReferralWorkflow::retry($diagnostic);
+            $this->fail('Retired diagnostic retry must be refused.');
+        } catch (HttpException $exception) {
+            $this->assertSame(409, $exception->getStatusCode());
+        }
+        $this->assertSame($before, $diagnostic->fresh()->getAttributes());
+        $this->assertDatabaseCount('referral_events', 1);
+        Mail::assertNothingSent();
+        Queue::assertNothingPushed();
     }
 
     public function test_five_legacy_jobs_are_preserved_and_only_explicit_report_reapproval_can_deliver(): void

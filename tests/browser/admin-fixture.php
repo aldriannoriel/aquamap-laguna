@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 $root = dirname(__DIR__, 2);
 $directory = realpath(getenv('AQUAMAP_REPORT_FIXTURE') ?: '');
@@ -120,12 +121,24 @@ if ($setup) {
         }
         $report->save();
     }
-    echo json_encode(['isolated' => true, 'lakes' => DB::table('water_bodies')->count(), 'targetLake' => WaterBody::orderBy('id')->value('id')]);
+    $legacyReferences = [];
+    if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1') {
+        foreach (['queued', 'accepted', 'failed'] as $status) {
+            $legacy = Referral::forceCreate(['reference' => (string) Str::uuid(), 'dedupe_key' => 'retired-browser:'.$status,
+                'approved_by' => User::where('is_admin', true)->value('id'), 'approved_at' => now(), 'queued_at' => now(),
+                'status' => $status, 'payload' => ['test' => true, 'description' => 'Retired diagnostic browser fixture.'],
+                'recipient_snapshot' => ['name' => 'Retired diagnostic browser receiver', 'email' => Referral::TEST_RECIPIENT]]);
+            $legacyReferences[] = $legacy->reference;
+        }
+    }
+    echo json_encode(['isolated' => true, 'lakes' => DB::table('water_bodies')->count(), 'targetLake' => WaterBody::orderBy('id')->value('id'),
+        'legacyReferences' => $legacyReferences]);
 } elseif (PHP_SAPI === 'cli') {
     if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1' && ($argv[1] ?? '') === 'deliver-referrals') {
         Artisan::call('queue:work', ['connection' => 'referrals', '--queue' => config('referrals.queue'), '--stop-when-empty' => true,
             '--sleep' => 0, '--tries' => 3, '--timeout' => 45]);
-        echo json_encode(['accepted' => Referral::where('status', 'accepted')->count()]);
+        echo json_encode(['accepted' => Referral::whereNotNull('pollution_report_id')->where('status', 'accepted')->count(),
+            'retiredQueued' => Referral::whereNull('pollution_report_id')->where('status', 'queued')->count()]);
         exit;
     }
     $reports = DB::table('pollution_reports')->get();
