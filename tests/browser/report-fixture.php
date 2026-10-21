@@ -58,6 +58,9 @@ if ($setup) {
     if (getenv('AQUAMAP_BROWSER_RIVERS') === '1') {
         Artisan::call('rivers:import', ['--no-interaction' => true]);
     }
+    if (getenv('AQUAMAP_BROWSER_FULL_CATALOGUE') === '1') {
+        Artisan::call('lakes:import', ['--no-interaction' => true]);
+    }
     $rows = [];
     foreach (['water_bodies', 'fish_species', 'water_body_fish'] as $table) {
         $query = DB::table($table);

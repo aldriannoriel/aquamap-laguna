@@ -102,8 +102,7 @@ if (mapElement) {
         clearSelection();
         opener = trigger;
         selectedId = lake.id;
-        const profile = document.getElementById('profile-' + lake.id).cloneNode(true);
-        profile.removeAttribute('id');
+        const profile = document.getElementById('profile-' + lake.id).content.cloneNode(true);
         profile.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
         profile.querySelectorAll('[data-research-source]').forEach((element) => { element.id = element.dataset.researchSource + '-selected'; });
         profile.querySelectorAll('[data-citation-jump]').forEach((link) => { link.hash += '-selected'; });

@@ -116,10 +116,10 @@ class WaterBodyCardTest extends TestCase
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         $xpath = new DOMXPath($document);
-        $this->assertSame(3, $xpath->query('//article[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
+        $this->assertSame(3, $xpath->query('//template[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
         foreach (['Hulugan Falls', 'Bukal Falls', 'Bunga Twin Falls'] as $name) {
             $lake = WaterBody::where('name', $name)->sole();
-            $this->assertStringContainsString('object-contain', $xpath->evaluate('string(//article[@id="profile-'.$lake->id.'"]//img/@class)'));
+            $this->assertStringContainsString('object-contain', $xpath->evaluate('string(//template[@id="profile-'.$lake->id.'"]//img/@class)'));
         }
     }
 
@@ -157,7 +157,7 @@ class WaterBodyCardTest extends TestCase
         $this->assertSame(4, $xpath->query('//div[@id="profile-tabs"]/button[@role="tab"]')->length);
         $this->assertSame(0, $xpath->query('//*[@data-profile-section="pollution"]')->length);
         foreach ($response->viewData('lakes') as $record) {
-            $root = '//article[@id="profile-'.$record['id'].'"]';
+            $root = '//template[@id="profile-'.$record['id'].'"]';
             foreach (['overview', 'classification', 'fish', 'research'] as $section) {
                 $panels = $xpath->query($root.'//section[@data-profile-section="'.$section.'"]');
                 $this->assertSame(1, $panels->length);
@@ -169,8 +169,8 @@ class WaterBodyCardTest extends TestCase
         $this->assertSame('Water Type', trim($xpath->evaluate('string(//button[@data-profile-tab="classification"])')));
         $response->assertSee('Historical aquaculture')->assertSee('Plapla')->assertSee('Name source')
             ->assertSee('Water type not yet verified')->assertSee('OpenStreetMap contributors')->assertSee('Image attribution');
-        $this->assertSame(27, $xpath->query('//article[starts-with(@id,"profile-")]//figure/img')->length);
-        $this->assertSame(3, $xpath->query('//article[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
+        $this->assertSame(27, $xpath->query('//template[starts-with(@id,"profile-")]//figure/img')->length);
+        $this->assertSame(3, $xpath->query('//template[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
     }
 
     #[TestWith(['Pagsanjan Falls', ['Cavinti Falls', 'Magdapio Falls']])]
@@ -193,7 +193,7 @@ class WaterBodyCardTest extends TestCase
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         $xpath = new DOMXPath($document);
-        $root = '//article[@id="profile-'.$lake->id.'"]';
+        $root = '//template[@id="profile-'.$lake->id.'"]';
         $this->assertSame($name, trim($xpath->evaluate('string('.$root.'//h2)')));
         $researchNames = $xpath->evaluate('string('.$root.'//section[@data-profile-section="research"]//*[@data-alternative-names])');
         foreach ($aliases as $alias) {

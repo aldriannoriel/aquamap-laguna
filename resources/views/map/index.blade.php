@@ -59,16 +59,18 @@
                 </div>
                 <p id="wheel-hint" class="map-wheel-hint">Click or focus the map to zoom with a mouse wheel or trackpad.</p>
                 <p id="tile-status" role="status" class="px-3 py-2 text-xs text-estuary" hidden>Some map tiles could not load. Check your connection. Profiles remain available.</p>
-                <p id="map-status" role="status" class="map-status">Loading the map. Research profiles remain available below.</p>
+                <p id="map-status" role="status" class="map-status">Loading the map. Select a sidebar item to open its profile.</p>
             </section>
         </div>
         <div class="map-context">
             <p>Select a marker, shape or sidebar item for environmental context, historical species records and research sources.</p>
             <details id="research-notes"><summary>Map context &amp; data limits</summary><p>Source-checked WGS84 geography is a reference, not a survey, legal boundary or incident location. River courses may be incomplete. Original lake-point datum remains unconfirmed. Resort markers identify properties, not verified spring sources. Water type and historical fish records do not establish current safety or suitability. Community reports and evidence are private.</p></details>
         </div>
-        <noscript><p class="mt-3 rounded-lg border border-line bg-white p-4 text-sm">Enable JavaScript for the interactive map and filters. Browse all profiles and research references below.</p></noscript>
-        <details class="reference-library"><summary>All water body profiles &amp; research references</summary><div class="reference-grid">@foreach ($lakes as $lake)<article id="profile-{{ $lake['id'] }}" class="min-w-0 text-sm leading-6">@include('map.profile', ['lake' => $lake, 'profile' => $profiles[$lake['id']]])</article>@endforeach</div></details>
+        <noscript><p class="mt-3 rounded-lg border border-line bg-white p-4 text-sm">Enable JavaScript for the interactive map, filters, individual profiles and research sources.</p></noscript>
     </main>
+    @foreach ($lakes as $lake)
+        <template id="profile-{{ $lake['id'] }}"><div class="min-w-0 text-sm leading-6">@include('map.profile', ['lake' => $lake, 'profile' => $profiles[$lake['id']]])</div></template>
+    @endforeach
     <a href="{{ route('reports.create') }}" class="report-fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 21V3m0 1h14l-2 5 2 5H4"/></svg><span>Report a Concern</span></a>
     <script id="lake-data" type="application/json">{!! \Illuminate\Support\Js::encode($lakes) !!}</script>
 </body>

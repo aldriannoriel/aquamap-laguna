@@ -127,6 +127,16 @@ The source links and corresponding revision metadata are stored on every profile
 
 Overpass returned 504 then 406; direct OSM retrieval later reached 429, at which point requests stopped. No access/rate limit was bypassed. NAMRIA/LGU survey geometry and legal boundaries were not obtained. These are research gaps, not evidence that locations do not exist.
 
+## Tadlac addition and withheld Patola candidate (2026-10-21)
+
+`database/data/lake-additions.json` adds only Tadlac Lake, Los Baños. LLDA's [2009 Annual Report, section VII, Development of Tadlak Lake](https://llda.gov.ph/wp-content/uploads/dox/ar/ar09.pdf) identifies Barangay Tadlac, Los Baños. Its [2017-2022 Milestone Report, Tadlac Lake](https://llda.gov.ph/wp-content/uploads/dox/milestones/Milestone%20Report%20-%202017-2022.pdf) corroborates Alligator/Enchanted aliases and the Calamba/Los Baños boundary locality. These passages were verified through indexed publisher extracts; direct PDF retrieval returned 403 and was not bypassed. Historical plans do not establish present environmental conditions.
+
+Geometry was checked vertex-for-vertex against the interrupted work's saved OSM API response: [way 26513229](https://www.openstreetmap.org/way/26513229), version 17, 2025-07-18T19:25:13Z. All 57 node references, including the closing vertex, match in original order. EPSG:4326 coordinates describe the mapped water surface, not surveyed accuracy or a legal boundary. The original API snapshot remains ignored under `storage/app/lake-sidebar/tadlac-osm.json`; a fresh API connection was unavailable during recovery. OpenStreetMap contributors/ODbL attribution remains visible. No photograph, water-type conclusion, fish association, measurements or pollution records were added.
+
+DENR CALABARZON's [2024-2029 wetland roadmap announcement](https://calabarzon.denr.gov.ph/news-events/denr-crafts-5-year-conservation-roadmap-for-calabarzon-inland-wetlands/) names Patola Lake in Laguna. No reliable municipality/coordinates or exact mapped identity were confirmed by the targeted search. Patola is withheld; the provincial mention alone does not justify inventing a location or merging it with another lake.
+
+`php artisan lakes:import --no-interaction` explicitly imports this additive catalogue through the existing guarded transactional importer. It checks configured and connected database identity, locks existing identities, rejects canonical/alias ambiguity or conflicting metadata, and leaves repeat-import values/timestamps unchanged. The original ExplorerSeeder baseline remains separate.
+
 ## Geographic seed evidence
 
 | Seed name | Latitude (N) | Longitude (E) | Water type | Project locality |

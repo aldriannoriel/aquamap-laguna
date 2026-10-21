@@ -63,7 +63,7 @@
 .map-dashboard > header [aria-label="AquaMap Laguna home"] > span:first-child svg { width: 1.7rem; height: 1.7rem; }
 .map-dashboard > header nav { font-size: .75rem; gap: .8rem; }
 .explorer-main { padding: .75rem; max-width: 1920px; margin: auto; padding-bottom: 5rem; }
-.explorer-layout { display: grid; grid-template-columns: minmax(17.5rem, 32%) minmax(0, 1fr); height: max(35rem, calc(100dvh - var(--explorer-top, 5.25rem) - 1rem)); border: 1px solid var(--color-line); border-radius: .85rem; overflow: hidden; background: white; }
+.explorer-layout { display: grid; grid-template-columns: minmax(0, 25%) minmax(0, 1fr); height: max(35rem, calc(100dvh - var(--explorer-top, 5.25rem) - 1rem)); border: 1px solid var(--color-line); border-radius: .85rem; overflow: hidden; background: white; }
 .explorer-sidebar { position: relative; min-width: 0; min-height: 0; overflow: hidden; border-right: 1px solid var(--color-line); }
 .sidebar-toggle { display: none; }
 .sidebar-body { position: absolute; inset: 0; display: flex; height: 100%; min-height: 0; flex-direction: column; }
@@ -97,8 +97,6 @@
 .map-context details { margin-top: .35rem; }
 .map-context summary { color: var(--color-estuary); cursor: pointer; font-weight: 600; }
 .map-context details p { margin-top: .4rem; max-width: 95ch; }
-.reference-library { margin-top: .5rem; border-top: 1px solid var(--color-line); padding: .75rem .3rem; color: var(--color-estuary); font-size: .8rem; }
-.reference-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 2rem; margin-top: 1.5rem; }
 .water-profile { position: absolute; z-index: 1100; top: .75rem; left: .75rem; display: flex; flex-direction: column; width: min(22rem, 46%); height: min(35rem, calc(100% - 1.5rem)); min-height: 0; overflow: hidden; border: 1px solid #c9dada; border-radius: .75rem; background: white; box-shadow: 0 5px 24px #123f4330; overflow-wrap: anywhere; }
 .profile-header { display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .75rem .85rem; border-bottom: 1px solid var(--color-line); flex-shrink: 0; }
 .profile-header h2 { font-size: 1rem; font-weight: 600; line-height: 1.35; color: var(--color-estuary); }
@@ -130,6 +128,7 @@
 .report-fab svg { width: 1.1rem; height: 1.1rem; }
 .report-fab:hover { background: #205960; }
 @media (max-width: 1099px) {
+    .explorer-layout { grid-template-columns: minmax(17.5rem, 32%) minmax(0, 1fr); }
     .water-profile { top: auto; bottom: 4.75rem; left: .6rem; width: calc(100% - 1.2rem); height: 46%; max-height: 23rem; }
     .profile-tabs [role="tab"] { min-height: 3.2rem; font-size: .6875rem; }
     .profile-header { padding: .5rem .75rem; }

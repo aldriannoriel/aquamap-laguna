@@ -1,0 +1,345 @@
+[
+    {
+        "name": "Tadlac Lake",
+        "municipality": "Los Baños",
+        "water_type": "Not assessed",
+        "latitude": "14.1803342",
+        "longitude": "121.2055782",
+        "description": "Lake in Barangay Tadlac, Los Baños, Laguna, also known as Alligator Lake. LLDA identifies the Tadlac Lake Nature Park in Los Baños; the lake lies near the Calamba boundary. The mapped OSM water-surface polygon is a geographic reference, not a surveyed or legal boundary. Current water conditions, fish occurrence and habitat suitability have not been assessed.",
+        "source_url": "https://llda.gov.ph/wp-content/uploads/dox/ar/ar09.pdf",
+        "category": "lake",
+        "site_type": "water_body",
+        "spring_type": null,
+        "official_url": "https://llda.gov.ph/wp-content/uploads/dox/ar/ar09.pdf",
+        "aliases": [
+            "Alligator Lake",
+            "Tadlak Lake",
+            "Enchanted Lake"
+        ],
+        "geography": {
+            "status": "source_verified",
+            "crs": "EPSG:4326",
+            "source_url": "https://www.openstreetmap.org/way/26513229",
+            "checked_on": "2026-10-21",
+            "note": "Original closed water-surface polygon from OSM way 26513229 v17 (2025-07-18T19:25:13Z), all 57 source node references retained in order. Source coordinate precision does not establish survey accuracy or a legal boundary. Locality corroborated by LLDA Annual Report 2009, Development of Tadlak Lake.",
+            "osm_way_id": 26513229,
+            "osm_version": 17,
+            "osm_timestamp": "2025-07-18T19:25:13Z",
+            "osm_node_ids": [
+                290581709,
+                1239568828,
+                1239568840,
+                1239568767,
+                1239568754,
+                1239568818,
+                1239599567,
+                1239568805,
+                1239568830,
+                290581710,
+                1239568867,
+                1239568795,
+                1239568808,
+                5916130019,
+                5916130018,
+                5916130020,
+                290581711,
+                1239568854,
+                1239568842,
+                1239568757,
+                1239568778,
+                1239568768,
+                1239568804,
+                1239568791,
+                290581704,
+                290581712,
+                1239568858,
+                1239568846,
+                1239568760,
+                1239568851,
+                1239568839,
+                1239568817,
+                1239568827,
+                1239568747,
+                1239568796,
+                290581706,
+                1239568790,
+                1239568826,
+                1239568802,
+                290581707,
+                1239568813,
+                1239568799,
+                1239568836,
+                1239568752,
+                1239568765,
+                1239568824,
+                1239568855,
+                290581708,
+                1239568792,
+                5230021304,
+                1239568758,
+                1239568769,
+                1239568868,
+                1239568831,
+                1239568843,
+                1239568779,
+                290581709
+            ],
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            121.2055782,
+                            14.1803342
+                        ],
+                        [
+                            121.2052779,
+                            14.1802892
+                        ],
+                        [
+                            121.2049981,
+                            14.1803818
+                        ],
+                        [
+                            121.2046723,
+                            14.1804486
+                        ],
+                        [
+                            121.2045221,
+                            14.1805458
+                        ],
+                        [
+                            121.2043804,
+                            14.1807301
+                        ],
+                        [
+                            121.2043374,
+                            14.1808504
+                        ],
+                        [
+                            121.204349,
+                            14.1809608
+                        ],
+                        [
+                            121.204383,
+                            14.1810302
+                        ],
+                        [
+                            121.204296,
+                            14.1811865
+                        ],
+                        [
+                            121.2042975,
+                            14.1812461
+                        ],
+                        [
+                            121.204241,
+                            14.1812864
+                        ],
+                        [
+                            121.2041928,
+                            14.1813489
+                        ],
+                        [
+                            121.2041317,
+                            14.1813744
+                        ],
+                        [
+                            121.2041008,
+                            14.1814928
+                        ],
+                        [
+                            121.2040794,
+                            14.1818477
+                        ],
+                        [
+                            121.2040223,
+                            14.1822078
+                        ],
+                        [
+                            121.2041808,
+                            14.1829054
+                        ],
+                        [
+                            121.2044039,
+                            14.1834925
+                        ],
+                        [
+                            121.2046668,
+                            14.1837783
+                        ],
+                        [
+                            121.2047824,
+                            14.1838787
+                        ],
+                        [
+                            121.2049935,
+                            14.1842649
+                        ],
+                        [
+                            121.2052007,
+                            14.1845082
+                        ],
+                        [
+                            121.2057026,
+                            14.1847245
+                        ],
+                        [
+                            121.2059284,
+                            14.1847576
+                        ],
+                        [
+                            121.2068388,
+                            14.1849276
+                        ],
+                        [
+                            121.2074515,
+                            14.1850528
+                        ],
+                        [
+                            121.207818,
+                            14.1851455
+                        ],
+                        [
+                            121.2080929,
+                            14.1851378
+                        ],
+                        [
+                            121.2082562,
+                            14.1850799
+                        ],
+                        [
+                            121.2084275,
+                            14.1847941
+                        ],
+                        [
+                            121.2084753,
+                            14.1845314
+                        ],
+                        [
+                            121.2085749,
+                            14.1842533
+                        ],
+                        [
+                            121.2087422,
+                            14.1838285
+                        ],
+                        [
+                            121.2088059,
+                            14.1834925
+                        ],
+                        [
+                            121.2088216,
+                            14.1831945
+                        ],
+                        [
+                            121.2088931,
+                            14.1829255
+                        ],
+                        [
+                            121.2088825,
+                            14.1825391
+                        ],
+                        [
+                            121.2087838,
+                            14.1821043
+                        ],
+                        [
+                            121.2086502,
+                            14.1819071
+                        ],
+                        [
+                            121.2084776,
+                            14.1817213
+                        ],
+                        [
+                            121.208324,
+                            14.1815941
+                        ],
+                        [
+                            121.2082549,
+                            14.1814561
+                        ],
+                        [
+                            121.2082428,
+                            14.1811678
+                        ],
+                        [
+                            121.2081327,
+                            14.1810399
+                        ],
+                        [
+                            121.2079614,
+                            14.1808544
+                        ],
+                        [
+                            121.207766,
+                            14.1807441
+                        ],
+                        [
+                            121.2074946,
+                            14.1806909
+                        ],
+                        [
+                            121.2072881,
+                            14.1807279
+                        ],
+                        [
+                            121.2070003,
+                            14.1806918
+                        ],
+                        [
+                            121.206863,
+                            14.1806388
+                        ],
+                        [
+                            121.2068042,
+                            14.1805397
+                        ],
+                        [
+                            121.2067047,
+                            14.1804345
+                        ],
+                        [
+                            121.2063583,
+                            14.180305
+                        ],
+                        [
+                            121.2061259,
+                            14.1803004
+                        ],
+                        [
+                            121.2058839,
+                            14.1803125
+                        ],
+                        [
+                            121.2055782,
+                            14.1803342
+                        ]
+                    ]
+                ]
+            }
+        },
+        "research_references": [
+            {
+                "title": "Annual Report 2009: Development of Tadlak Lake / Tadlak Lake Nature Park",
+                "publisher": "Laguna Lake Development Authority",
+                "published_on": "2009",
+                "url": "https://llda.gov.ph/wp-content/uploads/dox/ar/ar09.pdf"
+            },
+            {
+                "title": "Milestone Report 2017-2022: Tadlac Lake identity, aliases and boundary locality",
+                "publisher": "Laguna Lake Development Authority",
+                "published_on": "2017-2022 reporting period",
+                "url": "https://llda.gov.ph/wp-content/uploads/dox/milestones/Milestone%20Report%20-%202017-2022.pdf"
+            },
+            {
+                "title": "Tadlac Lake / Alligator Lake: mapped water surface, way 26513229",
+                "publisher": "OpenStreetMap contributors",
+                "published_on": "Map revision 2025-07-18 (v17)",
+                "url": "https://www.openstreetmap.org/way/26513229"
+            }
+        ],
+        "image": null
+    }
+]
