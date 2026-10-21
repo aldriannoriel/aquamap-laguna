@@ -25,5 +25,41 @@
     "source_url": "https://www.frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2024.1410666/full",
     "reference": "Bicaldo et al. (2024), Frontiers in Microbiology 15:1410666, study-site freshwater context",
     "note": "Historical freshwater study context for this named maar lake. This is not a current salinity measurement, a DENR water-quality class or a safety assessment."
+  },
+  "Bunot Lake": {
+    "status": "geographic_assessment",
+    "municipality": "San Pablo City",
+    "category": "lake",
+    "type": "freshwater",
+    "basis": "general_geographic_assessment",
+    "scope": "lake freshwater habitat; salinity can vary locally",
+    "source_url": "https://www.openstreetmap.org/way/24821711",
+    "reference": "Existing catalogue geography; preliminary inland freshwater assessment",
+    "note": "Bunot Lake is assessed as an inland freshwater lake from its geographic setting. This is a general geographic assessment, not a salinity measurement.",
+    "limitations": "No current salinity measurement, statutory water-quality class or safety finding is supplied."
+  },
+  "Caliraya Lake": {
+    "status": "geographic_assessment",
+    "municipality": "Lumban / Cavinti / Kalayaan area",
+    "category": "lake",
+    "type": "freshwater",
+    "basis": "general_geographic_assessment",
+    "scope": "lake freshwater habitat; salinity can vary locally",
+    "source_url": "https://www.openstreetmap.org/relation/1622400",
+    "reference": "Existing catalogue geography; preliminary inland freshwater assessment",
+    "note": "Caliraya Lake is assessed as an inland freshwater lake from its geographic setting. This is a general geographic assessment, not a salinity measurement.",
+    "limitations": "No current salinity measurement, statutory water-quality class or safety finding is supplied."
+  },
+  "Laguna de Bay": {
+    "status": "source_verified",
+    "municipality": "Multiple lakeshore municipalities in Laguna; also Rizal and Metro Manila",
+    "category": "lake",
+    "type": "freshwater",
+    "basis": "verified_information",
+    "scope": "lake freshwater habitat; salinity can vary locally",
+    "source_url": "https://repository.seafdec.org.ph/handle/10862/844?show=full",
+    "reference": "Gonzal, Santiago and Afuang (2001), Pasig River backflow study; freshwater lake with variable saline influence",
+    "note": "Laguna de Bay is treated as Freshwater. Historical monitoring documents Pasig River backflow carrying saline water into parts of the lake; salinity varies by location, season and lake level. This does not assert a uniform or current salinity.",
+    "limitations": "No current salinity measurement, statutory water-quality class or safety finding is supplied."
   }
 }

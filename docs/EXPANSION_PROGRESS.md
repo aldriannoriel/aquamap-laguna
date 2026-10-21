@@ -212,3 +212,6 @@ Removed the standalone referral/live-test interface in favor of report-bound Sen
 ## Fish habitat recovery established: 2026-10-21 against 4f4f1b2
 
 The supported database inventory matches the requested 53 names (11/29/13); two legacy properties remain stored/hidden. Existing reviewed Water Type coverage is 3/53; possible-fish assessment coverage is 0/53. Nine candidate species/source-photo metadata have been researched but no new assignment or asset is applied. Original fourteen table hashes and .env match the pre-task audit. Detailed IDs, completed/pending tasks, next action and batch checkpoint protocol are written in FISH_HABITAT_CHECKPOINT.md. No persistent database operation, migration, email or push.
+
+
+Habitat batch IDs: 5,12,14,16 — #5 Bunot Lake; #12 Calibato Lake; #14 Caliraya Lake; #16 Laguna de Bay. Coverage: Water Type 6/53; Possible Fish 4/53. Checkpoint saved; validate before the local milestone commit.

@@ -15,7 +15,9 @@
     <h3 class="font-semibold text-estuary">Water Type</h3>
     @if ($profile['water_type_evidence'])
         <p data-water-type class="mt-3 text-lg font-semibold text-estuary">{{ ['freshwater' => 'Freshwater', 'brackish' => 'Brackish Water', 'saltwater' => 'Saltwater'][$profile['water_type_evidence']['type']] }}</p>
+        <p data-water-type-basis class="profile-note">Basis: {{ ($profile['water_type_evidence']['basis'] ?? 'verified_information') === 'general_geographic_assessment' ? 'General geographic assessment; salinity has not been measured here.' : 'Verified information in the cited source; not a current salinity measurement.' }}@if($profile['water_type_evidence']['scope'] ?? null) Scope: {{ $profile['water_type_evidence']['scope'] }}.@endif</p>
         <p class="profile-note">{{ $profile['water_type_evidence']['note'] }}</p>
+        @if($profile['water_type_evidence']['limitations'] ?? null)<p class="profile-note">{{ $profile['water_type_evidence']['limitations'] }}</p>@endif
         <a href="{{ $profile['water_type_evidence']['source_url'] }}" target="_blank" rel="noopener noreferrer" class="lake-detail-source">{{ $profile['water_type_evidence']['reference'] }}</a>
     @else
         <p data-water-type class="mt-3 font-semibold">Water type not yet verified</p>

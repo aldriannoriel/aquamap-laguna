@@ -1,6 +1,6 @@
 # AquaMap Laguna checkpoint
 
-Active work: Water Type and Possible Fish for 53 supported bodies. Audit/research is preserved; implementation/database population has not started. Read [FISH_HABITAT_CHECKPOINT.md](FISH_HABITAT_CHECKPOINT.md) first for exact coverage, all pending IDs/names and recovery instructions. Save it after each 3?5-body batch. The verified admin milestone below remains intact.
+Active work: Water Type and Possible Fish for 53 supported bodies. First four-body batch applied and repeat import verified unchanged. Current reviewed/display coverage: Water Type 6/53; Possible Fish 4/53. Four usable reference photographs are installed; missing/unusable species images have labelled placeholders. Read [FISH_HABITAT_CHECKPOINT.md](FISH_HABITAT_CHECKPOINT.md) first for actual coverage, completed/pending IDs and exact recovery action. Checkpoints are saved automatically after each 3-5-body import.
 
 **2026-10-21. Simplified environmental report management against d310dcc. Local commit only; no push.**
 

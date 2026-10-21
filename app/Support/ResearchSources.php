@@ -61,6 +61,17 @@ class ResearchSources
                 $library->add('fish', $source['url'], $source, 'Filipino common name '.$species['filipino_name_evidence']['name'].' / '.$species['scientific_name'].'. '.$species['filipino_name_evidence']['note'], 'fish_name');
             }
         }
+        foreach ($profile['possible_fish']['candidates'] ?? [] as $candidate) {
+            foreach ($candidate['references'] as $reference) {
+                $library->add('fish', $reference['url'], $reference, 'General habitat biology supporting a preliminary educational candidate: '.$candidate['scientific_name'].'. This is not proof of local occurrence or a measured suitability result.');
+            }
+            if ($image = $candidate['image']) {
+                $library->add('photography', $image['source_url'], ['title' => $image['alt'], 'publisher' => $image['author']],
+                    'Reference fish photograph by '.$image['author'].', '.$image['license'].'. Resized and fitted within a square frame; not photographed at this water body.');
+                $library->add('photography', $image['license_url'], ['title' => $image['license'], 'publisher' => 'Image licensing'],
+                    'Reuse license for the reference photograph of '.$candidate['scientific_name'].'.');
+            }
+        }
         foreach ($profile['references'] as $source) {
             $key = self::key($source['url']);
             $group = $library->metadata[$key]['group'] ?? ($library->citations[$key]['group'] ?? 'geography');

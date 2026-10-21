@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\FishSpecies;
 use App\Models\WaterBody;
 use App\Support\ExplorerProfile;
+use App\Support\HabitatCatalogue;
 use App\Support\ResearchSources;
 use App\Support\RiverCourseCatalogue;
 use App\Support\WaterBodyMetrics;
@@ -30,6 +31,8 @@ class MapController extends Controller
         $courseCatalogue = RiverCourseCatalogue::load();
         $displayGeographies = $records->mapWithKeys(fn (WaterBody $lake): array => [$lake->id => RiverCourseCatalogue::resolve($lake, $courseCatalogue)])->all();
         $evidence = json_decode(file_get_contents(database_path('data/water-body-evidence.json')), true, flags: JSON_THROW_ON_ERROR);
+        $habitatCatalogue = HabitatCatalogue::load();
+        $habitats = $records->mapWithKeys(fn (WaterBody $water): array => [$water->id => HabitatCatalogue::assessment($water, $habitatCatalogue)])->all();
         $waterTypeEvidence = $records->mapWithKeys(fn (WaterBody $lake): array => [
             $lake->id => ExplorerProfile::waterType($evidence[$lake->name] ?? null, $lake->municipality, $lake->category),
         ])->all();
@@ -54,7 +57,7 @@ class MapController extends Controller
 
         $fishNames = json_decode(file_get_contents(database_path('data/fish-name-evidence.json')), true, flags: JSON_THROW_ON_ERROR);
         $fishByLake = $records->mapWithKeys(function (WaterBody $lake) use ($fishNames): array {
-            $fish = $lake->fishSpecies->map(function (FishSpecies $species) use ($fishNames): array {
+            $fish = $lake->fishSpecies->reject(fn (FishSpecies $species): bool => $species->pivot->evidence_type === 'potential_habitat')->values()->map(function (FishSpecies $species) use ($fishNames): array {
                 $data = $species->only(['id', 'common_name', 'scientific_name', 'water_type', 'habitat_requirements', 'source_url']);
                 $data['habitat_requirements'] = filled($data['habitat_requirements']) ? trim($data['habitat_requirements']) : null;
                 $data['source_url'] = $this->publicSource($data['source_url']);
@@ -74,7 +77,7 @@ class MapController extends Controller
         $images = json_decode(file_get_contents(database_path('data/explorer-images.json')), true, flags: JSON_THROW_ON_ERROR);
         $metrics = json_decode(file_get_contents(database_path('data/water-body-metrics.json')), true, flags: JSON_THROW_ON_ERROR);
         $replacements = json_decode(file_get_contents(database_path('data/waterfall-photos.json')), true, flags: JSON_THROW_ON_ERROR);
-        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $metrics, $displayGeographies, $waterTypeEvidence): array {
+        $profiles = $records->mapWithKeys(function (WaterBody $lake) use ($images, $replacements, $metrics, $displayGeographies, $waterTypeEvidence, $habitats): array {
             $supplement = $images[$lake->name] ?? null;
             $image = $lake->image;
             if ($image === null && is_array($supplement) && ($supplement['municipality'] ?? null) === $lake->municipality) {
@@ -91,6 +94,7 @@ class MapController extends Controller
 
             return [$lake->id => [
                 'water_type_evidence' => $waterTypeEvidence[$lake->id],
+                'possible_fish' => $habitats[$lake->id],
                 'legacy_classification' => $lake->water_type,
                 'references' => ExplorerProfile::references($lake->research_references, allowMissingMetadata: true),
                 'image' => ExplorerProfile::image($image),

@@ -1,5 +1,42 @@
-<section data-fish-section class="mt-0" aria-label="Fish and habitat information">
-    <h3 class="text-base font-semibold text-estuary">Fish &amp; habitat</h3>
+<section data-possible-fish class="mt-0" aria-label="Possible fish">
+    <h3 class="text-base font-semibold text-estuary">Possible Fish</h3>
+    <p class="profile-note">Fish that may live here based on general habitat conditions. Their presence has not been confirmed.</p>
+    @php
+        $assessment = $profile['possible_fish'] ?? null;
+    @endphp
+    @if($assessment && $assessment['candidates'])
+        <p class="profile-note">Preliminary habitat estimate. {{ $assessment['habitat_explanation'] }}</p>
+        <div class="possible-fish-grid" data-possible-fish-gallery>
+            @foreach($assessment['candidates'] as $candidate)
+                <figure class="min-w-0" data-possible-fish-card data-species-id="{{ $candidate['id'] }}">
+                    @if($candidate['image'])<img class="possible-fish-thumb" src="{{ $candidate['image']['path'] }}" alt="{{ $candidate['image']['alt'] }}" width="160" height="160" loading="lazy" data-fish-image>
+                    @else<div class="possible-fish-thumb possible-fish-placeholder" data-fish-placeholder role="img" aria-label="Reference photo unavailable for {{ $candidate['common_name'] }}"><svg width="40" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 12c5-8 13-7 16 0-3 7-11 8-16 0Zm16 0 3-4v8l-3-4Z"/><circle cx="7" cy="11" r=".7"/></svg><span>Photo unavailable</span></div>@endif
+                    <figcaption class="possible-fish-name">{{ $candidate['common_name'] }}</figcaption>
+                </figure>
+            @endforeach
+        </div>
+        @if(!$assessment['complete'])<p class="profile-note">This assessment is partially populated. Further reviewed candidate links are pending.</p>@endif
+        <details class="possible-fish-reasons" data-fish-reasons>
+            <summary>Why these fish?</summary>
+            <p class="profile-note">{{ $assessment['limitations'] }}</p>
+            <div class="mt-3 space-y-4">
+                @foreach($assessment['candidates'] as $candidate)
+                    <article data-fish-explanation class="min-w-0 border-t border-line pt-3">
+                        <h4 class="font-semibold text-estuary">{{ $candidate['common_name'] }} &mdash; <i>{{ $candidate['scientific_name'] }}</i></h4>
+                        <p class="profile-note">{{ $candidate['explanation'] }}</p>
+                        <p class="profile-note"><strong>Habitat needs:</strong> {{ $candidate['habitat_requirements'] }}</p>
+                        <p class="profile-note"><strong>Limits:</strong> {{ $candidate['limitations'] }}</p>
+                        @foreach($candidate['references'] as $reference)<a class="lake-detail-source" href="{{ $reference['url'] }}" target="_blank" rel="noopener noreferrer">{{ $reference['title'] }}<span class="sr-only"> (general biology reference, opens in a new tab)</span></a>@endforeach
+                        @if($candidate['image'])<p class="profile-note">Photo: {{ $candidate['image']['author'] }} / {{ $candidate['image']['license'] }}. <a class="text-water underline" href="{{ $candidate['image']['source_url'] }}" target="_blank" rel="noopener noreferrer">Source</a> / <a class="text-water underline" href="{{ $candidate['image']['license_url'] }}" target="_blank" rel="noopener noreferrer">License</a>. Resized and fitted without cropping; a reference photograph from another location.</p>@endif
+                    </article>
+                @endforeach
+            </div>
+        </details>
+    @else<p class="profile-note">The preliminary habitat review has not been populated for this profile yet.</p>@endif
+</section>
+<details class="mt-5" data-documented-fish>
+<summary class="cursor-pointer font-semibold text-estuary">Documented Fish Records ({{ count($fish) }})</summary>
+<section data-fish-section class="mt-3" aria-label="Documented fish records">
     <p class="mt-1 text-sm leading-6 text-muted">Occurrence records describe what a study found. They do not establish habitat suitability.</p>
     <div class="mt-4 grid gap-3">
         @forelse ($fish as $species)
@@ -59,3 +96,4 @@
         @endforelse
     </div>
 </section>
+</details>

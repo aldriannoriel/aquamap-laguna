@@ -1,0 +1,538 @@
+{
+  "version": 1,
+  "reviewed_on": "2026-10-21",
+  "inventory": {
+    "Aliw Falls": {
+      "municipality": "Luisiana (tourism locality; Cavinti boundary context)",
+      "category": "waterfall"
+    },
+    "Ambon-Ambon Falls": {
+      "municipality": "Pangil",
+      "category": "waterfall"
+    },
+    "Balanac River": {
+      "municipality": "Pagsanjan",
+      "category": "river"
+    },
+    "Balatuin River": {
+      "municipality": "San Pablo City",
+      "category": "river"
+    },
+    "Balon-Balon Falls": {
+      "municipality": "Cavinti",
+      "category": "waterfall"
+    },
+    "Banca-Banca River": {
+      "municipality": "Victoria",
+      "category": "river"
+    },
+    "Bay River": {
+      "municipality": "Bay",
+      "category": "river"
+    },
+    "Biñan River": {
+      "municipality": "Biñan City",
+      "category": "river"
+    },
+    "Botocan River": {
+      "municipality": "Luisiana",
+      "category": "river"
+    },
+    "Bukal Falls": {
+      "municipality": "Majayjay / Liliw access area",
+      "category": "waterfall"
+    },
+    "Bumbungan River": {
+      "municipality": "Pagsanjan",
+      "category": "river"
+    },
+    "Bunga Twin Falls": {
+      "municipality": "Nagcarlan",
+      "category": "waterfall"
+    },
+    "Bunot Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake"
+    },
+    "Buntot Palos Falls": {
+      "municipality": "Pangil",
+      "category": "waterfall"
+    },
+    "Buruwisan Falls": {
+      "municipality": "Siniloan",
+      "category": "waterfall"
+    },
+    "Calibato Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake"
+    },
+    "Caliraya Lake": {
+      "municipality": "Lumban / Cavinti / Kalayaan area",
+      "category": "lake"
+    },
+    "Calo River": {
+      "municipality": "Bay",
+      "category": "river"
+    },
+    "Dalitiwan River": {
+      "municipality": "Majayjay",
+      "category": "river"
+    },
+    "Dampalit Falls": {
+      "municipality": "Los Baños",
+      "category": "waterfall"
+    },
+    "Hulugan Falls": {
+      "municipality": "Luisiana",
+      "category": "waterfall"
+    },
+    "Laguna de Bay": {
+      "municipality": "Multiple lakeshore municipalities in Laguna; also Rizal and Metro Manila",
+      "category": "lake"
+    },
+    "Lanzones Falls": {
+      "municipality": "Siniloan",
+      "category": "waterfall"
+    },
+    "Lumot Lake": {
+      "municipality": "Cavinti",
+      "category": "lake"
+    },
+    "Maimpis River": {
+      "municipality": "Nagcarlan",
+      "category": "river"
+    },
+    "Makpongo River": {
+      "municipality": "San Pablo City",
+      "category": "river"
+    },
+    "Malaunod River": {
+      "municipality": "San Pablo City",
+      "category": "river"
+    },
+    "Matikiw River": {
+      "municipality": "Pakil",
+      "category": "river"
+    },
+    "Mohicap Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake"
+    },
+    "Onipa River": {
+      "municipality": "San Pablo City",
+      "category": "river"
+    },
+    "Pagsanjan Falls": {
+      "municipality": "Cavinti",
+      "category": "waterfall"
+    },
+    "Palakpakin Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake"
+    },
+    "Pandin Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake"
+    },
+    "Pangil River": {
+      "municipality": "Pangil",
+      "category": "river"
+    },
+    "Pila River": {
+      "municipality": "Pila",
+      "category": "river"
+    },
+    "Prinza River": {
+      "municipality": "Calauan",
+      "category": "river"
+    },
+    "Romero River": {
+      "municipality": "Famy",
+      "category": "river"
+    },
+    "Sampaloc Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake"
+    },
+    "San Antonio River": {
+      "municipality": "Santa Maria / Mabitac",
+      "category": "river"
+    },
+    "San Cristobal River": {
+      "municipality": "Calamba City",
+      "category": "river"
+    },
+    "San Isidro River": {
+      "municipality": "San Pedro City",
+      "category": "river"
+    },
+    "San Juan River": {
+      "municipality": "Calamba City",
+      "category": "river"
+    },
+    "San Pedro River": {
+      "municipality": "San Pedro City",
+      "category": "river"
+    },
+    "Santa Cruz River": {
+      "municipality": "Santa Cruz",
+      "category": "river"
+    },
+    "Santa Rosa River": {
+      "municipality": "Santa Rosa City",
+      "category": "river"
+    },
+    "Siniloan River": {
+      "municipality": "Siniloan",
+      "category": "river"
+    },
+    "Tadlac Lake": {
+      "municipality": "Los Baños",
+      "category": "lake"
+    },
+    "Talay Falls": {
+      "municipality": "Luisiana",
+      "category": "waterfall"
+    },
+    "Tarak River": {
+      "municipality": "San Pablo City",
+      "category": "river"
+    },
+    "Taytay Falls": {
+      "municipality": "Majayjay",
+      "category": "waterfall"
+    },
+    "Tigas River": {
+      "municipality": "Alaminos",
+      "category": "river"
+    },
+    "Tunasan River": {
+      "municipality": "San Pedro / Muntinlupa boundary area",
+      "category": "river"
+    },
+    "Yambo Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake"
+    }
+  },
+  "species": {
+    "tilapia": {
+      "scientific_name": "Oreochromis niloticus",
+      "common_name": "Tilapia",
+      "database_name": "Nile tilapia",
+      "water_type": "freshwater",
+      "habitat_requirements": "Warm freshwater shallows with food and sheltered spawning areas. Temperature, oxygen and water chemistry must be checked locally.",
+      "fit": "a warm, sheltered margin rather than a cold torrent",
+      "limitations": "Introduced species; historical farming does not establish a wild population or present suitability.",
+      "source_url": "https://www.fao.org/fishery/docs/CDrom/aquaculture/I1129m/file/en/en_niletilapia.htm",
+      "references": [
+        {
+          "title": "Nile tilapia species biology",
+          "publisher": "FAO / Rakocy",
+          "url": "https://www.fao.org/fishery/docs/CDrom/aquaculture/I1129m/file/en/en_niletilapia.htm",
+          "published_on": "2009"
+        }
+      ],
+      "image": {
+        "path": "/images/fish/tilapia.jpg",
+        "alt": "Nile tilapia (Oreochromis niloticus); reference photograph, not a local observation",
+        "author": "Bob Walker",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Oreochromis_niloticus.jpg",
+        "license": "CC BY-SA 2.5",
+        "license_url": "https://creativecommons.org/licenses/by-sa/2.5",
+        "changes": "Resized, with the full photograph fitted inside a square frame; no claim of local occurrence.",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Oreochromis_niloticus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    "hito": {
+      "scientific_name": "Clarias macrocephalus",
+      "common_name": "Native hito",
+      "database_name": "Broadhead catfish",
+      "water_type": "freshwater",
+      "habitat_requirements": "Freshwater margins, ponds and wetland-like refuges with cover and accessible surface air. Air breathing does not make polluted water safe.",
+      "fit": "a quiet covered margin with surface access",
+      "limitations": "This is C. macrocephalus, not African catfish or a hybrid. Local presence and available vegetated refuge are unverified.",
+      "source_url": "https://www.seafdec.org.ph/2020/conservation-urged-to-save-native-catfish/",
+      "references": [
+        {
+          "title": "Native catfish habitat and conservation",
+          "publisher": "SEAFDEC/AQD",
+          "url": "https://www.seafdec.org.ph/2020/conservation-urged-to-save-native-catfish/",
+          "published_on": "2020"
+        }
+      ],
+      "image": {
+        "path": "/images/fish/hito.jpg",
+        "alt": "Broadhead catfish (Clarias macrocephalus); reference photograph, not a local observation",
+        "author": "Judgefloro",
+        "source_url": "https://commons.wikimedia.org/wiki/File:0171Native_Hito_textures_55.jpg",
+        "license": "CC0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+        "changes": "Resized, with the full photograph fitted inside a square frame; no claim of local occurrence.",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/9/9d/0171Native_Hito_textures_55.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    "dalag": {
+      "scientific_name": "Channa striata",
+      "common_name": "Dalag",
+      "database_name": "Striped snakehead",
+      "water_type": "freshwater",
+      "habitat_requirements": "Freshwater pools and wetland margins with cover, suitable prey and surface access; exposed high-velocity water is a poor default assumption.",
+      "fit": "a slower pool or vegetated refuge with prey",
+      "limitations": "Predatory feeding and air breathing do not prove survival under the actual local chemistry or pollution conditions.",
+      "source_url": "https://www.fao.org/4/T8389E/T8389E13.htm",
+      "references": [
+        {
+          "title": "Asian catfish and snakehead culture biology",
+          "publisher": "FAO",
+          "url": "https://www.fao.org/4/T8389E/T8389E13.htm",
+          "published_on": null
+        }
+      ],
+      "image": {
+        "path": "/images/fish/dalag.jpg",
+        "alt": "Striped snakehead (Channa striata); reference photograph, not a local observation",
+        "author": "Nilesh Heda",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Channa_striatus.jpg",
+        "license": "Public domain",
+        "license_url": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+        "changes": "Resized, with the full photograph fitted inside a square frame; no claim of local occurrence.",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Channa_striatus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    "carp": {
+      "scientific_name": "Cyprinus carpio",
+      "common_name": "Common carp",
+      "database_name": "Common carp",
+      "water_type": "freshwater",
+      "habitat_requirements": "Lake or reservoir shallows and slower river reaches with bottom food and suitable spawning substrate; fast cascades are excluded.",
+      "fit": "a slower shallow feeding area with suitable bottom substrate",
+      "limitations": "Introduced species. Depth, food, substrate and seasonal conditions remain unmeasured; this is not a stocking recommendation.",
+      "source_url": "https://www.fao.org/fishery/docs/CDrom/aquaculture/I1129m/file/en/en_commoncarp.htm",
+      "references": [
+        {
+          "title": "Common carp habitat biology",
+          "publisher": "FAO / Peteri",
+          "url": "https://www.fao.org/fishery/docs/CDrom/aquaculture/I1129m/file/en/en_commoncarp.htm",
+          "published_on": "2009"
+        }
+      ],
+      "image": {
+        "path": "/images/fish/carp.jpg",
+        "alt": "Common carp (Cyprinus carpio); reference photograph, not a local observation",
+        "author": "George Chernilevsky",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Cyprinus_carpio_2008_G1.jpg",
+        "license": "CC BY-SA 3.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+        "changes": "Resized, with the full photograph fitted inside a square frame; no claim of local occurrence.",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/2/26/Cyprinus_carpio_2008_G1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    "ayungin": {
+      "scientific_name": "Leiopotherapon plumbeus",
+      "common_name": "Ayungin",
+      "database_name": "Silver therapon",
+      "water_type": "freshwater",
+      "habitat_requirements": "Freshwater lake habitat with food, adequate oxygen and suitable breeding/refuge areas; local life-stage requirements must be checked.",
+      "fit": "a freshwater lake margin with sufficient food and oxygen",
+      "limitations": "An endemic Philippine species is not automatically present in every Philippine lake; local establishment is unconfirmed.",
+      "source_url": "https://repository.seafdec.org.ph/handle/10862/6070",
+      "references": [
+        {
+          "title": "Ayungin freshwater biology and conservation",
+          "publisher": "Aya / SEAFDEC",
+          "url": "https://repository.seafdec.org.ph/handle/10862/6070",
+          "published_on": "2021"
+        }
+      ],
+      "image": {
+        "path": "/images/fish/ayungin.jpg",
+        "alt": "Silver therapon (Leiopotherapon plumbeus); reference photograph, not a local observation",
+        "author": "Shrumster",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Leiopotherapon_plumbeus.jpg",
+        "license": "CC BY-SA 3.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+        "changes": "Resized, with the full photograph fitted inside a square frame; no claim of local occurrence.",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Leiopotherapon_plumbeus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    "kanduli": {
+      "scientific_name": "Arius manillensis",
+      "common_name": "Kanduli",
+      "database_name": "Manila sea catfish",
+      "water_type": "freshwater",
+      "habitat_requirements": "Freshwater lake feeding habitat and suitable reproductive conditions; the common family name sea catfish does not mean saltwater is obligatory here.",
+      "fit": "suitable open-lake and bottom-feeding habitat",
+      "limitations": "Selected only for Laguna de Bay. The cited historical species research does not verify current presence or current water quality.",
+      "source_url": "https://mjs.um.edu.my/index.php/MJS/article/view/16448",
+      "references": [
+        {
+          "title": "Kanduli reproductive biology in Laguna de Bay",
+          "publisher": "Alfonso and Ramos / Malaysian Journal of Science",
+          "url": "https://mjs.um.edu.my/index.php/MJS/article/view/16448",
+          "published_on": "2019"
+        }
+      ],
+      "image": {
+        "path": "/images/fish/kanduli.jpg",
+        "alt": "Manila sea catfish (Arius manillensis); reference photograph, not a local observation",
+        "author": "Ramon FVelasquez",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Arius_manillensis.JPG",
+        "license": "CC BY-SA 3.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+        "changes": "Resized, with the full photograph fitted inside a square frame; no claim of local occurrence.",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/6/68/Arius_manillensis.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    "goby": {
+      "scientific_name": "Glossogobius giuris",
+      "common_name": "Tank goby",
+      "database_name": "Tank goby",
+      "water_type": "freshwater",
+      "habitat_requirements": "Freshwater or low-salinity benthic habitat with appropriate substrate, food and flow refuges; habitat varies along stream gradients.",
+      "fit": "a connected pool or sheltered bottom habitat with appropriate substrate",
+      "limitations": "Biya covers several species. This candidate refers only to G. giuris; migration access, substrate and actual identity need field checks.",
+      "source_url": "https://www.ukdr.uplb.edu.ph/journal-articles/1793/",
+      "references": [
+        {
+          "title": "Stream gobioid habitat gradients in Southern Luzon",
+          "publisher": "Corpuz, Paller and Ocampo / UPLB, Raffles Bulletin of Zoology",
+          "url": "https://www.ukdr.uplb.edu.ph/journal-articles/1793/",
+          "published_on": "2015"
+        }
+      ],
+      "image": {
+        "path": "/images/fish/goby.jpg",
+        "alt": "Tank goby (Glossogobius giuris); reference photograph, not a local observation",
+        "author": "Trevor Menezes",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Glossogobius_giuris.jpg",
+        "license": "CC BY 3.0",
+        "license_url": "https://creativecommons.org/licenses/by/3.0",
+        "changes": "Resized, with the full photograph fitted inside a square frame; no claim of local occurrence.",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Glossogobius_giuris.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    "loach": {
+      "scientific_name": "Rhyacichthys aspro",
+      "common_name": "Loach goby",
+      "database_name": "Loach goby",
+      "water_type": "freshwater",
+      "habitat_requirements": "Flowing freshwater stream habitat with hard-bottom refuges. Verify substrate, oxygen, flow and passage before treating any waterfall reach as suitable.",
+      "fit": "an accessible flowing stream reach with rock refuges",
+      "limitations": "Only conditional connected-stream habitat is assessed, never the falling water itself or an assumed population above a barrier.",
+      "source_url": "https://zoolstud.sinica.edu.tw/Journals/23.2/211.pdf",
+      "references": [
+        {
+          "title": "Notes on the freshwater loach goby",
+          "publisher": "Liang / Academia Sinica",
+          "url": "https://zoolstud.sinica.edu.tw/Journals/23.2/211.pdf",
+          "published_on": "1984"
+        }
+      ],
+      "image": {
+        "path": "/images/fish/loach.jpg",
+        "alt": "Loach goby (Rhyacichthys aspro); reference photograph, not a local observation",
+        "author": "Totti",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Rhyacichthys_aspro_Enosui.jpg",
+        "license": "CC BY-SA 4.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+        "changes": "Resized, with the full photograph fitted inside a square frame; no claim of local occurrence.",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Rhyacichthys_aspro_Enosui.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    },
+    "bangus": {
+      "scientific_name": "Chanos chanos",
+      "common_name": "Bangus",
+      "database_name": "Milkfish",
+      "water_type": "freshwater",
+      "habitat_requirements": "Juveniles can use freshwater grow-out habitat, but marine spawning and early life stages require a different setting and salinity regime.",
+      "fit": "freshwater juvenile grow-out habitat in a large lake",
+      "limitations": "Selected only for Laguna de Bay. Adult survival and a self-sustaining freshwater breeding population are not equivalent; no stocking or production recommendation.",
+      "source_url": "https://www.fao.org/fishery/docs/CDrom/aquaculture/I1129m/file/en/en_milkfish.htm",
+      "references": [
+        {
+          "title": "Milkfish habitat and life cycle",
+          "publisher": "FAO",
+          "url": "https://www.fao.org/fishery/docs/CDrom/aquaculture/I1129m/file/en/en_milkfish.htm",
+          "published_on": "2009"
+        }
+      ],
+      "image": {
+        "path": "/images/fish/bangus.jpg",
+        "alt": "Milkfish (Chanos chanos); reference photograph, not a local observation",
+        "author": "Bryan Harry (U.S. National Park Service)",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Milkfish.jpg",
+        "license": "Public domain",
+        "license_url": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+        "changes": "Resized, with the full photograph fitted inside a square frame; no claim of local occurrence.",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Milkfish.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+      }
+    }
+  },
+  "water_bodies": {
+    "Bunot Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-21",
+      "habitat_explanation": "Assess sheltered lake margins only; shoreline cover and oxygen below the surface remain unmeasured.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Assess sheltered lake margins only; shoreline cover and oxygen below the surface remain unmeasured. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Assess sheltered lake margins only; shoreline cover and oxygen below the surface remain unmeasured. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Assess sheltered lake margins only; shoreline cover and oxygen below the surface remain unmeasured. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "Assess sheltered lake margins only; shoreline cover and oxygen below the surface remain unmeasured. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate.",
+        "ayungin": "Assess sheltered lake margins only; shoreline cover and oxygen below the surface remain unmeasured. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen."
+      }
+    },
+    "Calibato Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-21",
+      "habitat_explanation": "Assess shallow shoreline pockets rather than assume the full deep lake basin supports the same fish.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Assess shallow shoreline pockets rather than assume the full deep lake basin supports the same fish. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Assess shallow shoreline pockets rather than assume the full deep lake basin supports the same fish. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "Assess shallow shoreline pockets rather than assume the full deep lake basin supports the same fish. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate.",
+        "ayungin": "Assess shallow shoreline pockets rather than assume the full deep lake basin supports the same fish. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen.",
+        "goby": "Assess shallow shoreline pockets rather than assume the full deep lake basin supports the same fish. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Caliraya Lake": {
+      "municipality": "Lumban / Cavinti / Kalayaan area",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-21",
+      "habitat_explanation": "Reservoir coves and littoral shelves are the conditional habitat; drawdown, water temperature and submerged cover are unknown.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Reservoir coves and littoral shelves are the conditional habitat; drawdown, water temperature and submerged cover are unknown. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Reservoir coves and littoral shelves are the conditional habitat; drawdown, water temperature and submerged cover are unknown. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Reservoir coves and littoral shelves are the conditional habitat; drawdown, water temperature and submerged cover are unknown. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "Reservoir coves and littoral shelves are the conditional habitat; drawdown, water temperature and submerged cover are unknown. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate.",
+        "ayungin": "Reservoir coves and littoral shelves are the conditional habitat; drawdown, water temperature and submerged cover are unknown. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen.",
+        "goby": "Reservoir coves and littoral shelves are the conditional habitat; drawdown, water temperature and submerged cover are unknown. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Laguna de Bay": {
+      "municipality": "Multiple lakeshore municipalities in Laguna; also Rizal and Metro Manila",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-21",
+      "habitat_explanation": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate.",
+        "ayungin": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen.",
+        "kanduli": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Kanduli is a candidate only where there is suitable open-lake and bottom-feeding habitat.",
+        "goby": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate.",
+        "bangus": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Bangus is a candidate only where there is freshwater juvenile grow-out habitat in a large lake."
+      }
+    }
+  }
+}

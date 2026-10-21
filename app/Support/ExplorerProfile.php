@@ -23,7 +23,7 @@ class ExplorerProfile
 
     public static function waterType(mixed $entry, string $municipality, string $category): ?array
     {
-        if (! is_array($entry) || ($entry['status'] ?? null) !== 'source_verified'
+        if (! is_array($entry) || ! in_array($entry['status'] ?? null, ['source_verified', 'geographic_assessment'], true)
             || ($entry['municipality'] ?? null) !== $municipality || ($entry['category'] ?? null) !== $category
             || ! in_array($entry['type'] ?? null, ['freshwater', 'brackish', 'saltwater'], true)
             || ! self::url($entry['source_url'] ?? null)
@@ -32,7 +32,14 @@ class ExplorerProfile
             return null;
         }
 
-        return array_intersect_key($entry, array_flip(['type', 'source_url', 'reference', 'note']));
+        if ($entry['status'] === 'geographic_assessment' && (($entry['basis'] ?? null) !== 'general_geographic_assessment'
+            || ! is_string($entry['limitations'] ?? null) || ! filled($entry['limitations'])
+            || ! is_string($entry['scope'] ?? null) || ! filled($entry['scope']))) {
+            return null;
+        }
+
+        return [...array_intersect_key($entry, array_flip(['type', 'source_url', 'reference', 'note', 'limitations', 'scope'])),
+            'basis' => $entry['status'] === 'source_verified' ? 'verified_information' : 'general_geographic_assessment'];
     }
 
     public static function url(mixed $value): ?string
@@ -126,10 +133,10 @@ class ExplorerProfile
     /**
      * @return array{path: string, alt: string, author: string, license: string, source_url: string, license_url: string, fit?: 'contain'|'cover'}|null
      */
-    public static function image(mixed $value): ?array
+    public static function image(mixed $value, string $directory = 'water-bodies'): ?array
     {
-        if (! is_array($value) || ! is_string($value['path'] ?? null)
-            || ! preg_match('~^/images/water-bodies/[a-z0-9-]+\.(jpg|jpeg|png|webp)$~D', $value['path'])
+        if (! in_array($directory, ['water-bodies', 'fish'], true) || ! is_array($value) || ! is_string($value['path'] ?? null)
+            || ! preg_match('~^/images/'.preg_quote($directory, '~').'/[a-z0-9-]+\.(jpg|jpeg|png|webp)$~D', $value['path'])
             || ! is_file(public_path($value['path']))
             || ! self::url($value['source_url'] ?? null) || ! self::url($value['license_url'] ?? null)) {
             return null;
