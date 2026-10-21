@@ -215,3 +215,9 @@ The supported database inventory matches the requested 53 names (11/29/13); two 
 
 
 Habitat batch IDs: 5,12,14,16 — #5 Bunot Lake; #12 Calibato Lake; #14 Caliraya Lake; #16 Laguna de Bay. Coverage: Water Type 6/53; Possible Fish 4/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 15,4,13,2 — #15 Lumot Lake; #4 Mohicap Lake; #13 Palakpakin Lake; #2 Pandin Lake. Coverage: Water Type 9/53; Possible Fish 8/53. Checkpoint saved; validate before the local milestone commit.
+
+
+Habitat batch IDs: 1,55,3 — #1 Sampaloc Lake; #55 Tadlac Lake; #3 Yambo Lake. Coverage: Water Type 11/53; Possible Fish 11/53. Checkpoint saved; validate before the local milestone commit.

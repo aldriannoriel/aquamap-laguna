@@ -61,5 +61,70 @@
     "reference": "Gonzal, Santiago and Afuang (2001), Pasig River backflow study; freshwater lake with variable saline influence",
     "note": "Laguna de Bay is treated as Freshwater. Historical monitoring documents Pasig River backflow carrying saline water into parts of the lake; salinity varies by location, season and lake level. This does not assert a uniform or current salinity.",
     "limitations": "No current salinity measurement, statutory water-quality class or safety finding is supplied."
+  },
+  "Lumot Lake": {
+    "status": "geographic_assessment",
+    "municipality": "Cavinti",
+    "category": "lake",
+    "type": "freshwater",
+    "basis": "general_geographic_assessment",
+    "scope": "inland lake freshwater habitat",
+    "source_url": "https://www.openstreetmap.org/relation/152819",
+    "reference": "Existing catalogue geography; general inland freshwater assessment",
+    "note": "Lumot Lake is assessed as an inland freshwater lake. The general geographic setting is the basis; no present salinity measurement is supplied.",
+    "limitations": "Temperature, salinity and water quality have not been measured here. This is not a statutory water-quality class or safety finding.",
+    "reviewed_on": "2026-10-22"
+  },
+  "Mohicap Lake": {
+    "status": "geographic_assessment",
+    "municipality": "San Pablo City",
+    "category": "lake",
+    "type": "freshwater",
+    "basis": "general_geographic_assessment",
+    "scope": "inland lake freshwater habitat",
+    "source_url": "https://www.openstreetmap.org/way/25032575",
+    "reference": "Existing catalogue geography; general inland freshwater assessment",
+    "note": "Mohicap Lake is assessed as an inland freshwater lake. The general geographic setting is the basis; no present salinity measurement is supplied.",
+    "limitations": "Temperature, salinity and water quality have not been measured here. This is not a statutory water-quality class or safety finding.",
+    "reviewed_on": "2026-10-22"
+  },
+  "Palakpakin Lake": {
+    "status": "geographic_assessment",
+    "municipality": "San Pablo City",
+    "category": "lake",
+    "type": "freshwater",
+    "basis": "general_geographic_assessment",
+    "scope": "inland lake freshwater habitat",
+    "source_url": "https://www.openstreetmap.org/relation/6476644",
+    "reference": "Existing catalogue geography; general inland freshwater assessment",
+    "note": "Palakpakin Lake is assessed as an inland freshwater lake. The general geographic setting is the basis; no present salinity measurement is supplied.",
+    "limitations": "Temperature, salinity and water quality have not been measured here. This is not a statutory water-quality class or safety finding.",
+    "reviewed_on": "2026-10-22"
+  },
+  "Sampaloc Lake": {
+    "status": "geographic_assessment",
+    "municipality": "San Pablo City",
+    "category": "lake",
+    "type": "freshwater",
+    "basis": "general_geographic_assessment",
+    "scope": "inland lake freshwater habitat",
+    "source_url": "https://www.openstreetmap.org/relation/1557746",
+    "reference": "Existing catalogue geography; general inland freshwater assessment",
+    "note": "Sampaloc Lake is assessed as an inland freshwater lake. The general geographic setting is the basis; no present salinity measurement is supplied.",
+    "limitations": "Temperature, salinity and water quality have not been measured here. This is not a statutory water-quality class or safety finding.",
+    "reviewed_on": "2026-10-22"
+  },
+  "Tadlac Lake": {
+    "status": "geographic_assessment",
+    "municipality": "Los Baños",
+    "category": "lake",
+    "type": "freshwater",
+    "basis": "general_geographic_assessment",
+    "scope": "inland lake freshwater habitat",
+    "source_url": "https://www.openstreetmap.org/way/26513229",
+    "reference": "Existing catalogue geography; general inland freshwater assessment",
+    "note": "Tadlac Lake is assessed as an inland freshwater lake. The general geographic setting is the basis; no present salinity measurement is supplied.",
+    "limitations": "Temperature, salinity and water quality have not been measured here. This is not a statutory water-quality class or safety finding.",
+    "reviewed_on": "2026-10-22"
   }
 }

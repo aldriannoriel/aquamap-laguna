@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "reviewed_on": "2026-10-21",
+  "reviewed_on": "2026-10-22",
   "inventory": {
     "Aliw Falls": {
       "municipality": "Luisiana (tourism locality; Cavinti boundary context)",
@@ -532,6 +532,111 @@
         "kanduli": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Kanduli is a candidate only where there is suitable open-lake and bottom-feeding habitat.",
         "goby": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate.",
         "bangus": "A large freshwater lake offers several possible habitat zones; seasonal salinity, oxygen, algal conditions and local pollution can exclude a candidate. Bangus is a candidate only where there is freshwater juvenile grow-out habitat in a large lake."
+      }
+    },
+    "Lumot Lake": {
+      "municipality": "Cavinti",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Reservoir shore margins and sheltered coves are considered; reservoir operations and changing water levels have not been evaluated.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Reservoir shore margins and sheltered coves are considered; reservoir operations and changing water levels have not been evaluated. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Reservoir shore margins and sheltered coves are considered; reservoir operations and changing water levels have not been evaluated. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Reservoir shore margins and sheltered coves are considered; reservoir operations and changing water levels have not been evaluated. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "Reservoir shore margins and sheltered coves are considered; reservoir operations and changing water levels have not been evaluated. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate.",
+        "ayungin": "Reservoir shore margins and sheltered coves are considered; reservoir operations and changing water levels have not been evaluated. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen.",
+        "goby": "Reservoir shore margins and sheltered coves are considered; reservoir operations and changing water levels have not been evaluated. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Mohicap Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Use a cautious small-lake shoreline assessment; current depth-specific oxygen, food and cover are unknown.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Use a cautious small-lake shoreline assessment; current depth-specific oxygen, food and cover are unknown. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Use a cautious small-lake shoreline assessment; current depth-specific oxygen, food and cover are unknown. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Use a cautious small-lake shoreline assessment; current depth-specific oxygen, food and cover are unknown. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "ayungin": "Use a cautious small-lake shoreline assessment; current depth-specific oxygen, food and cover are unknown. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen."
+      }
+    },
+    "Palakpakin Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Consider quieter lake-edge habitat only; shallow-water availability and present oxygen conditions need field verification.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Consider quieter lake-edge habitat only; shallow-water availability and present oxygen conditions need field verification. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Consider quieter lake-edge habitat only; shallow-water availability and present oxygen conditions need field verification. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Consider quieter lake-edge habitat only; shallow-water availability and present oxygen conditions need field verification. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "Consider quieter lake-edge habitat only; shallow-water availability and present oxygen conditions need field verification. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate.",
+        "ayungin": "Consider quieter lake-edge habitat only; shallow-water availability and present oxygen conditions need field verification. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen."
+      }
+    },
+    "Pandin Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Consider protected shoreline habitat separately from historical aquaculture; lake stratification and bottom habitat remain unmeasured.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Consider protected shoreline habitat separately from historical aquaculture; lake stratification and bottom habitat remain unmeasured. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Consider protected shoreline habitat separately from historical aquaculture; lake stratification and bottom habitat remain unmeasured. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Consider protected shoreline habitat separately from historical aquaculture; lake stratification and bottom habitat remain unmeasured. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "ayungin": "Consider protected shoreline habitat separately from historical aquaculture; lake stratification and bottom habitat remain unmeasured. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen.",
+        "goby": "Consider protected shoreline habitat separately from historical aquaculture; lake stratification and bottom habitat remain unmeasured. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Sampaloc Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Assess shoreline feeding and refuge habitat; the preserved tilapia farming study is not used as proof of present ecological compatibility.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Assess shoreline feeding and refuge habitat; the preserved tilapia farming study is not used as proof of present ecological compatibility. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "hito": "Assess shoreline feeding and refuge habitat; the preserved tilapia farming study is not used as proof of present ecological compatibility. Native hito is a candidate only where there is a quiet covered margin with surface access.",
+        "dalag": "Assess shoreline feeding and refuge habitat; the preserved tilapia farming study is not used as proof of present ecological compatibility. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "Assess shoreline feeding and refuge habitat; the preserved tilapia farming study is not used as proof of present ecological compatibility. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate.",
+        "ayungin": "Assess shoreline feeding and refuge habitat; the preserved tilapia farming study is not used as proof of present ecological compatibility. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen.",
+        "goby": "Assess shoreline feeding and refuge habitat; the preserved tilapia farming study is not used as proof of present ecological compatibility. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
+      }
+    },
+    "Tadlac Lake": {
+      "municipality": "Los Baños",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "This preliminary lake-edge assessment excludes claims about deep-water oxygen, seasonal mixing or stocking history.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "This preliminary lake-edge assessment excludes claims about deep-water oxygen, seasonal mixing or stocking history. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "This preliminary lake-edge assessment excludes claims about deep-water oxygen, seasonal mixing or stocking history. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "This preliminary lake-edge assessment excludes claims about deep-water oxygen, seasonal mixing or stocking history. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate.",
+        "ayungin": "This preliminary lake-edge assessment excludes claims about deep-water oxygen, seasonal mixing or stocking history. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen."
+      }
+    },
+    "Yambo Lake": {
+      "municipality": "San Pablo City",
+      "category": "lake",
+      "evidence_classification": "preliminary_habitat_estimate",
+      "reviewed_on": "2026-10-22",
+      "habitat_explanation": "Consider the sheltered freshwater fringe; food, substrate and seasonal conditions are not inferred from historical farmed-fish sampling.",
+      "limitations": "No current local salinity, temperature, dissolved oxygen, pH, substrate, prey or connectivity survey has been validated. These are conditional educational estimates, not occurrence records, survival guarantees or stocking advice.",
+      "candidates": {
+        "tilapia": "Consider the sheltered freshwater fringe; food, substrate and seasonal conditions are not inferred from historical farmed-fish sampling. Tilapia is a candidate only where there is a warm, sheltered margin rather than a cold torrent.",
+        "dalag": "Consider the sheltered freshwater fringe; food, substrate and seasonal conditions are not inferred from historical farmed-fish sampling. Dalag is a candidate only where there is a slower pool or vegetated refuge with prey.",
+        "carp": "Consider the sheltered freshwater fringe; food, substrate and seasonal conditions are not inferred from historical farmed-fish sampling. Common carp is a candidate only where there is a slower shallow feeding area with suitable bottom substrate.",
+        "ayungin": "Consider the sheltered freshwater fringe; food, substrate and seasonal conditions are not inferred from historical farmed-fish sampling. Ayungin is a candidate only where there is a freshwater lake margin with sufficient food and oxygen.",
+        "goby": "Consider the sheltered freshwater fringe; food, substrate and seasonal conditions are not inferred from historical farmed-fish sampling. Tank goby is a candidate only where there is a connected pool or sheltered bottom habitat with appropriate substrate."
       }
     }
   }
