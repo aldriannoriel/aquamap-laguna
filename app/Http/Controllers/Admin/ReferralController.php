@@ -9,6 +9,7 @@ use App\Models\Referral;
 use App\Support\ReferralWorkflow;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -22,14 +23,15 @@ class ReferralController extends Controller
             $request->session()->put('referral_test_token', $token);
         }
 
-        return view('admin.referrals.index', ['referrals' => Referral::with('events')->latest('id')->paginate(15), 'testToken' => $token, 'ready' => ReferralWorkflow::ready()]);
+        return view('admin.referrals.index', ['referrals' => Referral::with('events')->latest('id')->paginate(15), 'testToken' => $token, 'ready' => ReferralWorkflow::ready(),
+            'waitingJobs' => DB::table('jobs')->where('queue', 'referrals')->whereNull('reserved_at')->count()]);
     }
 
     public function preview(Request $request, PollutionReport $pollutionReport): View
     {
         $data = $request->validate(['agency_id' => ['required', 'integer', 'exists:agencies,id'], 'include_photo' => ['nullable', 'boolean']]);
         $a = Agency::findOrFail($data['agency_id']);
-        abort_unless($a->active && $a->waterBodies()->whereKey($pollutionReport->water_body_id)->exists(), 422, 'Choose an active recipient assigned to this water body.');
+        abort_unless(ReferralWorkflow::eligible($a, $pollutionReport), 422, 'Choose an active municipality recipient or a verified routing assignment.');
         $photo = $request->boolean('include_photo');
 
         return view('admin.referrals.preview', ['report' => $pollutionReport, 'agency' => $a, 'details' => ReferralWorkflow::payload($pollutionReport, $photo),
@@ -42,7 +44,13 @@ class ReferralController extends Controller
             'review_hash' => ['required', 'string', 'size:64'], 'approved' => ['accepted']]);
         $r = ReferralWorkflow::enqueue($pollutionReport, Agency::findOrFail($data['agency_id']), $request->user(), $request->boolean('include_photo'), $data['review_hash']);
 
-        return to_route('admin.referrals.index')->with('referral_saved', 'Referral '.$r->reference.' is recorded. A repeated approval does not send a duplicate.');
+        $message = match ($r->status) {
+            'accepted' => 'Referral email sent successfully (accepted by SMTP). Inbox receipt is unverified.',
+            'queued' => 'Referral queued for sending.',
+            default => 'Referral already recorded: '.$r->label().'. Check its delivery history.',
+        };
+
+        return to_route('admin.referrals.index')->with('referral_saved', $message);
     }
 
     public function test(Request $request): RedirectResponse

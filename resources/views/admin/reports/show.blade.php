@@ -2,8 +2,8 @@
 @section('title', 'Report details')
 @section('content')
     <a href="{{ route('admin.reports.index') }}" class="text-sm font-semibold text-water underline underline-offset-4">Back to reports</a>
-    <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><h1 class="text-3xl font-semibold tracking-tight">Report #{{ $report->id }}</h1><div id="report-current-status">@include('admin.reports.status', ['status' => $report->status])</div></div>
-    @if(session('review_saved'))<p id="review-success" role="status" tabindex="-1" class="mt-5 rounded-xl border border-moss/30 bg-white p-4 text-sm text-moss">Status updated. The review has been recorded in the audit history.</p>@endif
+    <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><h1 class="text-3xl font-semibold tracking-tight">Report #{{ $report->id }}</h1><div id="report-current-status" class="flex flex-wrap items-center gap-3">@if($referral)<span class="rounded-lg bg-white px-3 py-2 text-sm font-semibold">{{ $referral->label() }}</span><span class="text-xs text-muted">Moderation:</span>@endif @include('admin.reports.status', ['status' => $report->status])</div></div>
+    @if(session('review_saved'))<p id="review-success" role="status" tabindex="-1" class="mt-5 rounded-xl border border-moss/30 bg-white p-4 text-sm text-moss">Review decision recorded. This saves moderation only. To email a verified report, preview the recipient and use Approve &amp; Send.</p>@endif
     <div class="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div class="min-w-0 space-y-6">
             <section class="rounded-xl border border-line bg-white p-5 sm:p-6">
@@ -46,17 +46,18 @@
         <section class="rounded-xl border border-line bg-white p-5 sm:p-6" aria-labelledby="review-heading">
             <div class="mb-6 border-b border-line pb-6">
                 <h2 class="text-lg font-semibold">Environmental referral</h2>
-                @if($referral)<p class="mt-3 text-sm">Referral {{ $referral->reference }} / {{ $referral->status }}. Repeated approval does not send again.</p><a class="mt-3 inline-block text-water underline" href="{{ route('admin.referrals.index') }}">View referral history</a>
+                @if($referral)<p class="mt-3 text-sm">Referral {{ $referral->reference }} / {{ $referral->label() }}. Repeated approval does not send again.</p><a class="mt-3 inline-block text-water underline" href="{{ route('admin.referrals.index') }}">View referral history</a>
                 @elseif($recipients->isNotEmpty())
-                    <p class="mt-3 text-xs text-muted">Suggestions use explicit water-body assignments and locality labels. They do not establish barangay jurisdiction. Verify the report before sending.</p>
+                    <p class="mt-3 text-xs text-muted">{{ $suggestedRecipient ? 'Suggested from the exact verified municipality label. Review the recipient before approval.' : 'Municipality unknown, ambiguous, or without a unique recipient. Select and verify the recipient manually.' }} Verify the report, preview, then explicitly Approve &amp; Send.</p>
                     <form method="GET" action="{{ route('admin.referrals.preview', $report) }}" class="mt-4 space-y-4">
-                        <div><label for="agency_id" class="form-label">Suggested recipient / change recipient</label><select id="agency_id" name="agency_id" class="form-input" required>@foreach($recipients as $recipient)<option value="{{ $recipient->id }}">{{ $recipient->name }} / {{ $recipient->verification_status }} / {{ $recipient->email }}</option>@endforeach</select></div>
+                        <div><label for="agency_id" class="form-label">Municipality recipient / change recipient</label><select id="agency_id" name="agency_id" class="form-input" required><option value="">Choose a recipient manually</option>@foreach($recipients as $recipient)<option value="{{ $recipient->id }}" @selected($suggestedRecipient === $recipient->id)>{{ $recipient->municipality }} / {{ $recipient->verification_status }} / {{ $recipient->email }}</option>@endforeach</select></div>
                         @if($report->photo_path)<label class="flex gap-3 text-sm"><input type="checkbox" name="include_photo" value="1"><span>Include the supporting photo only if sharing is permitted and appropriate.</span></label>@endif
                         <button class="secondary-button">Preview email</button>
                     </form>
                 @else<p class="mt-3 text-sm">No active recipient is assigned to this water body. <a class="text-water underline" href="{{ route('admin.agencies.create') }}">Add a provisional or verified recipient</a>.</p>@endif
             </div>
             <h2 id="review-heading" class="text-lg font-semibold">Review decision</h2>
+            <p class="mt-3 text-sm text-muted">Record decision saves moderation only. Sending requires a separate preview and Approve &amp; Send confirmation.</p>
             @if($available = \App\Models\PollutionReport::TRANSITIONS[$report->status] ?? [])
                 <form id="review-form" method="POST" action="{{ route('admin.reports.status', $report) }}" class="mt-4 space-y-4">
                     @csrf @method('PATCH')

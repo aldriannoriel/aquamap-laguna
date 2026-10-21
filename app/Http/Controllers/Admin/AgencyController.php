@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AgencyRequest;
 use App\Models\Agency;
 use App\Models\WaterBody;
+use App\Support\MunicipalityRouting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +27,8 @@ class AgencyController extends Controller
             }
         }
 
-        return view('admin.agencies.index', ['agencies' => $q->orderBy('municipality')->paginate(15)->withQueryString(), 'filters' => $f]);
+        return view('admin.agencies.index', ['agencies' => $q->orderBy('municipality')->paginate(15)->withQueryString(), 'filters' => $f,
+            'municipalityBodies' => WaterBody::supported()->orderBy('name')->get(['name', 'municipality'])->groupBy('municipality')]);
     }
 
     public function create(): View
@@ -42,6 +44,7 @@ class AgencyController extends Controller
     private function form(Agency $agency): View
     {
         return view('admin.agencies.form', ['agency' => $agency, 'waterBodies' => WaterBody::supported()->orderBy('name')->get(['id', 'name', 'municipality']),
+            'municipalities' => MunicipalityRouting::municipalities(),
             'selected' => $agency->exists ? $agency->waterBodies()->pluck('water_bodies.id')->all() : []]);
     }
 
@@ -63,8 +66,8 @@ class AgencyController extends Controller
     {
         DB::transaction(function () use ($request, $agency): void {
             $data = $request->validated();
-            $ids = $data['water_body_ids'];
-            unset($data['water_body_ids']);
+            $ids = $data['water_body_ids'] ?? [];
+            unset($data['water_body_ids'], $data['barangay']);
             $data['email'] = mb_strtolower($data['email']);
             $agency->forceFill($data)->save();
             $agency->waterBodies()->sync($ids);

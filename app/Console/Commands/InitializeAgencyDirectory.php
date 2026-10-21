@@ -5,13 +5,14 @@ namespace App\Console\Commands;
 use App\Models\Agency;
 use App\Models\Referral;
 use App\Models\WaterBody;
+use App\Support\MunicipalityRouting;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class InitializeAgencyDirectory extends Command
 {
-    protected $signature = 'agencies:initialize';
+    protected $signature = 'agencies:initialize {--normalize : Normalize existing municipality identities without creating entries}';
 
     protected $description = 'Initialize provisional test routing once; never recreates deleted recipients';
 
@@ -23,22 +24,43 @@ class InitializeAgencyDirectory extends Command
             throw new RuntimeException('Agency initialization requires aquamap_laguna or isolated tests.');
         }
         $count = DB::transaction(function (): int {
+            if ($this->option('normalize')) {
+                $agencies = Agency::orderBy('id')->lockForUpdate()->get();
+                $municipalities = MunicipalityRouting::municipalities();
+                if ($agencies->groupBy('municipality')->contains(fn ($group) => $group->count() > 1)
+                    || $agencies->contains(fn (Agency $a) => ! $municipalities->contains($a->municipality) || filled($a->barangay))) {
+                    throw new RuntimeException('Existing recipients require manual duplicate/locality review. Nothing was changed.');
+                }
+                $changed = 0;
+                foreach ($agencies as $agency) {
+                    if (str_starts_with($agency->name, 'Provisional referral route: ')) {
+                        $agency->name = MunicipalityRouting::label($agency->municipality);
+                    }
+                    $agency->identity_key = Agency::identityKey($agency->name, $agency->municipality, null);
+                    if ($agency->isDirty()) {
+                        $agency->save();
+                        $changed++;
+                    }
+                }
+
+                return $changed;
+            }
             DB::table('agency_directory_initializations')->insertOrIgnore(['key' => 'provisional-laguna-v1']);
             $marker = DB::table('agency_directory_initializations')->where('key', 'provisional-laguna-v1')->lockForUpdate()->first();
             if ($marker->completed_at !== null) {
                 return 0;
             }
             $created = 0;
-            foreach (["Los Ba\u{00f1}os", 'San Pablo City', 'Cavinti', 'Pangil', 'Luisiana', 'Siniloan', 'Majayjay'] as $municipality) {
+            foreach (MunicipalityRouting::municipalities() as $municipality) {
                 $ids = WaterBody::supported()->where('municipality', $municipality)->pluck('id');
                 if ($ids->isEmpty()) {
                     continue;
                 }
-                $key = Agency::identityKey('Provisional referral route: '.$municipality, $municipality, null);
+                $key = Agency::identityKey(MunicipalityRouting::label($municipality), $municipality, null);
                 if (Agency::where('identity_key', $key)->exists()) {
                     continue;
                 }
-                $a = Agency::forceCreate(['name' => 'Provisional referral route: '.$municipality, 'municipality' => $municipality, 'email' => Referral::TEST_RECIPIENT,
+                $a = Agency::forceCreate(['name' => MunicipalityRouting::label($municipality), 'municipality' => $municipality, 'email' => Referral::TEST_RECIPIENT,
                     'active' => true, 'verification_status' => 'provisional', 'identity_key' => $key,
                     'notes' => 'Test routing only. No official agency identity, barangay responsibility or jurisdiction is verified. Associations use existing exact locality labels.']);
                 $a->waterBodies()->sync($ids);
@@ -51,7 +73,7 @@ class InitializeAgencyDirectory extends Command
 
             return $created;
         });
-        $this->info($count.' provisional test recipients created; no email sent.');
+        $this->info($count.($this->option('normalize') ? ' municipality recipients normalized; no entries created or email sent.' : ' provisional test recipients created; no email sent.'));
 
         return self::SUCCESS;
     }

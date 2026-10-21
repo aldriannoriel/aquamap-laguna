@@ -12,12 +12,14 @@ use App\Models\WaterBody;
 use App\Support\ReferralWorkflow;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\ExplorerSeeder;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Tests\TestCase;
 
@@ -134,6 +136,7 @@ class ReferralTest extends TestCase
 
     public function test_mail_configuration_blocks_log_transports_and_test_send_requires_explicit_approval(): void
     {
+        $this->assertContains('php artisan queue:work referrals --queue=referrals --tries=3 --timeout=45', array_column(DevCommands::commands(), 'command'));
         $this->actingAs($this->admin());
         $page = $this->get(route('admin.referrals.index'))->assertOk();
         Mail::assertNothingSent();
@@ -185,5 +188,80 @@ class ReferralTest extends TestCase
         $this->assertSame('transport_outcome_unknown', $ref->fresh()->error_code);
         $this->assertStringNotContainsString('secret transport', json_encode($ref->fresh()->getAttributes()));
         $this->actingAs($this->admin())->post(route('admin.referrals.retry', $ref), ['approved' => 1])->assertConflict();
+    }
+
+    public function test_moderation_does_not_send_and_smtp_handoff_moves_report_out_of_action_required_without_losing_evidence(): void
+    {
+        $r = $this->report();
+        $r->forceFill(['status' => 'pending'])->save();
+        $a = $this->agency($r);
+        $this->actingAs($this->admin())->patch(route('admin.reports.status', $r), ['expected_status' => 'pending', 'status' => 'verified', 'review_note' => 'Reviewed for referral'])->assertRedirect();
+        Mail::assertNothingSent();
+        Queue::assertNothingPushed();
+        $r->refresh();
+        $photo = $r->photo_path;
+        $this->get(route('admin.reports.show', $r))->assertOk()->assertSee('This saves moderation only.');
+        $data = ['agency_id' => $a->id, 'include_photo' => 0, 'review_hash' => ReferralWorkflow::reviewHash($r, $a, false), 'approved' => 1];
+        $this->post(route('admin.referrals.store', $r), $data)->assertSessionHas('referral_saved', 'Referral queued for sending.');
+        $this->get(route('admin.reports.index', ['queue' => 'action']))->assertSee('Approved for referral / queued');
+        $ref = Referral::sole();
+        (new SendReferral($ref->id))->handle();
+        $this->get(route('admin.reports.index', ['queue' => 'action']))->assertDontSee('Report #'.$r->id);
+        $this->get(route('admin.reports.index', ['queue' => 'processed']))->assertSee('Report #'.$r->id)->assertSee('Sent / accepted by SMTP');
+        $this->get(route('admin.reports.show', $r))->assertOk()->assertSee('Sent / accepted by SMTP')->assertSee('Moderation:');
+        $this->get(route('admin.referrals.index'))->assertSee('Referral email sent successfully.');
+        $this->post(route('admin.referrals.store', $r), $data)->assertSessionHas('referral_saved', 'Referral email sent successfully (accepted by SMTP). Inbox receipt is unverified.');
+        (new SendReferral($ref->id))->handle();
+        Queue::assertPushed(SendReferral::class, 1);
+        Mail::assertSent(EnvironmentalReferral::class, 1);
+        $this->assertDatabaseCount('report_reviews', 1);
+        $this->assertSame($photo, $r->fresh()->photo_path);
+        Storage::disk('pollution-reports')->assertExists($photo);
+        $this->assertSame('14.1160000', $r->fresh()->latitude);
+    }
+
+    public function test_one_municipality_routes_multiple_bodies_and_unknown_or_boundary_locality_never_selects_a_default(): void
+    {
+        $r = $this->report();
+        $a = $this->agency($r);
+        $a->waterBodies()->detach();
+        $other = WaterBody::where('name', 'Yambo Lake')->sole();
+        $this->actingAs($this->admin());
+        $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', $a->id);
+        $this->get(route('admin.referrals.preview', [$r, 'agency_id' => $a->id]))->assertOk();
+        $r->forceFill(['water_body_id' => $other->id])->save();
+        $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', $a->id);
+        foreach (['Unknown', 'Majayjay / Liliw access area'] as $locality) {
+            $other->forceFill(['municipality' => $locality])->save();
+            $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', null)->assertSee('Select and verify the recipient manually.');
+            $this->get(route('admin.referrals.preview', $r))->assertSessionHasErrors('agency_id');
+            $this->get(route('admin.referrals.preview', [$r, 'agency_id' => $a->id]))->assertOk();
+        }
+        Mail::assertNothingSent();
+        Queue::assertNothingPushed();
+    }
+
+    public function test_explicit_smtp_rejection_is_visible_retryable_and_keeps_attempt_history(): void
+    {
+        $r = $this->report();
+        $ref = $this->approve($r, $this->agency($r));
+        Mail::swap(new MailManager(app()));
+        $transport = \Mockery::mock(TransportInterface::class);
+        $transport->shouldReceive('send')->once()->andThrow(new TransportException('Expected response code "235" but got code "535", with message "private provider diagnostics".'));
+        $transport->shouldReceive('__toString')->andReturn('smtp');
+        Mail::extend('smtp', fn () => $transport);
+        (new SendReferral($ref->id))->handle();
+        $this->assertSame('failed', $ref->fresh()->status);
+        $this->assertSame('smtp_auth_rejected', $ref->fresh()->error_code);
+        $this->actingAs($this->admin())->get(route('admin.referrals.index'))->assertSee('SMTP rejected sender authentication.')->assertSee('Retry safely')->assertDontSee('private provider diagnostics');
+        $this->get(route('admin.reports.index', ['queue' => 'action']))->assertSee('Report #'.$r->id)->assertSee('Failed');
+        Mail::fake();
+        $this->post(route('admin.referrals.retry', $ref), ['approved' => 1])->assertRedirect();
+        $this->post(route('admin.referrals.retry', $ref), ['approved' => 1])->assertConflict();
+        (new SendReferral($ref->id))->handle();
+        $this->assertSame(2, $ref->fresh()->attempts);
+        $this->assertSame('accepted', $ref->fresh()->status);
+        $this->assertSame(1, $ref->events()->where('event', 'smtp_auth_rejected')->count());
+        Mail::assertSent(EnvironmentalReferral::class, 1);
     }
 }

@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ReportFilterRequest;
 use App\Models\Agency;
 use App\Models\PollutionReport;
-use App\Models\Referral;
 use App\Models\WaterBody;
+use App\Support\MunicipalityRouting;
+use App\Support\ReferralWorkflow;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -18,7 +19,14 @@ class ReportController extends Controller
     public function index(ReportFilterRequest $request): View
     {
         $filters = $request->validated();
-        $query = PollutionReport::query()->with('waterBody:id,name');
+        $query = PollutionReport::query()->with(['waterBody:id,name', 'referral']);
+        $queue = $filters['queue'] ?? 'all';
+        if ($queue === 'action') {
+            $query->actionRequired();
+        } elseif ($queue === 'processed') {
+            $query->where(fn (Builder $q) => $q->whereHas('referral', fn (Builder $r) => $r->where('status', 'accepted'))
+                ->orWhere(fn (Builder $r) => $r->whereIn('status', ['rejected', 'resolved'])->whereDoesntHave('referral')));
+        }
         foreach (['lake' => 'water_body_id', 'type' => 'pollution_type', 'status' => 'status'] as $filter => $column) {
             if (isset($filters[$filter])) {
                 $query->where($column, $filters[$filter]);
@@ -39,7 +47,7 @@ class ReportController extends Controller
 
         return view('admin.reports.index', [
             'reports' => $query->latest('id')->paginate(15)->appends($filters),
-            'filters' => $filters, 'lakes' => WaterBody::query()->supported()->orderBy('name')->get(['id', 'name']),
+            'filters' => $filters, 'queue' => $queue, 'lakes' => WaterBody::query()->supported()->orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -47,10 +55,14 @@ class ReportController extends Controller
     {
         $pollutionReport->load(['waterBody:id,name,municipality', 'reviews.administrator:id,name']);
 
+        $recipients = Agency::with('waterBodies:id')->where('active', true)->orderBy('municipality')->get()
+            ->filter(fn (Agency $agency): bool => ReferralWorkflow::eligible($agency, $pollutionReport));
+        $matches = $recipients->where('municipality', MunicipalityRouting::exact($pollutionReport->waterBody->municipality));
+
         return view('admin.reports.show', ['report' => $pollutionReport,
-            'recipients' => Agency::where('active', true)->whereHas('waterBodies', fn ($q) => $q->whereKey($pollutionReport->water_body_id))
-                ->orderBy('verification_status', 'desc')->orderBy('municipality')->get(),
-            'referral' => Referral::where('pollution_report_id', $pollutionReport->id)->first(),
+            'recipients' => $recipients,
+            'suggestedRecipient' => $matches->count() === 1 ? $matches->first()->id : null,
+            'referral' => $pollutionReport->referral,
         ]);
     }
 

@@ -26,6 +26,7 @@ class ReportFilterRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'queue' => ['nullable', Rule::in(['all', 'action', 'processed'])],
             'q' => ['nullable', 'string', 'max:200'],
             'lake' => ['nullable', 'integer', Rule::exists(WaterBody::class, 'id')],
             'type' => ['nullable', 'string', Rule::in(array_keys(PollutionReport::TYPES))],

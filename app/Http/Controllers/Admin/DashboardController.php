@@ -16,6 +16,6 @@ class DashboardController extends Controller
             $counts[$status] = (int) ($grouped[$status] ?? 0);
         }
 
-        return view('admin.dashboard', ['counts' => $counts]);
+        return view('admin.dashboard', ['counts' => $counts, 'actionCount' => PollutionReport::actionRequired()->count()]);
     }
 }

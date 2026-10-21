@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Support\Testing\Fakes\MailFake;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Throwable;
 
 class SendReferral implements ShouldQueue
@@ -72,7 +73,7 @@ class SendReferral implements ShouldQueue
         }
         try {
             $sent = Mail::mailer(config('referrals.mailer'))->to($r->recipient_snapshot['email'])->send($mail);
-            $fake = app()->runningUnitTests() && Mail::getFacadeRoot() instanceof MailFake;
+            $fake = Mail::getFacadeRoot() instanceof MailFake;
             if ($sent === null && ! $fake) {
                 throw new \RuntimeException('No transport acknowledgement.');
             }
@@ -85,9 +86,20 @@ class SendReferral implements ShouldQueue
                 $r->forceFill(['status' => 'accepted', 'sent_at' => now(), 'error_code' => null, 'provider_message_id' => $id])->save();
                 ReferralWorkflow::record($r, 'transport_accepted');
             });
-        } catch (Throwable) {
-            Referral::whereKey($r->id)->where('status', 'sending')->update(['status' => 'uncertain', 'error_code' => 'transport_outcome_unknown', 'failed_at' => now()]);
-            ReferralWorkflow::record($r, 'transport_outcome_unknown_no_automatic_retry');
+        } catch (Throwable $exception) {
+            $code = null;
+            if ($exception instanceof TransportExceptionInterface
+                && preg_match('/Expected response code "[0-9,\/ ]+" but got code "([45][0-9]{2})"/', $exception->getMessage(), $matches)) {
+                $code = in_array($matches[1], ['530', '534', '535'], true) ? 'smtp_auth_rejected' : 'smtp_rejected';
+            }
+            DB::transaction(function () use ($r, $code): void {
+                $current = Referral::whereKey($r->id)->lockForUpdate()->firstOrFail();
+                if ($current->status !== 'sending') {
+                    return;
+                }
+                $current->forceFill(['status' => $code ? 'failed' : 'uncertain', 'error_code' => $code ?? 'transport_outcome_unknown', 'failed_at' => now()])->save();
+                ReferralWorkflow::record($current, $code ?? 'transport_outcome_unknown_no_automatic_retry');
+            });
         }
     }
 

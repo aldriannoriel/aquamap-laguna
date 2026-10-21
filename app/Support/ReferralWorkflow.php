@@ -63,6 +63,16 @@ class ReferralWorkflow
         return $agency->only(['name', 'email', 'municipality', 'barangay', 'verification_status']);
     }
 
+    public static function eligible(Agency $agency, PollutionReport $report): bool
+    {
+        $report->loadMissing('waterBody');
+        $agency->loadMissing('waterBodies');
+        $municipality = MunicipalityRouting::exact($report->waterBody->municipality);
+
+        return $agency->active && ($municipality === null || $agency->municipality === $municipality
+            || $agency->waterBodies->contains('id', $report->water_body_id));
+    }
+
     public static function reviewHash(PollutionReport $report, Agency $agency, bool $photo): string
     {
         return hash('sha256', json_encode([self::payload($report, $photo), self::recipient($agency)], JSON_THROW_ON_ERROR));
@@ -85,7 +95,7 @@ class ReferralWorkflow
             }
             abort_unless($report->status === 'verified', 422, 'Verify this report before approving a referral.');
             $agency = Agency::whereKey($agency->id)->lockForUpdate()->firstOrFail();
-            abort_unless($agency->active && $agency->waterBodies()->whereKey($report->water_body_id)->exists(), 422, 'Choose an active recipient assigned to this water body.');
+            abort_unless(self::eligible($agency, $report), 422, 'Choose an active municipality recipient or a verified routing assignment.');
             abort_unless(hash_equals(self::reviewHash($report, $agency, $photo), $reviewHash), 409, 'The report or recipient changed. Preview the email again.');
             $r = Referral::forceCreate(['reference' => (string) Str::uuid(), 'dedupe_key' => 'report:'.$report->id,
                 'pollution_report_id' => $report->id, 'agency_id' => $agency->id, 'approved_by' => $admin->id, 'approved_at' => now(),
@@ -124,8 +134,8 @@ class ReferralWorkflow
         self::assertReady();
         DB::transaction(function () use ($referral): void {
             $r = Referral::whereKey($referral->id)->lockForUpdate()->firstOrFail();
-            abort_unless($r->status === 'failed' && $r->sending_at === null, 409, 'This outcome cannot be retried safely. Check the provider before any resend.');
-            $r->forceFill(['status' => 'queued', 'attempts' => 0, 'claim_token' => null, 'error_code' => null, 'failed_at' => null, 'queued_at' => now()])->save();
+            abort_unless($r->retryable(), 409, 'This outcome cannot be retried safely. Check the provider before any resend.');
+            $r->forceFill(['status' => 'queued', 'claim_token' => null, 'sending_at' => null, 'error_code' => null, 'failed_at' => null, 'queued_at' => now()])->save();
             self::record($r, 'admin_safe_retry_queued');
             Queue::connection('referrals')->push(new SendReferral($r->id), '', 'referrals');
         });

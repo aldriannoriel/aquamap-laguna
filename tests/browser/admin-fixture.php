@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Symfony\Component\Mailer\Transport\NullTransport;
 
 $root = dirname(__DIR__, 2);
 $directory = realpath(getenv('AQUAMAP_REPORT_FIXTURE') ?: '');
@@ -51,7 +50,7 @@ if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1') {
     config(['referrals.mailer' => 'smtp', 'mail.mailers.smtp.host' => 'smtp.example.test',
         'mail.mailers.smtp.username' => 'fixture@example.test', 'mail.mailers.smtp.password' => 'fixture-only',
         'mail.from.address' => 'fixture@example.test']);
-    Mail::extend('smtp', fn () => new NullTransport);
+    Mail::fake();
 }
 DB::purge('sqlite');
 if (DB::connection()->getDriverName() !== 'sqlite'

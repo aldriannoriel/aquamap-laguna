@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        DevCommands::artisan('queue:work referrals --queue=referrals --tries=3 --timeout=45', 'referrals');
         Gate::define('access-admin', fn (User $user): bool => $user->is_admin === true);
         RateLimiter::for('admin-login', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
         RateLimiter::for('admin-reviews', fn (Request $request) => Limit::perMinute(30)->by((string) $request->user()?->id));

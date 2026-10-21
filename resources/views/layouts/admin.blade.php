@@ -16,7 +16,7 @@
                 <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-8">
                     <nav aria-label="Administrator navigation" class="flex flex-wrap items-center gap-5 text-sm font-semibold text-estuary">
                         <a href="{{ route('admin.dashboard') }}" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif>Overview</a>
-                        <a href="{{ route('admin.reports.index') }}" @if(request()->routeIs('admin.reports.*')) aria-current="page" @endif>Manage reports</a>
+                        <a href="{{ route('admin.reports.index', ['queue'=>'action']) }}" @if(request()->routeIs('admin.reports.*')) aria-current="page" @endif>Manage reports</a>
                         <a href="{{ route('admin.agencies.index') }}">Agency directory</a>
                         <a href="{{ route('admin.referrals.index') }}">Referrals &amp; email test</a>
                     </nav>

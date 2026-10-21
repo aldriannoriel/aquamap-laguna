@@ -14,7 +14,14 @@ class Agency extends Model
 
     public static function identityKey(string $name, string $municipality, ?string $barangay): string
     {
-        return hash('sha256', implode('|', array_map(fn (?string $v): string => mb_strtolower(preg_replace('/\s+/u', ' ', trim($v ?? ''))), [$name, $municipality, $barangay])));
+        return hash('sha256', mb_strtolower(preg_replace('/\s+/u', ' ', trim($municipality))));
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (Agency $agency): void {
+            $agency->identity_key = self::identityKey($agency->name, $agency->municipality, null);
+        });
     }
 
     public function waterBodies(): BelongsToMany

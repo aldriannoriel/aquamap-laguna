@@ -97,4 +97,30 @@ class AgencyDirectoryTest extends TestCase
         $id = DB::table('water_bodies')->insertGetId(['name' => 'Legacy resort', 'municipality' => 'Legacy', 'water_type' => 'Unknown', 'category' => 'spring', 'site_type' => 'resort']);
         $this->post(route('admin.agencies.store'), [...$this->data(), 'water_body_ids' => [$id]])->assertSessionHasErrors('water_body_ids.0');
     }
+
+    public function test_municipality_identity_ignores_office_names_and_inactive_recipients_and_requires_verified_localities(): void
+    {
+        $this->actingAs($this->admin());
+        $this->post(route('admin.agencies.store'), [...$this->data(), 'water_body_ids' => [], 'active' => 0])->assertSessionHasNoErrors();
+        $this->post(route('admin.agencies.store'), [...$this->data(), 'name' => 'Different office name', 'municipality' => ' san pablo city '])->assertSessionHasErrors('municipality');
+        $this->post(route('admin.agencies.store'), [...$this->data(), 'municipality' => 'Invented town'])->assertSessionHasErrors('municipality');
+        $this->assertDatabaseCount('agencies', 1);
+        $this->assertDatabaseCount('agency_water_body', 0);
+    }
+
+    public function test_existing_directory_normalization_preserves_routes_email_and_deleted_initialization_marker(): void
+    {
+        $this->artisan('agencies:initialize', ['--no-interaction' => true])->assertExitCode(0);
+        $a = Agency::firstOrFail();
+        DB::table('agencies')->where('id', $a->id)->update(['name' => 'Provisional referral route: '.$a->municipality, 'identity_key' => hash('sha256', 'legacy identity')]);
+        $routes = DB::table('agency_water_body')->get()->map(fn ($row) => (array) $row)->all();
+        $count = Agency::count();
+        $this->artisan('agencies:initialize', ['--normalize' => true, '--no-interaction' => true])->assertExitCode(0);
+        $this->assertSame($count, Agency::count());
+        $this->assertSame(Referral::TEST_RECIPIENT, $a->fresh()->email);
+        $this->assertSame($routes, DB::table('agency_water_body')->get()->map(fn ($row) => (array) $row)->all());
+        $first = Agency::all()->toArray();
+        $this->artisan('agencies:initialize', ['--normalize' => true, '--no-interaction' => true])->assertExitCode(0);
+        $this->assertSame($first, Agency::all()->toArray());
+    }
 }
