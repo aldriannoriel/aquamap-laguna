@@ -45,7 +45,7 @@ class MapTest extends TestCase
         $payload = $this->lakePayload($response);
         $this->assertSame(['Pandin Lake', 'Sampaloc Lake', 'Yambo Lake'], array_column($payload, 'name'));
         foreach ($payload as $item) {
-            $this->assertSame(['id', 'name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url', 'category', 'aliases', 'site_type', 'spring_type', 'official_url', 'geography'], array_keys($item));
+            $this->assertSame(['id', 'name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url', 'category', 'aliases', 'official_url', 'geography'], array_keys($item));
         }
         $this->assertSame($lake->latitude, collect($payload)->firstWhere('id', $lake->id)['latitude']);
         $this->assertSame($lake->longitude, $payload[1]['longitude']);

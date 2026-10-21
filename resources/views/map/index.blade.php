@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Explore Laguna's lakes, rivers, waterfalls and spring resorts through sourced geography and ecological research.">
+    <meta name="description" content="Explore Laguna's lakes, rivers and waterfalls through sourced geography and ecological research.">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Water explorer | AquaMap Laguna</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -34,7 +34,6 @@
                                 <span class="water-row-name">{{ $lake['name'] }}</span><span class="water-row-place">{{ $lake['municipality'] }}</span>
                                 <span class="water-row-meta"><span>{{ $categories[$lake['category']] }}</span><span class="selection-label">View details</span></span>
                                 @unless ($lake['geography'])<span class="water-row-unmapped">Location awaiting verification; not mapped.</span>@endunless
-                                @if ($lake['site_type'] === 'resort')<span class="water-row-unmapped">Property reference; spring source not verified.</span>@endif
                             </button></li>
                         @empty
                             <li class="p-4 text-sm text-muted">No water body records are available. Please check again later.</li>
@@ -64,7 +63,7 @@
         </div>
         <div class="map-context">
             <p>Select a marker, shape or sidebar item for environmental context, historical species records and research sources.</p>
-            <details id="research-notes"><summary>Map context &amp; data limits</summary><p>Source-checked WGS84 geography is a reference, not a survey, legal boundary or incident location. River courses may be incomplete. Original lake-point datum remains unconfirmed. Resort markers identify properties, not verified spring sources. Water type and historical fish records do not establish current safety or suitability. Community reports and evidence are private.</p></details>
+            <details id="research-notes"><summary>Map context &amp; data limits</summary><p>Source-checked WGS84 geography is a reference, not a survey, legal boundary or incident location. River courses may be incomplete. Original lake-point datum remains unconfirmed. Water type and historical fish records do not establish current safety or suitability. Community reports and evidence are private.</p></details>
         </div>
         <noscript><p class="mt-3 rounded-lg border border-line bg-white p-4 text-sm">Enable JavaScript for the interactive map, filters, individual profiles and research sources.</p></noscript>
     </main>

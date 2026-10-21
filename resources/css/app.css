@@ -57,7 +57,6 @@
 .category-waterfall { background: #456845; }
 
 
-.category-spring { background: #8b623d; }
 .map-dashboard > header > div { max-width: none; padding: .65rem 1rem; gap: .6rem; }
 .map-dashboard > header [aria-label="AquaMap Laguna home"] > span:first-child { width: 2.25rem; height: 2.25rem; border-radius: .6rem; }
 .map-dashboard > header [aria-label="AquaMap Laguna home"] > span:first-child svg { width: 1.7rem; height: 1.7rem; }

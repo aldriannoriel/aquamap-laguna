@@ -17,9 +17,9 @@ class MapController extends Controller
     {
         $fields = ['id', 'name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url'];
 
-        $metadata = ['category', 'aliases', 'site_type', 'spring_type', 'official_url', 'geography', 'research_references', 'image'];
+        $metadata = ['category', 'aliases', 'official_url', 'geography', 'research_references', 'image'];
         $records = WaterBody::query()->select([...$fields, ...$metadata])
-            ->whereIn('category', array_keys(WaterBody::PUBLIC_CATEGORIES))
+            ->supported()
             ->with(['fishSpecies' => fn (BelongsToMany $query): BelongsToMany => $query
                 ->select(['fish_species.id', 'common_name', 'scientific_name', 'water_type', 'habitat_requirements', 'fish_species.source_url'])
                 ->orderBy('common_name')])
@@ -42,8 +42,6 @@ class MapController extends Controller
                 $data['source_url'] = $this->publicSource($data['source_url']);
                 $data['category'] = $lake->category;
                 $data['aliases'] = array_values(array_filter(is_array($lake->aliases) ? $lake->aliases : [], 'is_string'));
-                $data['site_type'] = $lake->site_type === 'resort' ? 'resort' : 'water_body';
-                $data['spring_type'] = in_array($lake->spring_type, ['geothermal_hot_spring', 'natural_spring'], true) ? $lake->spring_type : null;
                 $data['official_url'] = $this->publicSource($lake->official_url);
                 $data['geography'] = $displayGeographies[$lake->id]['geography'];
                 if (($displayGeographies[$lake->id]['course']['coverage'] ?? null) === 'available_named_course') {

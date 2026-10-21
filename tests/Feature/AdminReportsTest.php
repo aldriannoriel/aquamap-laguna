@@ -84,7 +84,7 @@ class AdminReportsTest extends TestCase
 
         $this->assertSame($before, $lake->fresh()->toArray());
         $this->assertSame($lake->id, $report->fresh()->water_body_id);
-        $this->assertDatabaseCount('water_bodies', 30);
+        $this->assertDatabaseCount('water_bodies', 28);
     }
 
     public function test_dashboard_counts_each_status_and_includes_unknown_legacy_rows_only_in_total(): void

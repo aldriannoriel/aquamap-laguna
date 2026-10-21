@@ -95,7 +95,7 @@
 
             <fieldset class="border-t border-line pt-5">
                 <legend class="pr-3 text-lg font-semibold">Incident location <span class="text-sm font-normal text-muted">(optional)</span></legend>
-                <p id="incident-help" class="mt-2 text-xs leading-5 text-muted">Choose a water body to center the map, then tap or click where you observed the incident. Blue circles are water body references, not incident locations. They use source-checked WGS84 reference geometry; positional precision remains unconfirmed. They do not identify spring sources. You can leave the incident point blank.</p>
+                <p id="incident-help" class="mt-2 text-xs leading-5 text-muted">Choose a water body to center the map, then tap or click where you observed the incident. Blue circles are water body references, not incident locations. They use source-checked WGS84 reference geometry; positional precision remains unconfirmed. You can leave the incident point blank.</p>
                 <div class="mt-3 overflow-hidden rounded-xl border border-line">
                     <div id="incident-map" class="h-72 w-full sm:h-80" role="region" aria-label="Choose incident location. Pan with arrow keys; use the button below to select the map center." aria-describedby="incident-help incident-status"></div>
                 </div>

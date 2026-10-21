@@ -37,7 +37,7 @@ class ReportController extends Controller
 
         return view('admin.reports.index', [
             'reports' => $query->latest('id')->paginate(15)->appends($filters),
-            'filters' => $filters, 'lakes' => WaterBody::query()->orderBy('name')->get(['id', 'name']),
+            'filters' => $filters, 'lakes' => WaterBody::query()->supported()->orderBy('name')->get(['id', 'name']),
         ]);
     }
 

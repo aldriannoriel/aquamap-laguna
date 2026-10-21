@@ -19,7 +19,7 @@ class ResearchSourcesTest extends TestCase
         $this->artisan('migrate', ['--database' => 'sqlite', '--no-interaction' => true])->assertExitCode(0);
     }
 
-    public function test_all_54_profiles_keep_six_groups_and_unique_documents_without_changing_records(): void
+    public function test_all_52_profiles_keep_six_groups_and_unique_documents_without_changing_records(): void
     {
         $this->seed(DatabaseSeeder::class);
         $this->seed(ExplorerSeeder::class);
@@ -28,7 +28,7 @@ class ResearchSourcesTest extends TestCase
 
         $response = $this->get(route('map.index'))->assertOk();
 
-        $this->assertCount(54, $response->viewData('profiles'));
+        $this->assertCount(52, $response->viewData('profiles'));
         $uses = 0;
         foreach ($response->viewData('profiles') as $profile) {
             $library = $profile['research'];
@@ -41,7 +41,7 @@ class ResearchSourcesTest extends TestCase
             }
             $uses += $library['source_uses'];
         }
-        $this->assertSame(497, $uses);
+        $this->assertSame(483, $uses);
         $this->assertSame($before, [WaterBody::all()->toArray(), FishSpecies::all()->toArray(), WaterBodyFish::all()->toArray()]);
         $response->assertSee('OpenStreetMap contributors, ODbL 1.0')->assertSee('Image attribution')
             ->assertSee('Plapla')->assertSee('Pagpapalaki ng tilapya')->assertSee('Naming evidence only');

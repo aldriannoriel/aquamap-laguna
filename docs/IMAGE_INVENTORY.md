@@ -1,5 +1,7 @@
 # Water body image inventory
 
+Current scope (2026-10-21): only Lakes, Rivers and Waterfalls are public (26 photographs / 27 placeholders). Hidden Valley Springs is hidden; its image supplement, credit and asset remain preserved pending separate stored-record deletion approval. Historical inventories below retain their original audit scope. See SPRING_RESORT_REMOVAL.md.
+
 ## 2026-10-20: supplied Google document photographs
 
 The [source document](https://docs.google.com/document/d/1VgCM4bkVq816ffaz2uT_k31JQ_yfdOCLvnCl5veOmc4/edit) was downloaded through its public DOCX export and all ten embedded photographs were inspected in heading/paragraph order. Nine match the requested waterfall inventory; the Hidden Falls photograph is outside that inventory and is not published. Balisong Falls has a heading but no embedded image. Hulugan, Buruwisan, Taytay and Pagsanjan Falls have no replacement in the document and retain their existing photographs. Existing canonical names are preserved.

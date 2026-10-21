@@ -1,9 +1,8 @@
 <section data-profile-section="overview" aria-label="Profile">
     <h2 class="lake-detail-title">{{ $lake['name'] }}</h2>
     <p class="lake-detail-meta">{{ $lake['municipality'] }} / Laguna, Philippines</p>
-    <p class="profile-category">{{ $categories[$lake['category']] }}@if ($lake['site_type'] === 'resort') / Property reference @endif</p>
+    <p class="profile-category">{{ $categories[$lake['category']] }}</p>
     @if ($lake['description'])<p class="lake-detail-description">{{ \Illuminate\Support\Str::limit($lake['description'], 240) }}</p>@else<p class="lake-detail-fallback">No description is available for this water body.</p>@endif
-    @if ($lake['site_type'] === 'resort')<p class="profile-note">The source identifies this resort property. A natural spring source and its physical characteristics are not independently verified.</p>@endif
     <div class="profile-measurements">@include('map.geographic-summary')</div>
     @if ($profile['image'])
         <figure class="profile-photo"><img data-water-image src="{{ $profile['image']['path'] }}" alt="{{ $profile['image']['alt'] }}" loading="lazy" width="960" height="640" class="{{ ($profile['image']['fit'] ?? 'cover') === 'contain' ? 'object-contain' : 'object-cover' }}"><figcaption>Photo by {{ $profile['image']['author'] }} / {{ $profile['image']['license'] }}. Credits and permission in Research &amp; Sources.</figcaption></figure>

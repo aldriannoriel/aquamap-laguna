@@ -43,7 +43,7 @@ const originalCache = sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
 const finalValidation = process.argv.includes('--final');
-const artifactDirectory = process.argv.includes('--lake-sidebar') ? 'lake-sidebar/browser' : finalValidation ? 'final-validation/browser' : process.argv.includes('--research') ? 'research-audit/browser' : process.argv.includes('--fish') ? 'fish-names/browser' : process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
+const artifactDirectory = process.argv.includes('--supported-only') ? 'springs-removal/browser' : process.argv.includes('--lake-sidebar') ? 'lake-sidebar/browser' : finalValidation ? 'final-validation/browser' : process.argv.includes('--research') ? 'research-audit/browser' : process.argv.includes('--fish') ? 'fish-names/browser' : process.argv.includes('--quick') ? 'redesign/browser/quick' : 'redesign/browser';
 const imageSupplement = JSON.parse(readFileSync(path.join(root, 'database/data/explorer-images.json'), 'utf8'));
 const imageCatalogue = ['explorer.json', 'missing-water-bodies.json', 'waterfall-expansion.json'].flatMap(file => JSON.parse(readFileSync(path.join(root, 'database/data', file), 'utf8')));
 const imageReplacements = JSON.parse(readFileSync(path.join(root, 'database/data/waterfall-photos.json'), 'utf8'));
@@ -60,7 +60,7 @@ const fixtureEnvironment = { ...process.env, APP_ENV: 'testing', AQUAMAP_REPORT_
 const fixtureRouter = path.join(root, 'tests/browser/report-fixture.php');
 const setup = spawnSync('php', [fixtureRouter, 'setup'], { cwd: root, env: fixtureEnvironment, windowsHide: true, encoding: 'utf8' });
 assert.equal(setup.status, 0, 'Isolated map fixture setup failed.');
-assert.equal(JSON.parse(setup.stdout).lakes, 55);
+assert.equal(JSON.parse(setup.stdout).lakes, 53);
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function unusedPort() {
@@ -206,11 +206,14 @@ try {
         await send('Emulation.resetPageScaleFactor');
         await send('Emulation.setTouchEmulationEnabled', { enabled: mobile, maxTouchPoints: mobile ? 5 : 1 });
         await navigate('/map');
-        await waitFor(() => evaluate('document.querySelectorAll(".lake-marker").length === 43'), 'Expected 43 sourced map locations and 12 unmapped rivers.');
+        await waitFor(() => evaluate('document.querySelectorAll(".lake-marker").length === 41'), 'Expected 41 sourced map locations and 12 unmapped rivers.');
         assert.equal(await evaluate('document.querySelector(".reference-library, .reference-grid") === null && document.querySelectorAll("#main [data-profile-section]").length === 0'), true, "No public profile library or active expanded cards.");
         const lakes = await evaluate('JSON.parse(document.getElementById("lake-data").textContent)');
-        assert.equal(lakes.length, 55);
-        assert.equal(await evaluate('document.querySelectorAll("template[id^=profile-]").length'), 55);
+        assert(lakes.every(item => ['lake','river','waterfall'].includes(item.category)));
+        assert.equal(await evaluate('document.querySelector("[data-category=spring], [data-category=resort]") === null'), true);
+        assert.equal(await evaluate('document.body.textContent.includes("Hidden Valley Springs") || document.body.textContent.includes("Al Fresco Springs Resort")'), false);
+        assert.equal(lakes.length, 53);
+        assert.equal(await evaluate('document.querySelectorAll("template[id^=profile-]").length'), 53);
         assert.equal(lakes.filter(item => item.category === 'river').length, 29);
         assert(lakes.every(item => !('verified_report_count' in item)));
         assert.equal(await evaluate('document.querySelectorAll("[data-profile-tab]").length'), 4);
@@ -222,7 +225,7 @@ try {
             assert.equal(await evaluate('document.querySelector(".map-context > p").nextElementSibling.id'), 'research-notes');
             assert.equal(await evaluate('document.getElementById("water-search").labels.length'), 1);
             assert.equal(await evaluate('getComputedStyle(document.querySelector(".report-fab")).position'), 'fixed');
-            for (const [category, count] of Object.entries({ all: 55, lake: 11, river: 29, waterfall: 13, spring: 2 })) {
+            for (const [category, count] of Object.entries({ all: 53, lake: 11, river: 29, waterfall: 13 })) {
                 await click('[data-category="'+category+'"]');
                 assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'), count);
                 assert.equal(await evaluate('document.querySelector("[data-category='+category+'] [data-category-count]").textContent.trim()'), String(count));
@@ -240,7 +243,7 @@ try {
             assert.equal(await evaluate('scrollY'), initialPage);
         }
         const fishLakes = ['Pandin Lake', 'Sampaloc Lake', 'Yambo Lake'];
-        const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Tadlac Lake','Balanac River','San Isidro River','Yambo Lake','Hidden Valley Springs','Pagsanjan Falls'].includes(item.name) || (process.argv.includes('--fish') && fishLakes.includes(item.name)) || (process.argv.includes('--research') && ['Al Fresco Springs Resort','Balon-Balon Falls','Bunot Lake','Calibato Lake'].includes(item.name)));
+        const samples = lakes.filter(item => (!process.argv.includes('--quick') && [1440,390].includes(width)) || ['Tadlac Lake','Balanac River','San Isidro River','Yambo Lake','Pagsanjan Falls'].includes(item.name) || (process.argv.includes('--fish') && fishLakes.includes(item.name)) || (process.argv.includes('--research') && ['Balon-Balon Falls','Bunot Lake','Calibato Lake'].includes(item.name)));
         const contrastSelector = '[data-lake-id="'+samples[0].id+'"]';
         const { root: documentNode } = await send('DOM.getDocument');
         const { nodeId: contrastNode } = await send('DOM.querySelector', { nodeId: documentNode.nodeId, selector: contrastSelector });
@@ -283,7 +286,6 @@ try {
                 assert.equal(lake.geography.geometry.coordinates.length,20);
                 assert.equal(await evaluate('document.querySelectorAll("#selected-lake [data-course-source]").length'),20);
             }
-            if(lake.name==='Hidden Valley Springs')assert(overview.includes('spring source')||overview.includes('spring-source'));
             const expectedImage=await evaluate('document.querySelector("#selected-lake [data-water-image]")?.getAttribute("src") || null');
             if(expectedImage) {
                 const photoResponse = await fetch(base+expectedImage);
@@ -395,7 +397,7 @@ try {
         await evaluate('(()=>{const s=document.getElementById("water-search");s.value="no matching place fixture";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
         assert.equal(await evaluate('document.getElementById("filter-empty").hidden'),false);
         await click('#reset-map');
-        assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'),55);
+        assert.equal(await evaluate('document.querySelectorAll("[data-water-row]:not([hidden])").length'),53);
         const river=lakes.find(item=>item.name==='Balanac River');
         await click('[data-lake-id="'+river.id+'"]');
         await evaluate('document.getElementById("lake-map").focus({preventScroll:true})');
@@ -479,10 +481,6 @@ try {
             await send('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
             assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), 'Balanac River');
             await click('#close-water-detail');
-            await evaluate('(()=>{const s=document.getElementById("water-search");s.value="Hidden Valley Springs";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
-            await click('.lake-marker[title="Hidden Valley Springs"]');
-            assert.equal(await evaluate('document.getElementById("selected-lake-heading").textContent'), 'Hidden Valley Springs');
-            await click('#close-water-detail');
             await click('#reset-map');
         }
         await evaluate('(()=>{const s=document.getElementById("water-search");s.value="Pagsanjan Falls";s.dispatchEvent(new Event("input",{bubbles:true}));})()');
@@ -499,7 +497,7 @@ try {
         await navigate('/reports/create');
         assert.equal(await evaluate('document.getElementById("photo").required'),true);
         const choices=await evaluate('JSON.parse(document.getElementById("incident-lakes").textContent)');
-        assert.equal(choices.length,55);
+        assert.equal(choices.length,53);
         assert.equal(choices.find(item=>item.name==='San Isidro River').latitude,null);
     }
     assert.deepEqual(failures, []);

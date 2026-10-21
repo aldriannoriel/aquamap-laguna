@@ -33,7 +33,7 @@ class LakeSidebarTest extends TestCase
 
         $this->artisan('lakes:import', ['--no-interaction' => true])->assertExitCode(0);
 
-        $this->assertDatabaseCount('water_bodies', 55);
+        $this->assertDatabaseCount('water_bodies', 53);
         $this->assertSame($before, WaterBody::whereIn('id', array_column($before, 'id'))->orderBy('id')->get()->toArray());
         $this->assertDatabaseCount('water_body_fish', 3);
         $this->assertDatabaseCount('pollution_reports', 1);
@@ -67,7 +67,7 @@ class LakeSidebarTest extends TestCase
         $document->loadHTML($response->getContent(), LIBXML_NOERROR | LIBXML_NOWARNING);
         $xpath = new DOMXPath($document);
         $this->assertSame(0, $xpath->query('//main//article[starts-with(@id,"profile-")]')->length);
-        $this->assertSame(55, $xpath->query('//template[starts-with(@id,"profile-")]')->length);
+        $this->assertSame(53, $xpath->query('//template[starts-with(@id,"profile-")]')->length);
         foreach ($imported as $water) {
             $root = '//template[@id="profile-'.$water['id'].'"]';
             $this->assertSame(4, $xpath->query($root.'//section[@data-profile-section]')->length);

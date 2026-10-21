@@ -1856,48 +1856,5 @@
     ],
     "image": null,
     "aliases": []
-  },
-  {
-    "name": "Al Fresco Springs Resort",
-    "municipality": "Los Baños",
-    "water_type": "Natural hot spring water (operator claim)",
-    "latitude": "14.176666",
-    "longitude": "121.209719",
-    "description": "Private resort in Los Baños. The operator states that its pools use natural hot spring water without heaters. This is a resort location, not the location of a spring source. No temperatures or water-quality results are established.",
-    "source_url": "https://alfrescosprings.com/location",
-    "category": "spring",
-    "site_type": "resort",
-    "spring_type": "geothermal_hot_spring",
-    "official_url": "https://alfrescosprings.com/",
-    "geography": {
-      "status": "source_verified",
-      "crs": "EPSG:4326",
-      "source_url": "https://alfrescosprings.com/location",
-      "checked_on": "2026-10-17",
-      "note": "Operator-published resort reference point. This locates the resort, not a spring source; positional accuracy and water chemistry are unconfirmed.",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          121.209719,
-          14.176666
-        ]
-      }
-    },
-    "research_references": [
-      {
-        "title": "Al Fresco Springs: Location",
-        "publisher": "Al Fresco Springs (operator)",
-        "published_on": null,
-        "url": "https://alfrescosprings.com/location"
-      },
-      {
-        "title": "Al Fresco Springs: natural hot spring water",
-        "publisher": "Al Fresco Springs (operator)",
-        "published_on": null,
-        "url": "https://alfrescosprings.com/"
-      }
-    ],
-    "image": null,
-    "aliases": []
   }
 ]

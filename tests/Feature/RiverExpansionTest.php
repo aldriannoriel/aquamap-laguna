@@ -35,7 +35,7 @@ class RiverExpansionTest extends TestCase
 
         $this->artisan('rivers:import', ['--no-interaction' => true])->assertExitCode(0);
 
-        $this->assertDatabaseCount('water_bodies', 54);
+        $this->assertDatabaseCount('water_bodies', 52);
         $this->assertSame(29, WaterBody::where('category', 'river')->count());
         $this->assertSame($before, WaterBody::whereIn('id', array_column($before, 'id'))->orderBy('id')->get()->toArray());
         $this->assertSame($reports, PollutionReport::all()->toArray());
@@ -77,7 +77,7 @@ class RiverExpansionTest extends TestCase
         $response = $this->get(route('map.index'))->assertOk()->assertSee('River course not yet mapped.')
             ->assertSee('Length not yet verified.')->assertSee('Mapped course length:')->assertSee('Close profile and clear selection');
         $records = collect($response->viewData('lakes'))->keyBy('name');
-        $this->assertCount(54, $records);
+        $this->assertCount(52, $records);
         $this->assertCount(29, $records->where('category', 'river'));
         $this->assertCount(17, $records->where('category', 'river')->filter(fn (array $record): bool => $record['geography'] !== null));
         $this->assertNull($records['San Isidro River']['geography']);

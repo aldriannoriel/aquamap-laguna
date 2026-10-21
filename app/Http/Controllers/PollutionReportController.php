@@ -18,7 +18,7 @@ class PollutionReportController extends Controller
 {
     public function create(Request $request): Response
     {
-        $lakes = WaterBody::query()->whereIn('category', array_keys(WaterBody::REPORT_CATEGORIES))
+        $lakes = WaterBody::query()->supported()
             ->get(['id', 'name', 'category', 'geography'])
             ->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)
             ->values()

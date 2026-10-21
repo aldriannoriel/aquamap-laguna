@@ -36,7 +36,7 @@ class StorePollutionReportRequest extends FormRequest
             'website' => ['nullable', 'string', 'max:2048', 'prohibited'],
             'report_form_token' => ['bail', 'required', 'string', 'max:2048', new ReportFormToken($this)],
             'water_body_category' => ['nullable', 'string', Rule::in(array_keys(WaterBody::REPORT_CATEGORIES))],
-            'water_body_id' => ['bail', 'required', 'integer', Rule::exists(WaterBody::class, 'id')->whereIn('category', $categories)],
+            'water_body_id' => ['bail', 'required', 'integer', Rule::exists(WaterBody::class, 'id')->whereIn('category', $categories)->where('site_type', 'water_body')->whereNull('spring_type')],
             'pollution_type' => ['required', 'string', Rule::in(array_keys(PollutionReport::TYPES))],
             'description' => ['required', 'string', 'max:5000'],
             'latitude' => ['nullable', 'required_with:longitude', 'numeric', 'between:-90,90'],

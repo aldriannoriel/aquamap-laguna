@@ -31,7 +31,7 @@ class ExplorerTest extends TestCase
         $this->seed(DatabaseSeeder::class);
         $original = WaterBody::orderBy('id')->get()->map(fn (WaterBody $lake): array => $lake->only(['id', 'name', 'municipality', 'latitude', 'longitude', 'description', 'source_url']) + ['created_at' => $lake->created_at->toISOString()])->all();
         $this->seed(ExplorerSeeder::class);
-        $this->assertDatabaseCount('water_bodies', 30);
+        $this->assertDatabaseCount('water_bodies', 28);
         $this->assertDatabaseCount('water_body_fish', 3);
         $this->assertSame($original, WaterBody::orderBy('id')->limit(3)->get()->map(fn (WaterBody $lake): array => $lake->only(['id', 'name', 'municipality', 'latitude', 'longitude', 'description', 'source_url']) + ['created_at' => $lake->created_at->toISOString()])->all());
         $before = WaterBody::orderBy('id')->get()->toArray();
@@ -46,10 +46,10 @@ class ExplorerTest extends TestCase
         $this->seed(WaterBodySeeder::class);
         $this->seed(ExplorerSeeder::class);
         $response = $this->get(route('map.index'))->assertOk()->assertSee('All Water Bodies')->assertDontSee('Hot Springs / Natural Springs')
-            ->assertSee('Al Fresco Springs Resort')->assertSee('Hidden Valley Springs')->assertSee('Water type not yet verified')
+            ->assertDontSee('Al Fresco Springs Resort')->assertDontSee('Hidden Valley Springs')->assertSee('Water type not yet verified')
             ->assertSee('Publication year: Not provided.')->assertSee('not a survey');
         $records = collect($response->viewData('lakes'))->keyBy('name');
-        $this->assertSame(['lake' => 10, 'river' => 5, 'spring' => 2, 'waterfall' => 13], collect($response->viewData('lakes'))->countBy('category')->sortKeys()->all());
+        $this->assertSame(['lake' => 10, 'river' => 5, 'waterfall' => 13], collect($response->viewData('lakes'))->countBy('category')->sortKeys()->all());
         $this->assertSame('Polygon', $records['Sampaloc Lake']['geography']['geometry']['type']);
         $this->assertSame('MultiLineString', $records['Bumbungan River']['geography']['geometry']['type']);
         $this->assertSame([121.4999861, 14.2625628], $records['Pagsanjan Falls']['geography']['geometry']['coordinates']);
@@ -57,7 +57,7 @@ class ExplorerTest extends TestCase
         foreach ($records as $record) {
             $this->assertSame('EPSG:4326', $record['geography']['crs']);
             $this->assertSame('source_verified', $record['geography']['status']);
-            $this->assertSame(['id', 'name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url', 'category', 'aliases', 'site_type', 'spring_type', 'official_url', 'geography'], array_keys($record));
+            $this->assertSame(['id', 'name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url', 'category', 'aliases', 'official_url', 'geography'], array_keys($record));
         }
     }
 
@@ -219,10 +219,10 @@ class ExplorerTest extends TestCase
         $this->assertNull($initial->viewData('lakes')->first()->latitude);
         $this->seed(ExplorerSeeder::class);
         $response = $this->get(route('reports.create'))->assertOk()->assertSee('Water body *')->assertSee('Pagsanjan Falls')
-            ->assertSee('Al Fresco Springs Resort')->assertSee('Hidden Valley Springs');
+            ->assertDontSee('Al Fresco Springs Resort')->assertDontSee('Hidden Valley Springs');
         $waterfall = WaterBody::where('name', 'Pagsanjan Falls')->sole();
         $reference = $response->viewData('lakes')->firstWhere('id', $waterfall->id);
-        $this->assertCount(30, $response->viewData('lakes'));
+        $this->assertCount(28, $response->viewData('lakes'));
         $this->assertSame(14.2625628, $reference->latitude);
         $this->assertSame(121.4999861, $reference->longitude);
         $this->travel(3)->seconds();
@@ -235,25 +235,26 @@ class ExplorerTest extends TestCase
 
     #[TestWith(['Al Fresco Springs Resort'])]
     #[TestWith(['Hidden Valley Springs'])]
-    public function test_spring_property_profiles_accept_private_reports_without_changing_existing_reports(string $name): void
+    public function test_legacy_spring_properties_reject_new_reports_without_changing_existing_reports(string $name): void
     {
         $this->seed(WaterBodySeeder::class);
         $this->seed(ExplorerSeeder::class);
-        $spring = WaterBody::where('name', $name)->sole();
+        $id = DB::table('water_bodies')->insertGetId(['name' => $name, 'municipality' => 'Legacy fixture', 'water_type' => 'Not assessed', 'category' => 'spring', 'site_type' => 'resort']);
+        $spring = WaterBody::findOrFail($id);
         $existing = PollutionReport::forceCreate(['water_body_id' => $spring->id, 'pollution_type' => 'other', 'status' => 'verified', 'description' => 'Private existing spring observation']);
         $before = $spring->toArray();
-        $form = $this->get(route('reports.create'))->assertOk()->assertSee($name);
+        $form = $this->get(route('reports.create'))->assertOk()->assertDontSee($name);
         $this->travel(3)->seconds();
 
         Storage::fake('pollution-reports');
         $this->post(route('reports.store'), ['photo' => UploadedFile::fake()->image('proof.png'), 'water_body_id' => $spring->id, 'pollution_type' => 'other', 'description' => 'Rejected isolated fixture', 'report_form_token' => $form->viewData('reportFormToken')])
-            ->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
+            ->assertRedirectToRoute('reports.create')->assertSessionHasErrors('water_body_id');
 
-        $this->get(route('map.index'))->assertOk()->assertSee($name)->assertDontSee($existing->description);
+        $this->get(route('map.index'))->assertOk()->assertDontSee($name)->assertDontSee($existing->description);
         $this->assertSame($before, $spring->fresh()->toArray());
         $this->assertSame('verified', $existing->fresh()->status);
-        $this->assertDatabaseCount('water_bodies', 30);
-        $this->assertDatabaseCount('pollution_reports', 2);
+        $this->assertDatabaseCount('water_bodies', 29);
+        $this->assertDatabaseCount('pollution_reports', 1);
     }
 
     public function test_import_refuses_an_unapproved_configured_database_without_opening_it(): void

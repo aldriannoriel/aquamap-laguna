@@ -25,8 +25,5 @@
 @elseif ($lake['category'] === 'waterfall')
     <p><span class="font-semibold">Waterfall height:</span> Not yet verified.</p>
     <p class="text-xs text-muted">{{ $lake['geography'] ? 'Source-checked location reference; physical measurements are not yet verified.' : 'Geographic location: Not yet verified.' }}</p>
-@elseif ($lake['category'] === 'spring')
-    <p><span class="font-semibold">Spring characteristics:</span> Not yet verified.</p>
-    <p class="text-xs text-muted">{{ $lake['geography'] ? 'Source-checked property reference; spring-source location is not yet verified.' : 'Geographic location: Not yet verified.' }}</p>
 @endif
 </div>

@@ -3,29 +3,42 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 
 #[Fillable(['name', 'municipality', 'water_type', 'latitude', 'longitude', 'description', 'source_url'])]
 class WaterBody extends Model
 {
-    public const PUBLIC_CATEGORIES = [
+    public const CATEGORIES = [
         'lake' => 'Lakes',
         'river' => 'Rivers',
         'waterfall' => 'Waterfalls',
-        'spring' => 'Springs / Resorts',
     ];
 
-    public const CATEGORIES = [
-        ...self::PUBLIC_CATEGORIES,
-        'spring' => 'Hot Springs / Natural Springs',
-    ];
+    public const PUBLIC_CATEGORIES = self::CATEGORIES;
 
-    public const REPORT_CATEGORIES = [
-        ...self::PUBLIC_CATEGORIES,
-        'spring' => 'Natural Springs / Spring Resorts',
-    ];
+    public const REPORT_CATEGORIES = self::CATEGORIES;
+
+    protected static function booted(): void
+    {
+        static::creating(function (WaterBody $water): void {
+            if (! array_key_exists($water->category ?? 'lake', self::CATEGORIES)
+                || ($water->site_type ?? 'water_body') !== 'water_body' || $water->spring_type !== null) {
+                throw ValidationException::withMessages(['category' => 'Only lakes, rivers and waterfalls are supported.']);
+            }
+        });
+    }
+
+    #[Scope]
+    protected function supported(Builder $query): void
+    {
+        $query->whereIn('category', array_keys(self::CATEGORIES))
+            ->where('site_type', 'water_body')->whereNull('spring_type');
+    }
 
     protected function casts(): array
     {

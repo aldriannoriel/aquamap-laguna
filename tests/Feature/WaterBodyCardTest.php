@@ -29,10 +29,10 @@ class WaterBodyCardTest extends TestCase
             ->assertSee('Historical aquaculture')->assertSee('Potential habitat compatibility')->assertSee('Insufficient data')
             ->assertSee('Research &amp; Sources', false)->assertSee('Water type not yet verified')->assertDontSee('Spring type:')
             ->assertSee('Barrera marquez')->assertSee('Dionisia.besas')->assertSee('Photo by');
-        $this->assertDatabaseCount('water_bodies', 30);
-        $this->assertCount(30, $response->viewData('lakes'));
+        $this->assertDatabaseCount('water_bodies', 28);
+        $this->assertCount(28, $response->viewData('lakes'));
         $images = array_filter(array_column($response->viewData('profiles'), 'image'));
-        $this->assertCount(27, $images);
+        $this->assertCount(26, $images);
         foreach ($images as $image) {
             $this->assertFileExists(public_path($image['path']));
             $this->assertSame('image/jpeg', getimagesize(public_path($image['path']))['mime']);
@@ -116,7 +116,7 @@ class WaterBodyCardTest extends TestCase
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         $xpath = new DOMXPath($document);
-        $this->assertSame(3, $xpath->query('//template[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
+        $this->assertSame(2, $xpath->query('//template[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
         foreach (['Hulugan Falls', 'Bukal Falls', 'Bunga Twin Falls'] as $name) {
             $lake = WaterBody::where('name', $name)->sole();
             $this->assertStringContainsString('object-contain', $xpath->evaluate('string(//template[@id="profile-'.$lake->id.'"]//img/@class)'));
@@ -135,7 +135,7 @@ class WaterBodyCardTest extends TestCase
         libxml_clear_errors();
         libxml_use_internal_errors($previous);
         $xpath = new DOMXPath($document);
-        foreach (['all' => '30', 'lake' => '10', 'river' => '5', 'spring' => '2', 'waterfall' => '13'] as $category => $count) {
+        foreach (['all' => '28', 'lake' => '10', 'river' => '5', 'waterfall' => '13'] as $category => $count) {
             $this->assertSame($count, trim($xpath->evaluate('string(//button[@data-category="'.$category.'"]//span[@data-category-count])')));
         }
         $lake = WaterBody::where('name', 'Sampaloc Lake')->sole();
@@ -169,8 +169,8 @@ class WaterBodyCardTest extends TestCase
         $this->assertSame('Water Type', trim($xpath->evaluate('string(//button[@data-profile-tab="classification"])')));
         $response->assertSee('Historical aquaculture')->assertSee('Plapla')->assertSee('Name source')
             ->assertSee('Water type not yet verified')->assertSee('OpenStreetMap contributors')->assertSee('Image attribution');
-        $this->assertSame(27, $xpath->query('//template[starts-with(@id,"profile-")]//figure/img')->length);
-        $this->assertSame(3, $xpath->query('//template[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
+        $this->assertSame(26, $xpath->query('//template[starts-with(@id,"profile-")]//figure/img')->length);
+        $this->assertSame(2, $xpath->query('//template[starts-with(@id,"profile-")]//p[@data-image-placeholder]')->length);
     }
 
     #[TestWith(['Pagsanjan Falls', ['Cavinti Falls', 'Magdapio Falls']])]
@@ -210,7 +210,7 @@ class WaterBodyCardTest extends TestCase
         $xpath = new DOMXPath($document);
         $this->assertSame($name, trim($xpath->evaluate('string(//select[@id="water_body_id"]//option[@value="'.$lake->id.'"])')));
         $this->assertSame($before, WaterBody::orderBy('id')->get()->toArray());
-        $this->assertDatabaseCount('water_bodies', 30);
+        $this->assertDatabaseCount('water_bodies', 28);
     }
 
     public function test_new_geometries_preserve_island_holes_and_existing_lake_coordinates(): void
@@ -228,11 +228,7 @@ class WaterBodyCardTest extends TestCase
                 $this->assertSame($ring[0], $ring[array_key_last($ring)]);
             }
         }
-        $point = WaterBody::where('name', 'Hidden Valley Springs')->sole();
-        $this->assertSame('Point', $point->geography['geometry']['type']);
-        $this->assertSame('resort', $point->site_type);
-        $this->assertSame('natural_spring', $point->spring_type);
-        $this->assertStringContainsString('2014 OSM node', $point->geography['note']);
+        $this->assertDatabaseMissing('water_bodies', ['name' => 'Hidden Valley Springs']);
         $this->assertDatabaseCount('fish_species', 1);
         $this->assertDatabaseCount('water_body_fish', 3);
         $this->assertDatabaseCount('pollution_reports', 0);

@@ -20,20 +20,19 @@ class ReportCategoryTest extends TestCase
         $this->artisan('migrate', ['--database' => 'sqlite', '--no-interaction' => true])->assertExitCode(0);
     }
 
-    public function test_reporting_groups_all_database_locations_but_map_still_excludes_springs(): void
+    public function test_reporting_and_map_only_expose_supported_categories(): void
     {
         $this->seed(DatabaseSeeder::class);
         $this->seed(ExplorerSeeder::class);
-        $response = $this->get(route('reports.create'))->assertOk()->assertSee('Category')->assertSee('Natural Springs / Spring Resorts')->assertSee('Al Fresco Springs Resort')->assertSee('Hidden Valley Springs');
-        $this->assertSame(['lake' => 10, 'river' => 5, 'spring' => 2, 'waterfall' => 13], $response->viewData('lakes')->countBy('category')->sortKeys()->all());
+        $response = $this->get(route('reports.create'))->assertOk()->assertSee('Category')->assertDontSee('Natural Springs / Spring Resorts')->assertDontSee('Al Fresco Springs Resort')->assertDontSee('Hidden Valley Springs');
+        $this->assertSame(['lake' => 10, 'river' => 5, 'waterfall' => 13], $response->viewData('lakes')->countBy('category')->sortKeys()->all());
         $response->assertSee('optgroup label="Waterfalls"', false);
-        $this->get(route('map.index'))->assertOk()->assertSee('Al Fresco Springs Resort')->assertSee('Hidden Valley Springs');
+        $this->get(route('map.index'))->assertOk()->assertDontSee('Al Fresco Springs Resort')->assertDontSee('Hidden Valley Springs');
     }
 
     #[TestWith(['lake', 'Pandin Lake'])]
     #[TestWith(['river', 'Bumbungan River'])]
     #[TestWith(['waterfall', 'Balon-Balon Falls'])]
-    #[TestWith(['spring', 'Hidden Valley Springs'])]
     public function test_a_matching_category_saves_the_original_water_body_id_as_pending(string $category, string $name): void
     {
         $this->seed(DatabaseSeeder::class);

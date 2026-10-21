@@ -22,6 +22,13 @@ class ExplorerSeeder extends Seeder
      */
     public function import(array $data): void
     {
+        foreach ($data as $entry) {
+            if (! array_key_exists($entry['category'] ?? '', WaterBody::CATEGORIES)
+                || ($entry['site_type'] ?? 'water_body') !== 'water_body' || ($entry['spring_type'] ?? null) !== null) {
+                throw new RuntimeException('Only lakes, rivers and waterfalls may be imported.');
+            }
+        }
+
         $connection = (new WaterBody)->getConnection();
         $isolated = app()->runningUnitTests() && $connection->getDriverName() === 'sqlite'
             && $connection->getDatabaseName() === ':memory:';

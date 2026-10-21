@@ -1,5 +1,7 @@
 # Research sources
 
+Current scope (2026-10-21): Spring/Resort profiles and seed entries are withdrawn from active use. Their stored records and historical evidence below remain preserved pending separate deletion approval. Retained lake/river/waterfall research, shared citation metadata and source audit ledgers are unchanged. See SPRING_RESORT_REMOVAL.md.
+
 ## Remaining Batch 3: citation audit (2026-10-21)
 
 All **54 profiles** were reviewed against c59862b: **497 source uses → 341 document citations**, consolidating **156 duplicate displays** while retaining each claim, query version, fragment/page, original OSM revision and attribution. Source categories are Geography and GIS; Physical measurements; Water type and hydrology; Fish and habitat; Historical ecological evidence; Photography and licensing. A shared document appears once with cross-references from its other categories. Existing catalogue caveats are explicitly distinguished from additional source findings.
