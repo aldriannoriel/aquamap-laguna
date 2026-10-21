@@ -31,6 +31,11 @@ class Referral extends Model
         return $this->status === 'failed' && ($this->sending_at === null || in_array($this->error_code, ['smtp_auth_rejected', 'smtp_rejected', 'smtp_connection_failed'], true));
     }
 
+    public function cancellable(): bool
+    {
+        return $this->sent_at === null && (in_array($this->status, ['queued', 'preparing', 'cancelled'], true) || $this->retryable());
+    }
+
     protected $hidden = ['payload', 'recipient_snapshot'];
 
     protected function casts(): array

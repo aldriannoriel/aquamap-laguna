@@ -21,7 +21,13 @@ try {
     $connection = Illuminate\\Support\\Facades\\DB::connection();
     if ($connection->getDriverName() !== 'mysql' || $connection->getDatabaseName() !== 'aquamap_laguna') { exit(1); }
     if ($connection->selectOne('SELECT DATABASE() AS name', [], false)->name !== 'aquamap_laguna') { exit(1); }
-    echo hash('sha256', json_encode([App\\Models\\WaterBody::orderBy('id')->get()->toArray(), App\\Models\\FishSpecies::orderBy('id')->get()->toArray(), App\\Models\\WaterBodyFish::orderBy('id')->get()->toArray(), Illuminate\\Support\\Facades\\DB::table('pollution_reports')->orderBy('id')->get()->toArray(), Illuminate\\Support\\Facades\\DB::table('users')->orderBy('id')->get()->toArray(), Illuminate\\Support\\Facades\\DB::table('report_reviews')->orderBy('id')->get()->toArray()]));
+    $snapshot = [];
+    foreach (['water_bodies','fish_species','water_body_fish','pollution_reports','users','report_reviews','agencies','agency_water_body','agency_directory_initializations','referrals','referral_events','jobs','failed_jobs','migrations'] as $table) {
+        $rows = $connection->table($table)->get()->map(fn ($row) => (array) $row)->all();
+        usort($rows, fn ($a, $b) => strcmp(json_encode($a), json_encode($b)));
+        $snapshot[$table] = $rows;
+    }
+    echo hash('sha256', json_encode($snapshot));
 } catch (Throwable $exception) { exit(1); }
 `,
     });
@@ -30,6 +36,15 @@ try {
     return check.stdout;
 }
 const originalRecords = databaseSnapshot();
+const originalEnvironment = createHash('sha256').update(readFileSync(path.join(root, '.env'))).digest('hex');
+function photoSnapshot() {
+    const directory = path.join(root, 'storage/app/private/pollution-reports');
+    if (!existsSync(directory)) return '[]';
+    return JSON.stringify(readdirSync(directory, { recursive:true, withFileTypes:true }).filter(file=>file.isFile())
+        .map(file=>{const name=path.join(file.parentPath,file.name); return [path.relative(directory,name),createHash('sha256').update(readFileSync(name)).digest('hex')];})
+        .sort((a,b)=>a[0].localeCompare(b[0])));
+}
+const originalPhotos = photoSnapshot();
 function sharedCacheSnapshot() {
     const directory=path.join(root,'storage/framework/cache');
     const hashes=readdirSync(directory,{recursive:true,withFileTypes:true}).filter(file=>file.isFile())
@@ -40,7 +55,7 @@ function sharedCacheSnapshot() {
 const originalCache=sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'direct-referrals/browser';
+const artifactDirectory = 'report-workflow/browser';
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
@@ -246,6 +261,16 @@ try {
     await navigate('/admin/reports?queue=processed&q=Synthetic%20browser%20review%20target','!!document.getElementById("admin-report-list")');
     assert.equal(await evaluate('document.querySelector("article[data-report-id=\\"1\\"]")!==null'),true);
     await screenshot('processed.png',true);
+    await navigate('/admin/reports/1','!!document.getElementById("report-follow-up-form")');
+    assert.equal(await evaluate('document.getElementById("report-current-status").textContent.includes("Verified")'),true);
+    assert.equal(await evaluate('!!document.getElementById("reject-report-form")'),false);
+    await field('follow_up_status','under_review'); await field('review_note','Synthetic municipality review started.');
+    await click('#report-follow-up-form button[type=submit]');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("report-current-status")?.textContent.includes("Under Review")'),'Under Review update failed.');
+    await field('follow_up_status','in_progress'); await field('review_note','Synthetic cleanup in progress.');
+    await click('#report-follow-up-form button[type=submit]');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("report-current-status")?.textContent.includes("In Progress")'),'In Progress update failed.');
+    await screenshot('follow-up-desktop.png',true);
     await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
     await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});mobile=true;
     await navigate('/admin/reports/2','!!document.getElementById("send-to-municipality")');
@@ -256,6 +281,27 @@ try {
     await screenshot('confirmation-mobile.png');
     await click('#cancel-municipality-send');
     assert.equal(fixtureCommand('deliver-referrals').accepted,1);
+    assert.equal(await evaluate('document.getElementById("reject-report-form").checkValidity()'),false);
+    await field('rejection_reason','Synthetic duplicate concern; see fixture case 02.');
+    await click('#reject-report-form button[type=submit]');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("report-current-status")?.textContent.includes("Rejected")'),'Reasoned mobile rejection failed.');
+    assert.equal(await evaluate('!!document.getElementById("send-to-municipality")'),false);
+    await screenshot('rejected-mobile.png',true);
+    await navigate('/admin/reports/1','!!document.getElementById("report-follow-up-form")');
+    await field('follow_up_status','resolved');
+    assert.equal(await evaluate('document.getElementById("review_note").required && document.getElementById("resolution_basis").required'),true);
+    assert.equal(await evaluate('document.getElementById("report-follow-up-form").checkValidity()'),false);
+    await field('review_note','Synthetic follow-up inspection completed.');
+    assert.equal(await evaluate('document.getElementById("report-follow-up-form").checkValidity()'),false);
+    await field('resolution_basis','Synthetic municipality inspection reference FIXTURE-RESOLUTION confirms cleanup.');
+    assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
+    await screenshot('resolution-mobile.png',true);
+    await click('#report-follow-up-form button[type=submit]');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("report-current-status")?.textContent.includes("Resolved")'),'Documented resolution failed.');
+    assert.equal(await evaluate('document.getElementById("report-current-status").textContent.includes("Sent / accepted by SMTP")'),true);
+    assert.equal(await evaluate('!!document.getElementById("report-follow-up-form")'),false);
+    assert.equal(fixtureCommand('deliver-referrals').accepted,1);
+    await screenshot('resolved-mobile.png',true);
     await send('Emulation.setTouchEmulationEnabled',{enabled:false});mobile=false;
     await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1100,deviceScaleFactor:1,mobile:false});
     await navigate('/admin/agencies/1/edit','!!document.getElementById("notes")');
@@ -269,12 +315,14 @@ try {
     await navigate('/admin/reports/1','document.body.textContent.includes("Browser municipality recipient")');
     assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
     await screenshot('history-mobile.png',true);
-    results.push('Direct pending-report confirmation/cancel, explicit photo approval, duplicate submission block, real isolated queue worker, accurate queued/accepted notifications, processed movement, simulated receipt confirmation, municipality CRUD and preserved snapshots passed at desktop/mobile widths. All mail used Mail::fake(); basemap and GPS were locally simulated. No real email or inbox receipt was verified.');
+    results.push('Desktop/mobile: confirmed direct send, duplicate prevention, isolated worker, distinct report/email statuses, forwarded grouping, Under Review/In Progress, required rejection reason, required resolution remarks/basis, final-state history and unchanged accepted referral passed. Municipality CRUD/snapshots and private map controls passed. Mail::fake() and simulated tiles/GPS only; no real email sent.');
 
     assert.deepEqual(failures, [], 'Browser JavaScript exceptions occurred.');
     assert.equal(databaseSnapshot(), originalRecords, 'Browser verification changed lake or fish records.');
     assert.equal(sharedCacheSnapshot(),originalCache,'Browser fixture changed the shared application cache.');
-    results.push('Real MySQL lake, fish, association and pollution report records and shared application cache unchanged.');
+    assert.equal(photoSnapshot(),originalPhotos,'Browser fixture changed original private evidence.');
+    assert.equal(createHash('sha256').update(readFileSync(path.join(root,'.env'))).digest('hex'),originalEnvironment,'Browser fixture changed local credentials.');
+    results.push('All inspected real MySQL domain/report/audit/directory/referral/event/queue/migration rows, original photos, shared cache and .env unchanged.');
     await writeFile(path.join(output, 'results.json'), JSON.stringify({ passed: true, results, javascriptExceptions: failures }, null, 2));
     console.log(JSON.stringify({ passed: true, results, artifacts: `storage/app/${artifactDirectory}` }, null, 2));
 } catch (error) {

@@ -10,9 +10,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PollutionReport extends Model
 {
-    public const STATUSES = ['pending' => 'Pending', 'verified' => 'Verified', 'rejected' => 'Rejected', 'resolved' => 'Resolved'];
+    public const STATUSES = ['pending' => 'Pending', 'verified' => 'Verified', 'under_review' => 'Under Review',
+        'in_progress' => 'In Progress', 'rejected' => 'Rejected', 'resolved' => 'Resolved', 'closed' => 'Closed'];
 
-    public const TRANSITIONS = ['pending' => ['verified', 'rejected'], 'verified' => ['resolved'], 'rejected' => [], 'resolved' => []];
+    public const TRANSITIONS = ['pending' => ['verified', 'rejected', 'under_review', 'in_progress', 'resolved', 'closed'],
+        'verified' => ['rejected', 'under_review', 'in_progress', 'resolved', 'closed'],
+        'under_review' => ['in_progress', 'resolved', 'closed'], 'in_progress' => ['under_review', 'resolved', 'closed'],
+        'rejected' => [], 'resolved' => [], 'closed' => []];
 
     public const TYPES = [
         'plastic_waste' => 'Plastic waste',
@@ -51,20 +55,51 @@ class PollutionReport extends Model
     public function scopeActionRequired(Builder $query): Builder
     {
         return $query->where(function (Builder $query): void {
-            $query->whereHas('referral', fn (Builder $q) => $q->where('status', '!=', 'accepted'))
+            $query->whereHas('referral', fn (Builder $q) => $q->whereNotIn('status', ['accepted', 'cancelled'])->whereNull('sent_at'))
                 ->orWhere(fn (Builder $q) => $q->whereIn('status', ['pending', 'verified'])->whereDoesntHave('referral'));
         });
     }
 
-    public function getWorkflowStatusAttribute(): string
+    public function scopeForwarded(Builder $query): Builder
     {
-        if ($this->referral) {
-            return $this->referral->label();
+        return $query->whereHas('referral', fn (Builder $referral) => $referral->where(fn (Builder $delivery) => $delivery
+            ->where('status', 'accepted')->orWhereNotNull('sent_at')));
+    }
+
+    public function scopeProcessed(Builder $query): Builder
+    {
+        return $query->where(fn (Builder $reports) => $reports->forwarded()->orWhere(fn (Builder $closed) => $closed
+            ->whereIn('status', ['rejected', 'resolved', 'closed'])
+            ->where(fn (Builder $delivery) => $delivery->whereDoesntHave('referral')
+                ->orWhereHas('referral', fn (Builder $referral) => $referral->where('status', 'cancelled')))));
+    }
+
+    public function forwarded(): bool
+    {
+        return $this->referral && ($this->referral->status === 'accepted' || $this->referral->sent_at !== null);
+    }
+
+    public function canReject(): bool
+    {
+        return in_array($this->status, ['pending', 'verified'], true)
+            && (! $this->referral || $this->referral->cancellable());
+    }
+
+    public function availableTransitions(): array
+    {
+        $allowed = self::TRANSITIONS[$this->status] ?? [];
+        if ($this->forwarded()) {
+            return array_values(array_intersect($allowed, ['under_review', 'in_progress', 'resolved', 'closed']));
         }
 
+        return $this->canReject() ? array_values(array_intersect($allowed, ['verified', 'rejected'])) : [];
+    }
+
+    public function getWorkflowStatusAttribute(): string
+    {
         return match ($this->status) {
-            'pending' => 'Pending review', 'verified' => 'Ready for referral approval',
-            default => self::STATUSES[$this->status],
+            'pending' => 'Pending review', 'verified' => $this->forwarded() ? 'Forwarded / awaiting follow-up' : 'Approved / awaiting forwarding',
+            default => self::STATUSES[$this->status] ?? 'Unknown status',
         };
     }
 }

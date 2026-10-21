@@ -25,8 +25,7 @@ class ReportController extends Controller
         if ($queue === 'action') {
             $query->actionRequired();
         } elseif ($queue === 'processed') {
-            $query->where(fn (Builder $q) => $q->whereHas('referral', fn (Builder $r) => $r->where('status', 'accepted'))
-                ->orWhere(fn (Builder $r) => $r->whereIn('status', ['rejected', 'resolved'])->whereDoesntHave('referral')));
+            $query->processed();
         }
         foreach (['lake' => 'water_body_id', 'type' => 'pollution_type', 'status' => 'status'] as $filter => $column) {
             if (isset($filters[$filter])) {

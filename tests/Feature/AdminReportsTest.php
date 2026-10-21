@@ -3,12 +3,16 @@
 namespace Tests\Feature;
 
 use App\Models\PollutionReport;
+use App\Models\Referral;
 use App\Models\ReportReview;
 use App\Models\User;
 use App\Models\WaterBody;
+use App\Support\ReferralWorkflow;
 use Database\Seeders\ExplorerSeeder;
 use Database\Seeders\WaterBodySeeder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\TestWith;
 use Tests\TestCase;
@@ -43,7 +47,15 @@ class AdminReportsTest extends TestCase
         ], $attributes));
     }
 
-    public function test_verification_and_resolution_update_public_category_counts_without_publishing_report_details(): void
+    private function forwarded(PollutionReport $report, User $admin): Referral
+    {
+        return Referral::forceCreate(['reference' => fake()->uuid(), 'dedupe_key' => 'report:'.$report->id,
+            'pollution_report_id' => $report->id, 'approved_by' => $admin->id, 'approved_at' => now(),
+            'recipient_snapshot' => ['name' => 'Isolated municipality', 'email' => 'municipality@example.test'],
+            'payload' => ReferralWorkflow::payload($report, false), 'status' => 'accepted', 'queued_at' => now(), 'sent_at' => now()]);
+    }
+
+    public function test_follow_up_and_resolution_never_publish_report_details_or_categories(): void
     {
         $report = $this->report(['pollution_type' => 'plastic_waste']);
         $admin = $this->admin();
@@ -55,7 +67,9 @@ class AdminReportsTest extends TestCase
         $verified = $this->get(route('map.index'))->assertOk()->assertDontSee($report->description);
         $this->assertArrayNotHasKey('report_categories', $verified->viewData('profiles')[$report->water_body_id]);
 
-        $this->patch(route('admin.reports.status', $report), ['status' => 'resolved', 'expected_status' => 'verified'])
+        $this->forwarded($report->fresh(), $admin);
+        $this->patch(route('admin.reports.status', $report), ['status' => 'resolved', 'expected_status' => 'verified',
+            'review_note' => 'Follow-up inspection completed.', 'resolution_basis' => 'Municipality inspection record FIXTURE-01 confirms cleanup.'])
             ->assertRedirectToRoute('admin.reports.show', $report)->assertSessionHasNoErrors();
         $resolved = $this->get(route('map.index'))->assertOk()->assertDontSee($report->description);
         $this->assertArrayNotHasKey('report_categories', $resolved->viewData('profiles')[$report->water_body_id]);
@@ -93,7 +107,8 @@ class AdminReportsTest extends TestCase
             $this->report(['status' => $status]);
         }
         $this->actingAs($this->admin())->get(route('admin.dashboard'))->assertOk()
-            ->assertViewHas('counts', ['total' => 6, 'pending' => 2, 'verified' => 1, 'rejected' => 1, 'resolved' => 1])
+            ->assertViewHas('counts', ['total' => 6, 'pending' => 2, 'verified' => 1, 'under_review' => 0,
+                'in_progress' => 0, 'rejected' => 1, 'resolved' => 1, 'closed' => 0])
             ->assertHeader('Cache-Control', 'no-store, private');
     }
 
@@ -190,12 +205,12 @@ class AdminReportsTest extends TestCase
 
     #[TestWith(['pending', 'verified', true])]
     #[TestWith(['pending', 'rejected', true])]
-    #[TestWith(['verified', 'resolved', true])]
+    #[TestWith(['verified', 'resolved', false])]
     #[TestWith(['pending', 'resolved', false])]
     #[TestWith(['pending', 'pending', false])]
     #[TestWith(['verified', 'pending', false])]
     #[TestWith(['verified', 'verified', false])]
-    #[TestWith(['verified', 'rejected', false])]
+    #[TestWith(['verified', 'rejected', true])]
     #[TestWith(['rejected', 'pending', false])]
     #[TestWith(['rejected', 'verified', false])]
     #[TestWith(['rejected', 'rejected', false])]
@@ -211,6 +226,7 @@ class AdminReportsTest extends TestCase
         $report = $this->report(['status' => $from]);
         $response = $this->actingAs($admin)->from(route('admin.reports.show', $report))->patch(route('admin.reports.status', $report), [
             'expected_status' => $from, 'status' => $to, 'review_note' => 'Isolated decision fixture.',
+            'rejection_reason' => 'Isolated decision fixture.', 'resolution_basis' => 'Documented isolated follow-up basis.',
             'administrator_id' => 9999, 'previous_status' => 'invented', 'created_at' => '2000-01-01',
         ]);
         if ($valid) {
@@ -220,7 +236,7 @@ class AdminReportsTest extends TestCase
             $this->assertSame($admin->id, $review->administrator_id);
             $this->assertSame($from, $review->previous_status);
             $this->assertSame($to, $review->new_status);
-            $this->assertSame('Isolated decision fixture.', $review->review_note);
+            $this->assertSame($to === 'rejected' ? "Rejection reason:\nIsolated decision fixture." : 'Isolated decision fixture.', $review->review_note);
             $this->assertTrue($review->created_at->equalTo(now()));
             $this->assertTrue($review->pollutionReport->is($report));
             $this->assertTrue($review->administrator->is($admin));
@@ -235,7 +251,8 @@ class AdminReportsTest extends TestCase
     {
         $report = $this->report();
         $this->actingAs($this->admin())->patch(route('admin.reports.status', $report), ['expected_status' => 'pending', 'status' => 'verified', 'review_note' => '<script>auditFixture()</script>'])->assertSessionHasNoErrors();
-        $this->patch(route('admin.reports.status', $report), ['expected_status' => 'pending', 'status' => 'resolved'])->assertSessionHasErrors('status');
+        $this->patch(route('admin.reports.status', $report), ['expected_status' => 'pending', 'status' => 'resolved',
+            'review_note' => 'Stale review.', 'resolution_basis' => 'Stale documented inspection.'])->assertSessionHasErrors('status');
         $this->assertSame('verified', $report->fresh()->status);
         $this->assertDatabaseCount('report_reviews', 1);
         $this->get(route('admin.reports.show', $report))->assertSee('Pending to Verified')->assertSee('&lt;script&gt;auditFixture()', false)->assertDontSee('<script>auditFixture()', false);
@@ -264,6 +281,63 @@ class AdminReportsTest extends TestCase
         $this->patch(route('admin.reports.status', $report), [])->assertStatus(429);
         $this->assertSame('pending', $report->fresh()->status);
         $this->assertDatabaseCount('report_reviews', 0);
+    }
+
+    public function test_forwarded_follow_up_preserves_delivery_evidence_and_requires_a_documented_resolution(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        Storage::fake('pollution-reports');
+        $path = UploadedFile::fake()->image('original.png')->store('', 'pollution-reports');
+        $report = $this->report(['status' => 'verified', 'photo_path' => $path, 'latitude' => 14.11, 'longitude' => 121.33]);
+        $admin = $this->admin();
+        $delivery = $this->forwarded($report, $admin);
+        $deliveryBefore = $delivery->fresh()->getAttributes();
+        $original = $report->only(['created_at', 'latitude', 'longitude', 'photo_path', 'description']);
+        $this->actingAs($admin)->get(route('admin.reports.show', $report))->assertOk()
+            ->assertSee('Report status:')->assertSee('Email delivery:')->assertSee('Report follow-up')->assertDontSee('id="reject-report-form"', false);
+        $url = route('admin.reports.status', $report);
+        $this->patch($url, ['status' => 'rejected', 'expected_status' => 'verified', 'rejection_reason' => 'Must use separate closure.'])->assertSessionHasErrors('status');
+        $this->patch($url, ['status' => 'under_review', 'expected_status' => 'verified', 'review_note' => 'Municipality review started.'])->assertSessionHasNoErrors();
+        $this->patch($url, ['status' => 'in_progress', 'expected_status' => 'under_review', 'review_note' => 'Cleanup scheduled.'])->assertSessionHasNoErrors();
+        $this->patch($url, ['status' => 'resolved', 'expected_status' => 'in_progress'])->assertSessionHasErrors(['review_note', 'resolution_basis']);
+        $this->patch($url, ['status' => 'resolved', 'expected_status' => 'in_progress', 'review_note' => 'Completion reported.'])->assertSessionHasErrors('resolution_basis');
+        $this->assertSame('in_progress', $report->fresh()->status);
+        $this->assertDatabaseCount('report_reviews', 2);
+        $this->patch($url, ['status' => 'resolved', 'expected_status' => 'in_progress', 'review_note' => 'Inspection completed.',
+            'resolution_basis' => '<script>unsafeBasis()</script> Inspection reference FIXTURE-02.'])->assertSessionHasNoErrors();
+        $this->assertSame('resolved', $report->fresh()->status);
+        $this->assertSame(['under_review', 'in_progress', 'resolved'], $report->reviews()->pluck('new_status')->all());
+        $this->assertSame($deliveryBefore, $delivery->fresh()->getAttributes());
+        $this->assertEquals($original, $report->fresh()->only(array_keys($original)));
+        Storage::disk('pollution-reports')->assertExists($path);
+        $this->get(route('admin.reports.show', $report))->assertOk()->assertSee('&lt;script&gt;unsafeBasis()', false)
+            ->assertSee('Documented resolution basis / supporting evidence:')->assertDontSee('<script>unsafeBasis()', false);
+        $this->patch($url, ['status' => 'under_review', 'expected_status' => 'resolved'])->assertSessionHasErrors('status');
+        $this->assertDatabaseCount('report_reviews', 3);
+        $this->get(route('admin.reports.index', ['queue' => 'processed', 'status' => 'resolved']))
+            ->assertViewHas('reports', fn ($reports) => $reports->pluck('id')->all() === [$report->id]);
+        Mail::assertNothingSent();
+        Queue::assertNothingPushed();
+    }
+
+    public function test_unforwarded_reports_cannot_enter_follow_up_and_forwarded_closure_requires_its_own_reason(): void
+    {
+        $report = $this->report(['status' => 'verified']);
+        $admin = $this->admin();
+        $url = route('admin.reports.status', $report);
+        $this->actingAs($admin);
+        foreach (['under_review', 'in_progress', 'resolved', 'closed'] as $status) {
+            $this->patch($url, ['status' => $status, 'expected_status' => 'verified', 'review_note' => 'No referral yet.',
+                'resolution_basis' => 'Cannot claim follow-up without forwarding.', 'closure_reason' => 'Cannot close as forwarded.'])->assertSessionHasErrors('status');
+        }
+        $this->assertDatabaseCount('report_reviews', 0);
+        $this->forwarded($report, $admin);
+        $this->patch($url, ['status' => 'closed', 'expected_status' => 'verified', 'review_note' => 'Administrative follow-up.'])->assertSessionHasErrors('closure_reason');
+        $this->patch($url, ['status' => 'closed', 'expected_status' => 'verified', 'closure_reason' => 'Merged into municipality case FIXTURE-03.'])->assertSessionHasNoErrors();
+        $this->assertSame('closed', $report->fresh()->status);
+        $this->assertStringContainsString("Closure reason (not resolved):\nMerged into municipality case FIXTURE-03.", ReportReview::sole()->review_note);
+        $this->patch($url, ['status' => 'under_review', 'expected_status' => 'closed'])->assertSessionHasErrors('status');
     }
 
     public function test_audit_failure_rolls_back_the_status_change(): void

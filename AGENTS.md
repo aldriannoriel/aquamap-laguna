@@ -161,4 +161,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - Environmental referrals are administrator-approved only, with a dedicated SMTP/database queue and immutable private snapshots. Never send live mail during tests/seeding/migrations or claim SMTP acceptance proves inbox receipt. Use fake/null transports in confined fixtures; never print .env or raw mail exceptions. Keep APP_KEY stable. Run agencies:initialize only explicitly; its marker must never recreate deleted recipients. See docs/EMAIL_REFERRALS.md for setup and retry/privacy constraints.
 
+- Report follow-up requires saved SMTP acceptance. Rejection needs a reason and safe unsent cancellation; resolution needs remarks plus documented basis/evidence reference, while administrative closure needs its own reason. Email must never resolve a report automatically. Preserve terminal decisions and append-only audits without schema changes.
+
 - Municipality referrals use connection referrals / queue municipality-referrals. Never start a worker on the old referrals queue or bulk retry its five preserved jobs. A new explicit report approval is required; legacy diagnostic sending is disabled. See docs/EMAIL_REFERRALS.md.

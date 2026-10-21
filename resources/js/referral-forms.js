@@ -1,4 +1,19 @@
 const form = document.getElementById('municipality-send-form');
+const followUp = document.getElementById('report-follow-up-form');
+if (followUp) {
+    const status = document.getElementById('follow_up_status');
+    const updateRequirements = () => {
+        const resolved = status.value === 'resolved';
+        const closed = status.value === 'closed';
+        document.getElementById('review_note').required = resolved;
+        document.getElementById('resolution_basis').required = resolved;
+        document.getElementById('closure_reason').required = closed;
+        document.getElementById('resolution-basis-fields').hidden = !resolved;
+        document.getElementById('closure-reason-fields').hidden = !closed;
+    };
+    status.addEventListener('change', updateRequirements);
+    updateRequirements();
+}
 if (form) {
     const options = JSON.parse(document.getElementById('municipality-send-options').textContent);
     const dialog = document.getElementById('municipality-confirmation');
@@ -44,7 +59,7 @@ if (delivery?.dataset.deliveryApproved === '1' && ['queued','preparing','sending
             if (!response.ok) return;
             const data = await response.json();
             delivery.textContent = data.label;
-            if (['accepted','failed','uncertain'].includes(data.status)) { location.reload(); return; }
+            if (['accepted','failed','uncertain','cancelled'].includes(data.status)) { location.reload(); return; }
         } catch { /* A manual reload still shows the authoritative delivery history. */ }
         if (++polls < 300) setTimeout(poll, 3000);
     };

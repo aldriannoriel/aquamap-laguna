@@ -7,6 +7,7 @@ use App\Mail\EnvironmentalReferral;
 use App\Models\Agency;
 use App\Models\PollutionReport;
 use App\Models\Referral;
+use App\Models\ReportReview;
 use App\Models\User;
 use App\Models\WaterBody;
 use App\Support\ReferralWorkflow;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Tests\TestCase;
@@ -226,7 +228,7 @@ class ReferralTest extends TestCase
         (new SendReferral($ref->id))->handle();
         $this->get(route('admin.reports.index', ['queue' => 'action']))->assertDontSee('Report #'.$r->id);
         $this->get(route('admin.reports.index', ['queue' => 'processed']))->assertSee('Report #'.$r->id)->assertSee('Sent / accepted by SMTP');
-        $this->get(route('admin.reports.show', $r))->assertOk()->assertSee('Sent / accepted by SMTP')->assertSee('Moderation:');
+        $this->get(route('admin.reports.show', $r))->assertOk()->assertSee('Sent / accepted by SMTP')->assertSee('Report status:')->assertSee('Report follow-up');
         $this->get(route('admin.reports.show', $r))->assertSee('Referral email sent successfully.');
         $this->post(route('admin.referrals.store', $r), $data)->assertSessionHas('referral_saved', 'Referral email sent successfully (accepted by SMTP). Inbox receipt is unverified.');
         (new SendReferral($ref->id))->handle();
@@ -366,11 +368,82 @@ class ReferralTest extends TestCase
         $this->assertSame($jobs, DB::table('jobs')->orderBy('id')->get()->map(fn ($row) => (array) $row)->all());
     }
 
+    #[TestWith(['queued'])]
+    #[TestWith(['preparing'])]
+    #[TestWith(['failed'])]
+    public function test_rejection_requires_a_reason_and_cancels_a_safely_unsent_referral(string $state): void
+    {
+        $report = $this->report();
+        $referral = $this->approve($report, $this->agency($report));
+        $referral->forceFill(['status' => $state, 'claim_token' => 'old-claim',
+            'error_code' => $state === 'failed' ? 'smtp_rejected' : null,
+            'sending_at' => $state === 'failed' ? now() : null])->save();
+        $snapshot = $referral->only(['payload', 'recipient_snapshot', 'approved_at', 'queued_at', 'sending_at', 'attempts']);
+        $admin = $this->admin();
+        $url = route('admin.reports.status', $report);
+        $this->actingAs($admin)->patch($url, ['status' => 'rejected', 'expected_status' => 'verified', 'rejection_reason' => '   '])
+            ->assertSessionHasErrors(['rejection_reason' => 'Explain why this report is being rejected.']);
+        $this->assertSame($state, $referral->fresh()->status);
+        $this->patch($url, ['status' => 'rejected', 'expected_status' => 'verified', 'rejection_reason' => 'Duplicate of documented case FIXTURE-04.'])
+            ->assertSessionHasNoErrors();
+        $this->assertSame('rejected', $report->fresh()->status);
+        $this->assertSame('cancelled', $referral->fresh()->status);
+        $this->assertEquals($snapshot, $referral->fresh()->only(array_keys($snapshot)));
+        $this->assertSame(1, $referral->events()->where('event', 'cancelled_report_rejected_by_admin_'.$admin->id)->count());
+        (new SendReferral($referral->id))->handle();
+        $this->post(route('admin.referrals.retry', [$report, $referral]), ['approved' => 1])->assertConflict();
+        $this->assertDatabaseCount('referrals', 1);
+        $this->assertDatabaseCount('report_reviews', 1);
+        $this->get(route('admin.reports.index', ['queue' => 'action']))
+            ->assertViewHas('reports', fn ($reports) => $reports->isEmpty());
+        $this->get(route('admin.reports.index', ['queue' => 'processed']))
+            ->assertViewHas('reports', fn ($reports) => $reports->pluck('id')->all() === [$report->id]);
+        Mail::assertNothingSent();
+    }
+
+    #[TestWith(['sending'])]
+    #[TestWith(['uncertain'])]
+    #[TestWith(['accepted'])]
+    public function test_rejection_is_blocked_after_submission_begins_or_is_accepted(string $state): void
+    {
+        $report = $this->report();
+        $referral = $this->approve($report, $this->agency($report));
+        $referral->forceFill(['status' => $state, 'sending_at' => now(), 'sent_at' => $state === 'accepted' ? now() : null])->save();
+        $before = $referral->fresh()->getAttributes();
+        $this->actingAs($this->admin())->patch(route('admin.reports.status', $report), ['status' => 'rejected',
+            'expected_status' => 'verified', 'rejection_reason' => 'Must not race SMTP.'])->assertSessionHasErrors('status');
+        $this->assertSame('verified', $report->fresh()->status);
+        $this->assertSame($before, $referral->fresh()->getAttributes());
+        $this->assertDatabaseCount('report_reviews', 0);
+        Mail::assertNothingSent();
+    }
+
+    public function test_audit_failure_rolls_back_referral_cancellation_and_rejection_together(): void
+    {
+        $report = $this->report();
+        $referral = $this->approve($report, $this->agency($report));
+        $before = $referral->fresh()->getAttributes();
+        ReportReview::creating(function (): void {
+            throw new \RuntimeException('Isolated rejection audit failure.');
+        });
+        try {
+            $this->actingAs($this->admin())->patch(route('admin.reports.status', $report), ['status' => 'rejected',
+                'expected_status' => 'verified', 'rejection_reason' => 'Isolated rollback fixture.'])->assertSessionHasErrors('status');
+            $this->assertSame('verified', $report->fresh()->status);
+            $this->assertSame($before, $referral->fresh()->getAttributes());
+            $this->assertDatabaseCount('referral_events', 2);
+            $this->assertDatabaseCount('report_reviews', 0);
+            Mail::assertNothingSent();
+        } finally {
+            ReportReview::flushEventListeners();
+        }
+    }
+
     public function test_rejection_does_not_send_and_worker_interruption_keeps_a_retryable_audit(): void
     {
         $r = $this->report();
         $r->forceFill(['status' => 'pending'])->save();
-        $this->actingAs($this->admin())->patch(route('admin.reports.status', $r), ['expected_status' => 'pending', 'status' => 'rejected'])->assertRedirect();
+        $this->actingAs($this->admin())->patch(route('admin.reports.status', $r), ['expected_status' => 'pending', 'status' => 'rejected', 'rejection_reason' => 'Duplicate isolated observation.'])->assertRedirect();
         $this->assertSame('rejected', $r->fresh()->status);
         Mail::assertNothingSent();
         Queue::assertNothingPushed();

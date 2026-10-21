@@ -1,4 +1,4 @@
-<h2 id="review-heading" class="text-lg font-semibold">Send to Municipality</h2>
+<h2 id="review-heading" class="text-lg font-semibold">{{ $report->forwarded() ? 'Municipality referral' : 'Send to Municipality' }}</h2>
 <p class="mt-3 text-sm text-muted">Review the report, evidence and location. Sending approves the report for referral and preserves your decision. It does not resolve the environmental concern.</p>
 @if(!$ready)<p role="alert" class="mt-3 text-sm">SMTP configuration is incomplete. Follow the local email setup guide before sending.</p>@endif
 @if($sendOptions)
@@ -21,7 +21,4 @@
 @if($referral)
     <p id="delivery-current-status" data-delivery-poll="{{ route('admin.referrals.status', $report) }}" data-delivery-state="{{ $referral->status }}" data-delivery-approved="{{ $referral->deliveryApproved() ? '1' : '0' }}" class="mt-4 text-sm" role="status">{{ $referral->label() }}</p>
     @include('admin.reports.delivery', ['delivery'=>$referral,'allowActions'=>true])
-@endif
-@if(!$referral && in_array($report->status, ['pending','verified'], true))
-    <form id="dismiss-report-form" method="POST" action="{{ route('admin.reports.status', $report) }}" class="mt-6 space-y-3 border-t border-line pt-5">@csrf @method('PATCH')<input type="hidden" name="expected_status" value="{{ $report->status }}"><input type="hidden" name="status" value="{{ $report->status === 'pending' ? 'rejected' : 'resolved' }}"><label class="form-label" for="review_note">Reason for closing without email (optional)</label><textarea class="form-input" name="review_note" id="review_note" rows="3" maxlength="2000">{{ is_string(old('review_note')) ? old('review_note') : '' }}</textarea><button class="secondary-button">{{ $report->status === 'pending' ? 'Reject without sending' : 'Close without sending' }}</button></form>
 @endif
