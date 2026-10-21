@@ -57,7 +57,7 @@
                     </aside>
                 </div>
                 <p id="wheel-hint" class="map-wheel-hint">Click or focus the map to zoom with a mouse wheel or trackpad.</p>
-                <p id="tile-status" role="status" class="px-3 py-2 text-xs text-estuary" hidden>Some map tiles could not load. Check your connection. Profiles remain available.</p>
+                <p id="tile-status" role="status" class="px-3 py-2 text-xs text-estuary" hidden>Basemap tiles are unavailable. Markers, mapped shapes, coordinates and profiles remain available. Check your connection or try again later.</p>
                 <p id="map-status" role="status" class="map-status">Loading the map. Select a sidebar item to open its profile.</p>
             </section>
         </div>

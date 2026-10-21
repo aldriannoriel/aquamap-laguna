@@ -18,7 +18,7 @@ class AdminPrivacy
         $response = $next($request);
         $response->headers->add([
             'Cache-Control' => 'no-store, private',
-            'Referrer-Policy' => 'same-origin',
+            'Referrer-Policy' => 'strict-origin-when-cross-origin',
             'X-Robots-Tag' => 'noindex, nofollow',
             'X-Content-Type-Options' => 'nosniff',
         ]);

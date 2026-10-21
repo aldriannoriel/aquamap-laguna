@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import { addMapTiles } from './map-tiles';
 import './report-categories';
 import './incident-map';
 import './admin-report-map';
@@ -179,11 +180,7 @@ if (mapElement) {
         });
         L.control.zoom({ position: 'topright', zoomInTitle: 'Zoom in', zoomOutTitle: 'Zoom out' }).addTo(map);
         L.control.scale({ imperial: false, position: 'bottomleft' }).addTo(map);
-        const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }).addTo(map);
-        tiles.once('tileerror', () => { document.getElementById('tile-status').hidden = false; });
+        addMapTiles(map, document.getElementById('tile-status'));
         for (const lake of lakes.filter((item) => item.geography)) {
             const geometry = lake.geography.geometry;
             const feature = L.geoJSON(geometry, { style: { color: '#277e96', weight: lake.category === 'river' ? 5 : 2, fillOpacity: 0.12 } });

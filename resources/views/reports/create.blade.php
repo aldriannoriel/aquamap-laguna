@@ -100,7 +100,7 @@
                     <div id="incident-map" class="h-72 w-full sm:h-80" role="region" aria-label="Choose incident location. Pan with arrow keys; use the button below to select the map center." aria-describedby="incident-help incident-status"></div>
                 </div>
                 <p id="incident-status" role="status" class="mt-2 text-xs leading-5 text-muted">No incident location selected.</p>
-                <p id="incident-tiles" class="mt-2 text-xs text-muted" role="status" hidden>Map tiles could not load. Leave the point blank if you cannot identify the location.</p>
+                <p id="incident-tiles" class="mt-2 text-xs text-muted" role="status" hidden>Basemap tiles are unavailable. Your selected coordinates and pin are kept; manual pin and GPS controls remain available. Leave the point blank if you cannot identify the location.</p>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button type="button" id="use-current-location" class="secondary-button">Use My Current Location</button>
                     <button type="button" id="use-gps-location" class="secondary-button" hidden>Use this GPS point as the problem location</button>

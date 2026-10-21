@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\PollutionReport;
+use App\Models\User;
 use App\Models\WaterBody;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Http\UploadedFile;
@@ -67,5 +68,24 @@ class ReportLocationTest extends TestCase
         unset($data['photo']);
         $this->postJson(route('reports.store'), $data)->assertUnprocessable()->assertJsonValidationErrors('photo');
         $this->assertDatabaseCount('pollution_reports', 1);
+    }
+
+    public function test_all_map_pages_allow_origin_referrers_while_admin_evidence_and_coordinates_stay_private(): void
+    {
+        foreach (['map.index', 'reports.create'] as $route) {
+            $this->get(route($route))->assertOk()->assertSee('<meta name="referrer" content="strict-origin-when-cross-origin">', false)
+                ->assertSee('Basemap tiles are unavailable.');
+        }
+        $report = PollutionReport::forceCreate(['water_body_id' => WaterBody::firstOrFail()->id, 'pollution_type' => 'other',
+            'description' => 'Private map fixture', 'latitude' => 14.1234567, 'longitude' => 121.2345678, 'status' => 'pending']);
+        $before = $report->refresh()->getAttributes();
+        $this->get(route('admin.reports.show', $report))->assertRedirectToRoute('admin.login');
+        $admin = User::factory()->create();
+        $admin->forceFill(['is_admin' => true])->save();
+        $this->actingAs($admin)->get(route('admin.reports.show', $report))->assertOk()
+            ->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin')->assertHeader('Cache-Control', 'no-store, private')
+            ->assertHeader('X-Robots-Tag', 'noindex, nofollow')->assertSee('<meta name="referrer" content="strict-origin-when-cross-origin">', false)
+            ->assertSee('id="private-tiles"', false)->assertSee('14.1234567')->assertSee('121.2345678');
+        $this->assertSame($before, $report->fresh()->getAttributes());
     }
 }

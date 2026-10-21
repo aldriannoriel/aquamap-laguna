@@ -1,4 +1,5 @@
 import L from 'leaflet';
+import { addMapTiles } from './map-tiles';
 
 const element = document.getElementById('incident-map');
 if (element) {
@@ -21,9 +22,7 @@ if (element) {
     let gpsRequest = 0;
     const map = L.map(element, { scrollWheelZoom: false }).setView([14.25, 121.35], 10);
     if (mapped.length) map.fitBounds(L.latLngBounds(mapped.map(lake => [Number(lake.latitude), Number(lake.longitude)])), { padding: [30, 30], maxZoom: 14 });
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).on('tileerror', () => { document.getElementById('incident-tiles').hidden = false; }).addTo(map);
+    addMapTiles(map, document.getElementById('incident-tiles'));
     for (const lake of mapped) {
         const label = document.createElement('span'); label.textContent = lake.name + ' / reference location only';
         L.circleMarker([Number(lake.latitude), Number(lake.longitude)], { radius: 7, color: '#277e96', fillOpacity: 0.35, bubblingMouseEvents: false }).bindTooltip(label).addTo(map);

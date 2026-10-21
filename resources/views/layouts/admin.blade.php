@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noindex, nofollow">
-        <meta name="referrer" content="same-origin">
+        <meta name="referrer" content="strict-origin-when-cross-origin">
         <title>@yield('title', 'Administrator') | AquaMap Laguna</title>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>

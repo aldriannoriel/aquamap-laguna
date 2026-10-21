@@ -14,6 +14,7 @@
                 <h3 class="mt-5 text-sm font-semibold">Reported incident location</h3>
                 @if($report->latitude !== null && $report->longitude !== null)
                     <div id="private-report-map" class="mt-3 h-72 rounded-lg border border-line" role="region" aria-label="Private reported problem location" data-latitude="{{ $report->latitude }}" data-longitude="{{ $report->longitude }}"></div>
+                    <p id="private-tiles" role="status" class="mt-2 text-sm text-muted" hidden>Basemap tiles are unavailable. The saved coordinates and incident marker remain available below and on this map.</p>
                 @endif
                 <p class="mt-3 text-sm">Landmark / barangay supplied by reporter: {{ $report->landmark ?: 'Not provided' }}.</p>
                 <p class="mt-2 text-sm">Observation date: {{ $report->observed_on?->format('Y-m-d') ?: 'Not provided' }}.</p>
