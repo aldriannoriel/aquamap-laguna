@@ -51,7 +51,10 @@ class ReferralWorkflow
             $hash = hash('sha256', Storage::disk('pollution-reports')->get($photo));
         }
 
+        $selection = MunicipalityRouting::selection($report);
+
         return ['test' => false, 'report_reference' => 'AQ-'.$report->id, 'water_body' => $report->waterBody->name,
+            'incident_municipality' => $selection['municipality'] ?? null, 'incident_routing' => $selection,
             'municipality' => $report->waterBody->municipality, 'concern' => PollutionReport::TYPES[$report->pollution_type] ?? 'Other concern',
             'description' => $report->description, 'observed_on' => $report->observed_on?->format('Y-m-d'),
             'submitted_at' => $report->created_at->toIso8601String(), 'latitude' => $report->latitude, 'longitude' => $report->longitude,
@@ -66,12 +69,7 @@ class ReferralWorkflow
 
     public static function eligible(Agency $agency, PollutionReport $report): bool
     {
-        $report->loadMissing('waterBody');
-        $agency->loadMissing('waterBodies');
-        $municipality = MunicipalityRouting::exact($report->waterBody->municipality);
-
-        return $agency->active && ($municipality === null || $agency->municipality === $municipality
-            || $agency->waterBodies->contains('id', $report->water_body_id));
+        return $agency->active && MunicipalityRouting::exact($agency->municipality) !== null;
     }
 
     public static function reviewHash(PollutionReport $report, Agency $agency, bool $photo): string
@@ -86,7 +84,16 @@ class ReferralWorkflow
 
     public static function existingHash(Referral $referral): string
     {
-        return hash('sha256', json_encode([$referral->reference, $referral->payload, $referral->recipient_snapshot, $referral->include_photo], JSON_THROW_ON_ERROR));
+        return hash('sha256', json_encode([$referral->reference, $referral->payload, $referral->recipient_snapshot, $referral->include_photo,
+            $referral->report ? MunicipalityRouting::selection($referral->report) : null], JSON_THROW_ON_ERROR));
+    }
+
+    public static function assertIncidentRecipient(PollutionReport $report, Agency $agency): void
+    {
+        $selection = MunicipalityRouting::selection($report);
+        if (! self::eligible($agency, $report) || ! $selection || $selection['agency_id'] !== $agency->id || $selection['municipality'] !== $agency->municipality) {
+            throw ValidationException::withMessages(['agency_id' => 'Save a valid incident municipality selection before sending.']);
+        }
     }
 
     public static function record(Referral $referral, string $event): void
@@ -103,6 +110,8 @@ class ReferralWorkflow
             $existing = Referral::where('pollution_report_id', $report->id)->first();
             if ($existing) {
                 if ($existing->status === 'queued' && ! $existing->deliveryApproved()) {
+                    $agency = Agency::whereKey($agency->id)->lockForUpdate()->firstOrFail();
+                    self::assertIncidentRecipient($report, $agency);
                     abort_unless(in_array($report->status, ['pending', 'verified'], true), 422, 'This report is closed and cannot be sent.');
                     abort_unless($existing->attempts === 0 && $existing->sending_at === null && $existing->sent_at === null, 409, 'Review the prior delivery attempt before approving again.');
                     abort_unless(hash_equals(self::existingHash($existing), $reviewHash), 409, 'Review the preserved approval snapshot before sending.');
@@ -115,6 +124,7 @@ class ReferralWorkflow
             }
             abort_unless(in_array($report->status, ['pending', 'verified'], true), 422, 'This report is closed and cannot be sent.');
             $agency = Agency::whereKey($agency->id)->lockForUpdate()->firstOrFail();
+            self::assertIncidentRecipient($report, $agency);
             abort_unless(self::eligible($agency, $report), 422, 'Choose an active municipality recipient or a verified routing assignment.');
             abort_unless(hash_equals(self::reviewHash($report, $agency, $photo), $reviewHash), 409, 'The report or recipient changed. Preview the email again.');
             if ($report->status === 'pending') {

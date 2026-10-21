@@ -17,6 +17,14 @@ if (followUp) {
 if (form) {
     const options = JSON.parse(document.getElementById('municipality-send-options').textContent);
     const dialog = document.getElementById('municipality-confirmation');
+    const recipientSelect = document.getElementById('agency_id');
+    const updateSendButton = () => {
+        const photo = document.getElementById('include_photo')?.checked ?? (form.querySelector('input[name=include_photo]').value === '1');
+        document.getElementById('send-to-municipality').disabled = form.dataset.smtpReady !== '1' || !options[recipientSelect.value]?.[photo ? '1' : '0'];
+    };
+    recipientSelect.addEventListener('change', updateSendButton);
+    document.getElementById('include_photo')?.addEventListener('change', updateSendButton);
+    updateSendButton();
     document.getElementById('send-to-municipality').addEventListener('click', () => {
         const recipient = document.getElementById('agency_id');
         if (!recipient.reportValidity()) return;

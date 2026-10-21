@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AgencyController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\IncidentMunicipalityController;
 use App\Http\Controllers\Admin\ReferralController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReportStatusController;
@@ -22,6 +23,8 @@ Route::prefix('admin')->name('admin.')->middleware(AdminPrivacy::class)->group(f
     Route::post('/login', [SessionController::class, 'store'])->middleware('throttle:admin-login')->name('login.store');
     Route::middleware(['auth', 'can:access-admin'])->group(function (): void {
         Route::resource('agencies', AgencyController::class)->except('show');
+        Route::post('/reports/{pollutionReport}/incident-municipality', IncidentMunicipalityController::class)
+            ->middleware('throttle:admin-reviews')->name('reports.municipality');
         Route::get('/reports/{pollutionReport}/delivery-status', [ReferralController::class, 'status'])->name('referrals.status');
         Route::post('/reports/{pollutionReport}/delivery/{referral}/retry', [ReferralController::class, 'retry'])->name('referrals.retry');
         Route::post('/reports/{pollutionReport}/delivery/{referral}/confirm', [ReferralController::class, 'confirm'])->name('referrals.confirm');

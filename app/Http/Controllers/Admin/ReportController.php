@@ -54,23 +54,26 @@ class ReportController extends Controller
     {
         $pollutionReport->load(['waterBody:id,name,municipality', 'reviews.administrator:id,name']);
 
-        $recipients = Agency::with('waterBodies:id')->where('active', true)->orderBy('municipality')->get()
+        $recipients = Agency::where('active', true)->orderBy('municipality')->get()
             ->filter(fn (Agency $agency): bool => ReferralWorkflow::eligible($agency, $pollutionReport));
-        $matches = $recipients->where('municipality', MunicipalityRouting::exact($pollutionReport->waterBody->municipality));
+        $incidentRouting = MunicipalityRouting::incident($pollutionReport);
+        $routingSelection = MunicipalityRouting::selection($pollutionReport);
+        $selectedRecipient = $routingSelection ? $recipients->first(fn (Agency $agency): bool => $agency->id === $routingSelection['agency_id']
+            && $agency->municipality === $routingSelection['municipality']) : null;
         $referral = $pollutionReport->referral?->load('events');
         $options = [];
-        if ($referral && $referral->status === 'queued' && ! $referral->deliveryApproved() && in_array($pollutionReport->status, ['pending', 'verified'], true)) {
+        if ($selectedRecipient && $referral && $referral->status === 'queued' && ! $referral->deliveryApproved() && in_array($pollutionReport->status, ['pending', 'verified'], true)) {
             $options[(string) $referral->agency_id] = [($referral->include_photo ? '1' : '0') => ['hash' => ReferralWorkflow::existingHash($referral),
                 'text' => view('mail.referral-text', ['details' => $referral->payload, 'reference' => $referral->reference])->render(),
                 'recipient' => $referral->recipient_snapshot['name'].' / '.$referral->recipient_snapshot['email']]];
-        } elseif (! $referral && $recipients->isNotEmpty() && in_array($pollutionReport->status, ['pending', 'verified'], true)
+        } elseif ($selectedRecipient && ! $referral && in_array($pollutionReport->status, ['pending', 'verified'], true)
             && $pollutionReport->waterBody()->supported()->exists()) {
             $payloads = [0 => ReferralWorkflow::payload($pollutionReport, false)];
             if (is_string($pollutionReport->photo_path) && preg_match('/\A[A-Za-z0-9_-]+\.(jpe?g|png|webp)\z/i', $pollutionReport->photo_path)
                 && Storage::disk('pollution-reports')->exists($pollutionReport->photo_path)) {
                 $payloads[1] = ReferralWorkflow::payload($pollutionReport, true);
             }
-            foreach ($recipients as $recipient) {
+            foreach ([$selectedRecipient] as $recipient) {
                 foreach ($payloads as $photo => $details) {
                     $options[(string) $recipient->id][(string) $photo] = [
                         'hash' => ReferralWorkflow::fingerprint($details, ReferralWorkflow::recipient($recipient)),
@@ -82,7 +85,12 @@ class ReportController extends Controller
 
         return view('admin.reports.show', ['report' => $pollutionReport,
             'recipients' => $recipients,
-            'suggestedRecipient' => $referral && ! $referral->deliveryApproved() ? $referral->agency_id : ($matches->count() === 1 ? $matches->first()->id : null),
+            'suggestedRecipient' => $selectedRecipient?->id, 'selectedRecipient' => $selectedRecipient,
+            'incidentRouting' => $incidentRouting, 'routingSelection' => $routingSelection,
+            'canSendReferral' => in_array($pollutionReport->status, ['pending', 'verified'], true) && $pollutionReport->waterBody()->supported()->exists()
+                && (! $referral || ($referral->status === 'queued' && ! $referral->deliveryApproved() && $referral->attempts === 0)),
+            'canSelectMunicipality' => in_array($pollutionReport->status, ['pending', 'verified'], true) && (! $referral
+                || ($referral->status === 'queued' && ! $referral->deliveryApproved() && $referral->attempts === 0)),
             'referral' => $referral, 'sendOptions' => $options, 'ready' => ReferralWorkflow::ready(),
         ]);
     }

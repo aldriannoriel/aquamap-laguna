@@ -22,6 +22,9 @@ class ReferralController extends Controller
         abort_unless(ReferralWorkflow::eligible($agency, $pollutionReport), 422, 'Choose an active municipality recipient or verified routing assignment.');
         $photo = $request->boolean('include_photo');
         $existing = $pollutionReport->referral;
+        if (! $existing || ($existing->status === 'queued' && ! $existing->deliveryApproved())) {
+            ReferralWorkflow::assertIncidentRecipient($pollutionReport, $agency);
+        }
 
         return view('admin.referrals.preview', ['report' => $pollutionReport, 'agency' => $agency,
             'recipient' => $existing?->recipient_snapshot ?? ReferralWorkflow::recipient($agency),

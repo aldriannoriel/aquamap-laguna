@@ -71,7 +71,11 @@ if ($setup) {
     foreach (['water_bodies', 'fish_species', 'water_body_fish'] as $table) {
         $query = DB::table($table);
         if ($table === 'water_bodies') {
-            $query->whereIn('name', ['Sampaloc Lake', 'Pandin Lake', 'Yambo Lake']);
+            $names = ['Sampaloc Lake', 'Pandin Lake', 'Yambo Lake'];
+            if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1') {
+                $names[] = 'Balanac River';
+            }
+            $query->whereIn('name', $names);
         }
         $rows[$table] = $query->get()->map(fn (object $row): array => (array) $row)->all();
     }
@@ -110,6 +114,12 @@ if ($setup) {
         $report->pollution_type = 'solid_waste';
         $report->description = $i === 0 ? 'Synthetic browser review target. Never a real incident.' : 'Synthetic isolated browser fixture '.($i + 1);
         $report->status = [1 => 'verified', 2 => 'rejected', 3 => 'resolved'][$i] ?? 'pending';
+        if ($i === 3 && getenv('AQUAMAP_BROWSER_REFERRALS') === '1') {
+            $report->water_body_id = WaterBody::where('name', 'Balanac River')->sole()->id;
+            $report->status = 'pending';
+            $report->latitude = 14.19;
+            $report->longitude = 121.43;
+        }
         if ($i === 0) {
             if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1') {
                 $report->latitude = 14.1234567;

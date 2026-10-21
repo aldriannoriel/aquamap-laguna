@@ -14,8 +14,8 @@
 <article class="rounded-xl border border-line bg-white p-5">
 <div class="flex flex-wrap items-start justify-between gap-3"><div><h2 class="text-lg font-semibold">{{ $agency->name }}</h2><p class="mt-1 text-sm">{{ $agency->municipality }}{{ $agency->barangay ? ' / '.$agency->barangay : '' }}</p><p class="mt-2 text-sm break-all">{{ $agency->email }}</p></div><p class="text-sm font-semibold">{{ $agency->active ? 'Active' : 'Inactive' }} / {{ ucfirst($agency->verification_status) }}</p></div>
 @if($agency->verification_status === 'provisional')<p class="mt-3 text-sm text-muted">Provisional routing only. Official responsibilities and jurisdiction have not been verified.</p>@endif
-<p class="mt-3 text-sm"><strong>Municipality coverage:</strong> {{ ($municipalityBodies[$agency->municipality] ?? collect())->pluck('name')->join(', ') ?: 'No exact locality matches; verify routing manually.' }}</p>
-@if($agency->waterBodies->isNotEmpty())<p class="mt-2 text-sm"><strong>Explicit routing assignments:</strong> {{ $agency->waterBodies->pluck('name')->join(', ') }}</p>@endif
+<p class="mt-3 text-sm"><strong>Catalogue locality matches:</strong> {{ ($municipalityBodies[$agency->municipality] ?? collect())->pluck('name')->join(', ') ?: 'No exact locality matches; verify routing manually.' }}</p>
+@if($agency->waterBodies->isNotEmpty())<p class="mt-2 text-sm"><strong>Catalogue associations:</strong> {{ $agency->waterBodies->pluck('name')->join(', ') }}</p>@endif
 @if($agency->notes)<p class="mt-3 text-sm whitespace-pre-wrap">{{ $agency->notes }}</p>@endif
 <a class="mt-4 inline-block text-sm font-semibold text-water underline" href="{{ route('admin.agencies.edit', $agency) }}">Edit recipient</a>
 </article>

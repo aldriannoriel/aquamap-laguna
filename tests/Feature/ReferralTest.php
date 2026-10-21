@@ -10,6 +10,7 @@ use App\Models\Referral;
 use App\Models\ReportReview;
 use App\Models\User;
 use App\Models\WaterBody;
+use App\Support\MunicipalityRouting;
 use App\Support\ReferralWorkflow;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\ExplorerSeeder;
@@ -70,7 +71,15 @@ class ReferralTest extends TestCase
 
     private function approve(PollutionReport $r, Agency $a, bool $photo = false): Referral
     {
+        $this->selectIncident($r, $a);
+
         return ReferralWorkflow::enqueue($r, $a, $this->admin(), $photo, ReferralWorkflow::reviewHash($r, $a, $photo));
+    }
+
+    private function selectIncident(PollutionReport $report, Agency $agency): void
+    {
+        MunicipalityRouting::select($report, $agency, $this->admin(), 'Isolated administrator review of the incident location.',
+            MunicipalityRouting::pointKey($report), $report->status);
     }
 
     public function test_preview_and_approval_are_private_explicit_and_deduplicated_with_safe_attachment(): void
@@ -78,6 +87,7 @@ class ReferralTest extends TestCase
         $r = $this->report();
         $a = $this->agency($r);
         $u = $this->admin();
+        $this->selectIncident($r, $a);
         $this->get(route('admin.referrals.preview', $r))->assertRedirectToRoute('admin.login');
         $this->actingAs(User::factory()->create())->post(route('admin.referrals.store', $r))->assertForbidden();
         $this->actingAs($u)->get(route('admin.referrals.preview', [$r, 'agency_id' => $a->id, 'include_photo' => 1]))->assertOk()
@@ -127,6 +137,7 @@ class ReferralTest extends TestCase
         $r = $this->report();
         $a = $this->agency($r);
         $this->actingAs($this->admin());
+        $this->selectIncident($r, $a);
         $hash = ReferralWorkflow::reviewHash($r, $a, false);
         $r->forceFill(['description' => 'Changed since preview'])->save();
         $data = ['agency_id' => $a->id, 'include_photo' => 0, 'review_hash' => $hash, 'approved' => 1];
@@ -220,6 +231,7 @@ class ReferralTest extends TestCase
         Mail::assertNothingSent();
         Queue::assertNothingPushed();
         $r->refresh();
+        $this->selectIncident($r, $a);
         $photo = $r->photo_path;
         $this->get(route('admin.reports.show', $r))->assertOk()->assertSee('Your decision was recorded');
         $data = ['agency_id' => $a->id, 'include_photo' => 0, 'review_hash' => ReferralWorkflow::reviewHash($r, $a, false), 'approved' => 1];
@@ -235,26 +247,27 @@ class ReferralTest extends TestCase
         (new SendReferral($ref->id))->handle();
         Queue::assertPushed(SendReferral::class, 1);
         Mail::assertSent(EnvironmentalReferral::class, 1);
-        $this->assertDatabaseCount('report_reviews', 1);
+        $this->assertDatabaseCount('report_reviews', 2);
         $this->assertSame($photo, $r->fresh()->photo_path);
         Storage::disk('pollution-reports')->assertExists($photo);
         $this->assertSame('14.1160000', $r->fresh()->latitude);
     }
 
-    public function test_one_municipality_routes_multiple_bodies_and_unknown_or_boundary_locality_never_selects_a_default(): void
+    public function test_explicit_incident_selection_routes_multiple_bodies_without_using_catalogue_locality(): void
     {
         $r = $this->report();
         $a = $this->agency($r);
         $a->waterBodies()->detach();
         $other = WaterBody::where('name', 'Yambo Lake')->sole();
         $this->actingAs($this->admin());
-        $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', $a->id);
+        $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', null);
+        $this->selectIncident($r, $a);
         $this->get(route('admin.referrals.preview', [$r, 'agency_id' => $a->id]))->assertOk();
         $r->forceFill(['water_body_id' => $other->id])->save();
         $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', $a->id);
         foreach (['Unknown', 'Majayjay / Liliw access area'] as $locality) {
             $other->forceFill(['municipality' => $locality])->save();
-            $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', null)->assertSee('Select and verify the recipient manually.');
+            $this->get(route('admin.reports.show', $r))->assertViewHas('suggestedRecipient', $a->id)->assertSee('Using the saved incident municipality selection.');
             $this->get(route('admin.referrals.preview', $r))->assertSessionHasErrors('agency_id');
             $this->get(route('admin.referrals.preview', [$r, 'agency_id' => $a->id]))->assertOk();
         }
@@ -316,6 +329,7 @@ class ReferralTest extends TestCase
         $r = $this->report();
         $r->forceFill(['status' => 'pending'])->save();
         $a = $this->agency($r);
+        $this->selectIncident($r, $a);
         $this->actingAs($this->admin());
         $data = ['agency_id' => $a->id, 'include_photo' => 0, 'review_hash' => ReferralWorkflow::reviewHash($r, $a, false)];
         $this->post(route('admin.referrals.store', $r), $data)->assertSessionHasErrors('approved');
@@ -323,7 +337,7 @@ class ReferralTest extends TestCase
         $this->post(route('admin.referrals.store', $r), [...$data, 'approved' => 1])->assertRedirectToRoute('admin.reports.show', $r);
         $this->post(route('admin.referrals.store', $r), [...$data, 'approved' => 1])->assertRedirect();
         $this->assertSame('verified', $r->fresh()->status);
-        $this->assertDatabaseCount('report_reviews', 1);
+        $this->assertDatabaseCount('report_reviews', 2);
         $this->assertSame('queued', Referral::sole()->status);
         Queue::assertPushed(SendReferral::class, fn ($job) => $job->connection === 'referrals' && $job->queue === 'municipality-referrals');
         Queue::assertPushed(SendReferral::class, 1);
@@ -414,6 +428,11 @@ class ReferralTest extends TestCase
         Queue::assertNothingPushed();
         $this->assertDatabaseCount('jobs', 5);
         $this->actingAs($u)->get(route('admin.reports.show', $r))->assertOk()->assertSee('legacy approval is paused');
+        $this->selectIncident($r, $a);
+        $a->forceFill(['active' => false])->save();
+        $this->post(route('admin.referrals.store', $r), ['agency_id' => $a->id, 'include_photo' => 0,
+            'review_hash' => ReferralWorkflow::existingHash($legacy), 'approved' => 1])->assertSessionHasErrors('agency_id');
+        $a->forceFill(['active' => true])->save();
         $a->forceFill(['email' => 'changed@example.test'])->save();
         $this->get(route('admin.referrals.preview', [$r, 'agency_id' => $a->id]))->assertOk()
             ->assertSee(Referral::TEST_RECIPIENT)->assertSee($legacy->reference)->assertDontSee('changed@example.test');
@@ -454,7 +473,7 @@ class ReferralTest extends TestCase
         (new SendReferral($referral->id))->handle();
         $this->post(route('admin.referrals.retry', [$report, $referral]), ['approved' => 1])->assertConflict();
         $this->assertDatabaseCount('referrals', 1);
-        $this->assertDatabaseCount('report_reviews', 1);
+        $this->assertDatabaseCount('report_reviews', 2);
         $this->get(route('admin.reports.index', ['queue' => 'action']))
             ->assertViewHas('reports', fn ($reports) => $reports->isEmpty());
         $this->get(route('admin.reports.index', ['queue' => 'processed']))
@@ -475,7 +494,7 @@ class ReferralTest extends TestCase
             'expected_status' => 'verified', 'rejection_reason' => 'Must not race SMTP.'])->assertSessionHasErrors('status');
         $this->assertSame('verified', $report->fresh()->status);
         $this->assertSame($before, $referral->fresh()->getAttributes());
-        $this->assertDatabaseCount('report_reviews', 0);
+        $this->assertDatabaseCount('report_reviews', 1);
         Mail::assertNothingSent();
     }
 
@@ -493,7 +512,7 @@ class ReferralTest extends TestCase
             $this->assertSame('verified', $report->fresh()->status);
             $this->assertSame($before, $referral->fresh()->getAttributes());
             $this->assertDatabaseCount('referral_events', 2);
-            $this->assertDatabaseCount('report_reviews', 0);
+            $this->assertDatabaseCount('report_reviews', 1);
             Mail::assertNothingSent();
         } finally {
             ReportReview::flushEventListeners();

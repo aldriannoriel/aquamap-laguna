@@ -9,7 +9,12 @@ Please locate this reference in the inbox before confirming receipt in AquaMap.
 @else
 Report reference: {{ $details['report_reference'] }}
 Water body: {{ $details['water_body'] }}
+@if(array_key_exists('incident_municipality', $details))
+Water-body recorded municipality: {{ $details['municipality'] }}
+Incident municipality (admin selected): {{ $details['incident_municipality'] ?: 'Not selected / not verified' }}
+@else
 Municipality / locality: {{ $details['municipality'] }}
+@endif
 Concern: {{ $details['concern'] }}
 Observation date: {{ $details['observed_on'] ?: 'Not provided' }}
 Submitted: {{ $details['submitted_at'] }}

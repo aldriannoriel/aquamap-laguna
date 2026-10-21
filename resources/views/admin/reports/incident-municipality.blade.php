@@ -1,0 +1,17 @@
+<section class="rounded-xl border border-line bg-white p-5 sm:p-6" aria-labelledby="incident-municipality-heading">
+    <h2 id="incident-municipality-heading" class="text-lg font-semibold">Incident municipality</h2>
+    <p class="mt-3 text-sm">Water-body recorded municipality: <strong>{{ $report->waterBody->municipality }}</strong></p>
+    <p class="mt-3 text-sm">Incident municipality: <strong id="incident-municipality">{{ $routingSelection['municipality'] ?? 'Not selected / not verified' }}</strong>@if($routingSelection) (admin selected)@endif</p>
+    <p class="mt-3 text-xs text-muted">{{ $incidentRouting['status'] === 'missing_incident_point' ? 'No saved incident coordinates are available.' : 'Saved incident coordinates are the routing reference, but no verified municipality boundary layer is installed.' }} Select the municipality manually after reviewing the location. Water-body locality, nearest town centres and routing assignments do not establish incident jurisdiction.</p>
+    @if($routingSelection)<p class="mt-3 whitespace-pre-wrap break-words text-sm">Selection / override reason: {{ $routingSelection['reason'] }}</p>@endif
+    @if($canSelectMunicipality)
+        <form id="incident-municipality-form" method="POST" action="{{ route('admin.reports.municipality', $report) }}" class="mt-4 space-y-4">
+            @csrf
+            <input type="hidden" name="point_key" value="{{ $incidentRouting['point_key'] }}"><input type="hidden" name="expected_status" value="{{ $report->status }}">
+            <div><label class="form-label" for="incident_agency_id">Incident municipality recipient</label><select class="form-input" id="incident_agency_id" name="agency_id" required><option value="">Select after reviewing the incident location</option>@foreach($recipients as $recipient)<option value="{{ $recipient->id }}" @selected($selectedRecipient?->id === $recipient->id)>{{ $recipient->municipality }} / {{ $recipient->email }}</option>@endforeach</select></div>
+            <div><label class="form-label" for="routing_reason">Selection / override reason (required)</label><textarea class="form-input" id="routing_reason" name="routing_reason" rows="4" maxlength="2000" required>{{ is_string(old('routing_reason')) ? old('routing_reason') : '' }}</textarea></div>
+            <button class="secondary-button" type="submit">Save incident municipality</button>
+            <p class="text-xs text-muted">Saving records the reviewer, time, municipality and reason. It does not send email or change the report decision. Existing referral snapshots cannot be rerouted.</p>
+        </form>
+    @else<p class="mt-3 text-xs text-muted">Existing decisions and referral snapshots are preserved. Historical referrals without an incident selection remain unverified.</p>@endif
+</section>

@@ -5,6 +5,7 @@
     <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><h1 class="text-3xl font-semibold tracking-tight">Report #{{ $report->id }}</h1><div id="report-current-status" class="flex flex-wrap items-center gap-3"><span class="text-xs text-muted">Report status:</span>@include('admin.reports.status', ['status' => $report->status])@if($referral)<span class="text-xs text-muted">Email delivery:</span><span class="rounded-lg bg-white px-3 py-2 text-sm font-semibold">{{ $referral->label() }}</span>@endif</div></div>
     @if(session('review_saved'))<p id="review-success" role="status" tabindex="-1" class="mt-5 rounded-xl border border-moss/30 bg-white p-4 text-sm text-moss">Your decision was recorded in the audit history. No email was sent.</p>@endif
     @if(session('referral_saved'))<p role="status" class="mt-4 rounded-lg border border-line bg-white p-4 text-sm">{{ session('referral_saved') }}</p>@endif
+    @if(session('routing_saved'))<p role="status" class="mt-4 rounded-lg border border-line bg-white p-4 text-sm">{{ session('routing_saved') }}</p>@endif
     <div class="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div class="min-w-0 space-y-6">
             <section class="rounded-xl border border-line bg-white p-5 sm:p-6">
@@ -38,7 +39,7 @@
                 <h2 class="text-lg font-semibold">Audit history</h2>
                 <ol class="mt-4 space-y-5" id="audit-history">
                     @forelse($report->reviews as $review)
-                        <li class="border-l-2 border-water pl-4 text-sm"><p class="font-semibold">{{ \App\Models\PollutionReport::STATUSES[$review->previous_status] ?? ucfirst($review->previous_status) }} to {{ \App\Models\PollutionReport::STATUSES[$review->new_status] ?? ucfirst($review->new_status) }}</p><p class="mt-1 text-xs leading-5 text-muted">{{ $review->administrator->name }} &middot; {{ $review->created_at->format('M j, Y H:i:s') }} {{ config('app.timezone') }}</p><p class="mt-2 leading-6 break-words whitespace-pre-wrap">{{ $review->review_note ?: 'No review note provided.' }}</p></li>
+                        <li class="border-l-2 border-water pl-4 text-sm">@if($selection = $review->incidentRouting())<p class="font-semibold">Incident municipality selected: {{ $selection['municipality'] }}</p><p class="mt-2 whitespace-pre-wrap break-words">Selection / override reason: {{ $selection['reason'] }}</p>@else<p class="font-semibold">{{ \App\Models\PollutionReport::STATUSES[$review->previous_status] ?? ucfirst($review->previous_status) }} to {{ \App\Models\PollutionReport::STATUSES[$review->new_status] ?? ucfirst($review->new_status) }}</p><p class="mt-2 leading-6 break-words whitespace-pre-wrap">{{ $review->review_note ?: 'No review note provided.' }}</p>@endif<p class="mt-1 text-xs leading-5 text-muted">{{ $review->administrator->name }} &middot; {{ $review->created_at->format('M j, Y H:i:s') }} {{ config('app.timezone') }}</p></li>
                     @empty
                         <li class="text-sm text-muted">No status changes have been recorded.</li>
                     @endforelse
@@ -46,6 +47,7 @@
             </section>
         </div>
         <div class="min-w-0 space-y-6">
+            @include('admin.reports.incident-municipality')
             <section class="rounded-xl border border-line bg-white p-5 sm:p-6" aria-labelledby="review-heading">@include('admin.reports.send')</section>
             @include('admin.reports.actions')
         </div>

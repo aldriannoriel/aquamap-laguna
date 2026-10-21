@@ -55,7 +55,7 @@ function sharedCacheSnapshot() {
 const originalCache=sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'legacy-delivery-ui/browser';
+const artifactDirectory = 'incident-routing/browser';
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
@@ -99,7 +99,7 @@ function fixtureCommand(mode) {
  try {return JSON.parse(result.stdout);} catch {throw new Error('Fixture returned non-JSON output: '+result.stdout.slice(0,300));}
 }
 const fixtureInfo=fixtureCommand('setup');
-assert.equal(fixtureInfo.isolated,true);assert.equal(fixtureInfo.lakes,3);
+assert.equal(fixtureInfo.isolated,true);assert.equal(fixtureInfo.lakes,4);
 const server=spawn('php',['-d','upload_max_filesize=5M','-d','post_max_size=8M','-S','127.0.0.1:'+httpPort,'-t',path.join(root,'public'),path.join(root,'tests/browser/admin-fixture.php')],{cwd:root,env:environment,windowsHide:true,stdio:'ignore'});
 let browser;
 let socket;
@@ -232,7 +232,7 @@ try {
         assert.equal(text.includes('Preserved legacy delivery history'),false);
         assert.equal(text.includes('Retired diagnostic browser'),false);
         for (const reference of fixtureInfo.legacyReferences) assert.equal(text.includes(reference),false);
-        if (queue === 'processed') assert.equal(await evaluate('document.querySelectorAll("#admin-report-list article").length'),2);
+        if (queue === 'processed') assert.equal(await evaluate('document.querySelectorAll("#admin-report-list article").length'),1);
     }
     await screenshot('real-reports-only-desktop.png',true);
     await navigate('/admin/agencies/create','!!document.getElementById("verification_status")');
@@ -241,6 +241,11 @@ try {
     await waitFor(()=>evaluate('document.readyState==="complete" && document.body.textContent.includes("Recipient added.")'),'Directory create failed.');
     await screenshot('directory.png',true);
     await navigate('/admin/reports/1','!!document.getElementById("send-to-municipality")');
+    assert.equal(await evaluate('document.getElementById("send-to-municipality").disabled'),true);
+    assert.equal(await evaluate('document.getElementById("agency_id").value'),'');
+    await field('incident_agency_id','1');await field('routing_reason','Synthetic administrator review of saved incident coordinates.');
+    await click('#incident-municipality-form button[type=submit]');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("incident-municipality").textContent==="San Pablo City"'),'Incident municipality save failed.');
     assert.equal(await evaluate('document.getElementById("agency_id").value'),'1');
     assert.equal(await evaluate('document.body.textContent.includes("Record decision")'),false);
     assert.equal(await evaluate('document.getElementById("private-report-map").dataset.latitude'),'14.1234567');
@@ -283,9 +288,30 @@ try {
     await click('#report-follow-up-form button[type=submit]');
     await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("report-current-status")?.textContent.includes("In Progress")'),'In Progress update failed.');
     await screenshot('follow-up-desktop.png',true);
+    await navigate('/admin/agencies/create','!!document.getElementById("municipality")');
+    await field('municipality','Magdalena');await field('email','aquamaplaguna@gmail.com');
+    await click('main form .primary-button');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.body.textContent.includes("Recipient added.")'),'Magdalena recipient create failed.');
+    await navigate('/admin/reports/4','!!document.getElementById("incident-municipality-form")');
+    assert.equal(await evaluate('document.body.textContent.includes("Balanac River") && document.body.textContent.includes("Pagsanjan")'),true);
+    assert.equal(await evaluate('document.getElementById("send-to-municipality").disabled'),true);
+    await field('incident_agency_id','2');await field('routing_reason','Synthetic review of incident near the dam; administrative Magdalena selection.');
+    await click('#incident-municipality-form button[type=submit]');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("incident-municipality").textContent==="Magdalena"'),'Report 4 incident selection failed.');
+    assert.equal(await evaluate('document.getElementById("report-current-status").textContent.includes("Pending")'),true);
+    assert.equal(await evaluate('document.getElementById("agency_id").value'),'2');
+    await click('#send-to-municipality');
+    assert.equal(await evaluate('document.getElementById("send-message-preview").textContent.includes("Water-body recorded municipality: Pagsanjan") && document.getElementById("send-message-preview").textContent.includes("Incident municipality (admin selected): Magdalena")'),true);
+    await screenshot('report4-routing-desktop.png');
+    await click('#cancel-municipality-send');
+    assert.equal(fixtureCommand('deliver-referrals').accepted,1);
     await send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
     await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});mobile=true;
     await navigate('/admin/reports/2','!!document.getElementById("send-to-municipality")');
+    assert.equal(await evaluate('document.getElementById("send-to-municipality").disabled'),true);
+    await field('incident_agency_id','1');await field('routing_reason','Synthetic manual locality review where no GPS point is saved.');
+    await click('#incident-municipality-form button[type=submit]');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("incident-municipality").textContent==="San Pablo City"'),'Mobile incident municipality save failed.');
     await click('#send-to-municipality');
     assert.equal(await evaluate('document.getElementById("municipality-confirmation").open'),true);
     assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
@@ -334,6 +360,7 @@ try {
     assert.equal(fixtureCommand('deliver-referrals').retiredQueued,1);
     await screenshot('real-reports-only-mobile.png',true);
     results.push('Retired queued/accepted/failed diagnostics are hidden from all report lists and processed history; real referral history remains visible, real-report totals stay correct and queued diagnostics stay unsent.');
+    results.push('Incident routing: no water-body auto-selection; disabled send until an audited manual selection; Report 4 Balanac/Pagsanjan fixture previews Magdalena after explicit selection without changing Pending or sending; missing-GPS manual selection works on mobile.');
     results.push('Desktop/mobile: confirmed direct send, duplicate prevention, isolated worker, distinct report/email statuses, forwarded grouping, Under Review/In Progress, required rejection reason, required resolution remarks/basis, final-state history and unchanged accepted referral passed. Municipality CRUD/snapshots and private map controls passed. Mail::fake() and simulated tiles/GPS only; no real email sent.');
 
     assert.deepEqual(failures, [], 'Browser JavaScript exceptions occurred.');

@@ -9,6 +9,18 @@ class ReportReview extends Model
 {
     public const UPDATED_AT = null;
 
+    public function incidentRouting(): ?array
+    {
+        if ($this->previous_status !== $this->new_status || ! is_string($this->review_note)) {
+            return null;
+        }
+        $selection = json_decode($this->review_note, true);
+
+        return is_array($selection) && ($selection['kind'] ?? null) === 'incident_municipality_v1'
+            && is_int($selection['agency_id'] ?? null) && is_string($selection['municipality'] ?? null)
+            && is_string($selection['point_key'] ?? null) && is_string($selection['reason'] ?? null) ? $selection : null;
+    }
+
     public function pollutionReport(): BelongsTo
     {
         return $this->belongsTo(PollutionReport::class);

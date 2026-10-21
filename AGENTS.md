@@ -163,4 +163,6 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 
 - Report follow-up requires saved SMTP acceptance. Rejection needs a reason and safe unsent cancellation; resolution needs remarks plus documented basis/evidence reference, while administrative closure needs its own reason. Email must never resolve a report automatically. Preserve terminal decisions and append-only audits without schema changes.
 
+- Incident municipality routing uses saved incident coordinates, never water-body default locality or assignment pivots. No verified municipal boundary layer is installed: require an audited admin selection/reason, keep sending disabled until valid, and invalidate selections when the point changes. Municipality names are not boundary verification.
+
 - Municipality referrals use connection referrals / queue municipality-referrals. Never start a worker on the old referrals queue or bulk retry its five preserved jobs. A new explicit report approval is required; legacy diagnostic sending is disabled. Null-report diagnostic referrals remain stored and must never appear in normal admin history. See docs/EMAIL_REFERRALS.md.
