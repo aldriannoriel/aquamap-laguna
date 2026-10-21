@@ -1,5 +1,7 @@
 # AquaMap Laguna checkpoint
 
+Active work: Water Type and Possible Fish for 53 supported bodies. Audit/research is preserved; implementation/database population has not started. Read [FISH_HABITAT_CHECKPOINT.md](FISH_HABITAT_CHECKPOINT.md) first for exact coverage, all pending IDs/names and recovery instructions. Save it after each 3?5-body batch. The verified admin milestone below remains intact.
+
 **2026-10-21. Simplified environmental report management against d310dcc. Local commit only; no push.**
 
 - Dashboard, report navigation and badges use Pending, Forwarded, Resolved, Rejected and Closed, with a visible total. Stored statuses and historical decisions are never rewritten. Approval/queued/failed delivery remains Pending; accepted nonterminal referrals are Forwarded, including Under Review/In Progress. Terminal decisions retain their category. Unknown unsent legacy statuses require review under Pending. Existing detailed filters and old queue links remain compatible.

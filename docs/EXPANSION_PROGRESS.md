@@ -207,3 +207,8 @@ Record decision was moderation-only, with zero recorded real sends. Registered t
 ## Direct municipality sending: 2026-10-21 against b167ce5
 
 Removed the standalone referral/live-test interface in favor of report-bound Send to Municipality, confirmation, delivery status/history and safe retry. Wrong-queue worker caused five unattempted jobs; these remain intact and paused while new explicit approvals use municipality-referrals. Supervised local startup and composer dev include the correct worker. Seven municipality recipients and sender credentials are unchanged. The user explicitly sent a new report and reapproved the old real snapshot: both were SMTP accepted on first attempts. Gmail receipt was confirmed in chat, with a separate in-app receipt audit for the old report. Automated Mail::fake()/desktop/mobile checks, validation counts and private recovery evidence are recorded in CURRENT_STATE.md. No schema/deletion/import/dependency/push.
+
+
+## Fish habitat recovery established: 2026-10-21 against 4f4f1b2
+
+The supported database inventory matches the requested 53 names (11/29/13); two legacy properties remain stored/hidden. Existing reviewed Water Type coverage is 3/53; possible-fish assessment coverage is 0/53. Nine candidate species/source-photo metadata have been researched but no new assignment or asset is applied. Original fourteen table hashes and .env match the pre-task audit. Detailed IDs, completed/pending tasks, next action and batch checkpoint protocol are written in FISH_HABITAT_CHECKPOINT.md. No persistent database operation, migration, email or push.
