@@ -76,7 +76,17 @@ class ReferralController extends Controller
     {
         $referral = $pollutionReport->referral;
 
-        return response()->json(['status' => $referral?->status, 'label' => $referral?->label()]);
+        return response()->json(['status' => $referral?->status, 'label' => $referral?->label(), 'interrupted' => $referral?->interrupted() ?? false]);
+    }
+
+    public function reconcile(Request $request, PollutionReport $pollutionReport, Referral $referral): RedirectResponse
+    {
+        abort_unless($referral->pollution_report_id === $pollutionReport->id, 404);
+        $request->validate(['approved' => ['required', 'accepted']]);
+        ReferralWorkflow::reconcileInterrupted($referral, $request->user());
+
+        return to_route('admin.reports.show', $pollutionReport)->with('referral_saved',
+            'Interrupted delivery recorded. No email was sent or retried. Check the exact reference in the receiver inbox and provider records; acceptance has not been established.');
     }
 
     public function retry(Request $request, PollutionReport $pollutionReport, Referral $referral): RedirectResponse

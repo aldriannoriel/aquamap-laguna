@@ -156,13 +156,15 @@ class RiverExpansionTest extends TestCase
     {
         $this->artisan('rivers:import', ['--no-interaction' => true])->assertExitCode(0);
         $water = WaterBody::where('name', $name)->sole();
+        $email = 'citizen_'.md5($name).'@example.test';
+        $this->verifyEmailSession($email);
         $form = $this->get(route('reports.create'))->assertOk();
         $this->travel(3)->seconds();
 
         Storage::fake('pollution-reports');
         $this->post(route('reports.store'), ['photo' => UploadedFile::fake()->image('proof.png'), 'water_body_category' => 'river', 'water_body_id' => $water->id,
             'pollution_type' => 'other', 'description' => 'Private isolated river concern', 'status' => 'verified',
-            'report_form_token' => $form->viewData('reportFormToken')])->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
+            'report_form_token' => $form->viewData('reportFormToken'), 'reporter_email' => $email])->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
 
         $report = PollutionReport::sole();
         $this->assertSame('pending', $report->status);

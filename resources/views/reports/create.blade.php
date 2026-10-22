@@ -128,19 +128,33 @@
             </div>
 
             <fieldset class="space-y-4 border-t border-line pt-5">
-                <legend class="pr-3 text-lg font-semibold">Your details <span class="text-sm font-normal text-muted">(optional)</span></legend>
-                <p class="text-xs leading-5 text-muted">You may submit anonymously. Contact details are stored privately with your report. No automatic email is sent.</p>
-                @foreach (['reporter_name' => ['Name', 'text', 'name', 255], 'reporter_email' => ['Email', 'email', 'email', 254]] as $field => [$label, $type, $autocomplete, $max])
+                <legend class="pr-3 text-lg font-semibold">Your details</legend>
+                <p class="text-xs leading-5 text-muted">Your name is optional. An email address is required only to verify your report submission. Your contact details remain private.</p>
+                <div>
+                    <label for="reporter_name" class="form-label">Name (optional)</label>
+                    <input id="reporter_name" name="reporter_name" type="text" autocomplete="name" maxlength="255" value="{{ old('reporter_name') }}" class="form-input" aria-invalid="{{ $errors->has('reporter_name') ? 'true' : 'false' }}" aria-describedby="reporter_name-error">
+                    <p id="reporter_name-error" class="form-error">@error('reporter_name'){{ $message }}@enderror</p>
+                </div>
+                <div>
+                    <label for="reporter_email" class="form-label">Email address *</label>
+                    <input id="reporter_email" name="reporter_email" type="email" autocomplete="email" maxlength="254" required value="{{ old('reporter_email') }}" class="form-input" aria-invalid="{{ $errors->has('reporter_email') ? 'true' : 'false' }}" aria-describedby="reporter_email-error otp-status">
+                    <p id="reporter_email-error" class="form-error">@error('reporter_email'){{ $message }}@enderror</p>
+                </div>
+                <div class="rounded-xl border border-line bg-mist p-4 space-y-3">
+                    <h3 class="font-semibold text-estuary">Verify your email</h3>
+                    <p class="text-xs leading-5 text-muted">Request a 6-digit code, then enter it below. Codes expire after 5 minutes. You have 5 attempts per code.</p>
+                    <button id="send-report-otp" type="button" class="secondary-button">Send verification code</button>
                     <div>
-                        <label for="{{ $field }}" class="form-label">{{ $label }}</label>
-                        <input id="{{ $field }}" name="{{ $field }}" type="{{ $type }}" autocomplete="{{ $autocomplete }}" maxlength="{{ $max }}" value="{{ old($field) }}" class="form-input" aria-invalid="{{ $errors->has($field) ? 'true' : 'false' }}" aria-describedby="{{ $field }}-error">
-                        <p id="{{ $field }}-error" class="form-error">@error($field){{ $message }}@enderror</p>
+                        <label for="report-otp-code" class="form-label">6-digit verification code</label>
+                        <input id="report-otp-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" class="form-input" placeholder="Enter 6-digit code">
                     </div>
-                @endforeach
+                    <button id="verify-report-otp" type="button" class="secondary-button">Verify code</button>
+                    <p id="otp-status" role="status" aria-live="polite" class="text-sm text-muted">Email not yet verified.</p>
+                </div>
             </fieldset>
             <div class="border-t border-line pt-5">
                 <button id="submit-report" type="submit" class="min-h-12 w-full rounded-xl bg-estuary px-6 py-3 text-sm font-semibold text-white hover:bg-water disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto" @disabled($lakes->isEmpty())>Submit private report</button>
-                <p class="mt-3 text-xs leading-5 text-muted">Submissions are limited to 5 attempts per hour per internet address to reduce abuse.</p>
+                <p class="mt-3 text-xs leading-5 text-muted">One successful report per verified email every 5 hours. Anti-abuse submission limits also apply.</p>
             </div>
         </form>
         <aside class="space-y-5" aria-label="Reporting guidance">
@@ -161,4 +175,112 @@
         </aside>
     </div>
     <script id="incident-lakes" type="application/json">{!! \Illuminate\Support\Js::encode($lakes) !!}</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const email = document.getElementById('reporter_email');
+            const code = document.getElementById('report-otp-code');
+            const sendButton = document.getElementById('send-report-otp');
+            const verifyButton = document.getElementById('verify-report-otp');
+            const status = document.getElementById('otp-status');
+            const submitButton = document.getElementById('submit-report');
+            const reportForm = document.getElementById('report-form');
+            const csrf = reportForm.querySelector('input[name="_token"]').value;
+            let verifiedEmail = null;
+            let busy = false;
+            let sendingReport = false;
+            const baseDisabled = submitButton.disabled;
+
+            function normalizedEmail() {
+                return email.value.trim().toLowerCase();
+            }
+            function updateSubmit() {
+                submitButton.disabled = baseDisabled || busy || verifiedEmail !== normalizedEmail();
+            }
+            function setStatus(message) {
+                status.textContent = message;
+            }
+            function setBusy(value) {
+                busy = value;
+                sendButton.disabled = value;
+                verifyButton.disabled = value;
+                updateSubmit();
+            }
+            async function post(url, payload) {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrf
+                    },
+                    body: JSON.stringify(payload)
+                });
+                let data = {};
+                try { data = await response.json(); } catch (_) { /* Unexpected response. */ }
+                if (!response.ok) {
+                    throw new Error(data.message || 'Request failed. Please try again.');
+                }
+                return data;
+            }
+
+            email.addEventListener('input', () => {
+                if (verifiedEmail !== normalizedEmail()) {
+                    verifiedEmail = null;
+                    setStatus('Email not yet verified.');
+                }
+                updateSubmit();
+            });
+            sendButton.addEventListener('click', async () => {
+                if (!email.reportValidity()) return;
+                verifiedEmail = null;
+                setBusy(true);
+                setStatus('Sending verification code...');
+                try {
+                    const data = await post(@json(route('reports.otp.send')), { email: normalizedEmail() });
+                    setStatus(data.message || 'Code sent. Check your email.');
+                } catch (error) {
+                    setStatus(error.message);
+                } finally {
+                    setBusy(false);
+                }
+            });
+            verifyButton.addEventListener('click', async () => {
+                if (!email.reportValidity()) return;
+                if (!/^[0-9]{6}$/.test(code.value.trim())) {
+                    setStatus('Enter the complete 6-digit code.');
+                    return;
+                }
+                const submittedEmail = normalizedEmail();
+                setBusy(true);
+                setStatus('Checking verification code...');
+                try {
+                    const data = await post(@json(route('reports.otp.verify')), {
+                        email: submittedEmail,
+                        code: code.value.trim()
+                    });
+                    if (data.verified === true && normalizedEmail() === submittedEmail) {
+                        verifiedEmail = submittedEmail;
+                        setStatus('Email verified. You can now submit your report.');
+                    } else {
+                        setStatus('Verification was not completed.');
+                    }
+                } catch (error) {
+                    setStatus(error.message);
+                } finally {
+                    setBusy(false);
+                }
+            });
+            reportForm.addEventListener('submit', (event) => {
+                if (verifiedEmail !== normalizedEmail() || busy || sendingReport) {
+                    event.preventDefault();
+                    if (!sendingReport) setStatus('Please verify your email before submitting.');
+                    return;
+                }
+                sendingReport = true;
+                submitButton.disabled = true;
+            });
+            updateSubmit();
+        });
+    </script>
 @endsection

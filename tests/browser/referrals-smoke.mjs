@@ -55,7 +55,7 @@ function sharedCacheSnapshot() {
 const originalCache=sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'resolution-evidence/browser';
+const artifactDirectory = 'report-status-controls/browser';
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
@@ -232,6 +232,28 @@ try {
     assert.equal(await evaluate('document.querySelector("[data-count=total]").textContent'),'18');
     assert.equal(await evaluate('JSON.stringify([...document.querySelectorAll("[data-count]")].map(node=>node.dataset.count))'),JSON.stringify(['total','pending','forwarded','resolved','rejected','closed']));
     await screenshot('five-category-dashboard-desktop.png',true);
+    for (const width of [1440,390]) {
+        await send('Emulation.setDeviceMetricsOverride',{width,height:1100,deviceScaleFactor:1,mobile:width===390});
+        await navigate('/admin/reports/18','!!document.getElementById("report-follow-up-form")');
+        assert.equal(await evaluate('document.getElementById("follow_up_status").matches(":disabled")'),true);
+        assert.equal(await evaluate('document.getElementById("supporting_evidence").matches(":disabled")'),true);
+        assert.equal(await evaluate('document.querySelector("[data-status-choice=resolved]").matches(":disabled")'),true);
+        assert.equal(await evaluate('document.querySelector("[data-status-choice=closed]").matches(":disabled")'),true);
+        assert.equal(await evaluate('document.getElementById("delivery-current-status").textContent'), 'Delivery outcome unknown');
+        assert.equal(await evaluate('!!document.getElementById("reject-report-form")'),false);
+        assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
+        await screenshot(`interrupted-controls-${width}.png`,true);
+    }
+    await evaluate('document.querySelector("form[action$=reconcile] input[name=approved]").checked=true');
+    await click('form[action$=reconcile] button');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.body.textContent.includes("Interrupted delivery recorded.")'),'Interrupted attempt was not reconciled.');
+    assert.equal(await evaluate('document.getElementById("delivery-current-status").textContent'), 'Failed');
+    assert.equal(await evaluate('document.body.textContent.includes("outcome is uncertain")'),true);
+    assert.equal(await evaluate('!!document.querySelector("form[action$=retry]")'),false);
+    assert.equal(await evaluate('document.getElementById("follow_up_status").matches(":disabled")'),true);
+    assert.equal(fixtureCommand('deliver-referrals').accepted,0);
+    results.push('1440/390px: interrupted Sending shows status/evidence controls disabled with the documented SMTP prerequisite; explicit reconciliation records uncertainty without sending, enabling retry or permitting rejection.');
+    await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1100,deviceScaleFactor:1,mobile:false});
     for (const queue of ['all','action','processed']) {
         await navigate('/admin/reports?queue='+queue,'!!document.getElementById("admin-report-list")');
         const text = await evaluate('document.body.textContent');

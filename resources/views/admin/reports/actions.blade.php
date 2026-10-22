@@ -18,9 +18,15 @@
             <p class="text-xs text-muted">Reopening returns this case to Forwarded / Under Review. The original closure and delivery history stay intact. No email is sent.</p>
             <button class="primary-button" type="submit">Reopen Case</button>
         </form>
-    @elseif($report->forwarded() && ($transitions = $report->availableTransitions()))
+    @elseif(($report->forwarded() && $report->availableTransitions()) || in_array($report->status, ['pending', 'verified', 'under_review', 'in_progress'], true))
+        @php($followUpBlocked = !$report->forwarded())
+        @php($transitions = $followUpBlocked ? array_intersect(\App\Models\PollutionReport::TRANSITIONS[$report->status], ['under_review', 'in_progress', 'resolved', 'closed']) : $report->availableTransitions())
+        @if($followUpBlocked)
+            <p id="follow-up-prerequisite{{ $suffix }}" role="status" class="mt-3 text-sm text-muted">Follow-up controls require recorded SMTP acceptance under the current forwarding policy. No acceptance is recorded for this report. Sending or an uncertain delivery does not establish forwarding. Review Email Information below; rejection remains unavailable after SMTP submission starts.</p>
+        @endif
         <form id="report-follow-up-form{{ $suffix }}" data-report-follow-up method="POST" enctype="multipart/form-data" action="{{ route('admin.reports.status', $report) }}" class="mt-4 space-y-4">
             @csrf @method('PATCH')
+            <fieldset class="space-y-4" @disabled($followUpBlocked) @if($followUpBlocked) aria-describedby="follow-up-prerequisite{{ $suffix }}" @endif>
             <input type="hidden" name="expected_status" value="{{ $report->status }}">
             <div class="flex flex-wrap gap-3"><button type="button" class="secondary-button" data-status-choice="municipality_update">Record Municipality Update</button><button type="button" class="primary-button" data-status-choice="resolved">Mark as Resolved</button><button type="button" class="secondary-button" data-status-choice="closed">Close Case</button></div>
             <div><label class="form-label" for="follow_up_status{{ $suffix }}">Outcome or follow-up status</label><select class="form-input" id="follow_up_status{{ $suffix }}" name="status" required><option value="">Choose an action</option><option value="municipality_update">Record Municipality Update</option>@foreach($transitions as $value)<option value="{{ $value }}" @selected(old('status') === $value)>{{ \App\Models\PollutionReport::STATUSES[$value] }}</option>@endforeach</select></div>
@@ -29,6 +35,7 @@
             <div data-resolution-fields><label class="flex gap-3 text-sm"><input type="checkbox" name="resolution_confirmed" value="1"><span>I reviewed the supporting evidence and confirm that it supports resolving this environmental concern. Uploading a file alone does not establish resolution.</span></label></div>
             <div data-closure-fields><label class="form-label" for="closure_reason{{ $suffix }}">Closure reason (required for Closed)</label><textarea class="form-input" id="closure_reason{{ $suffix }}" name="closure_reason" rows="3" maxlength="2000">{{ is_string(old('closure_reason')) ? old('closure_reason') : '' }}</textarea><label class="form-label mt-3" for="follow_up_attempts{{ $suffix }}">Relevant follow-up attempts (if any)</label><textarea class="form-input" id="follow_up_attempts{{ $suffix }}" name="follow_up_attempts" rows="3" maxlength="2000">{{ is_string(old('follow_up_attempts')) ? old('follow_up_attempts') : '' }}</textarea><p class="mt-2 text-xs text-muted">Closed records administrative closure without verified resolution. A lack of municipality response does not automatically close a case.</p></div>
             <button type="submit" class="primary-button" data-status-submit>Save report update</button>
+            </fieldset>
         </form>
     @elseif(in_array($report->status, ['rejected','resolved','closed'], true))
         <p class="mt-3 text-sm text-muted">This report's decision is preserved. Its evidence, delivery logs and complete audit history remain available.</p>

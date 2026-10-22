@@ -1,5 +1,6 @@
 const form = document.getElementById('municipality-send-form');
 document.querySelectorAll('[data-report-follow-up]').forEach((followUp) => {
+    if (followUp.querySelector('fieldset[disabled]')) return;
     const status = followUp.elements.status;
     const evidence = followUp.querySelector('[data-evidence-input]');
     const confirmation = followUp.elements.resolution_confirmed;
@@ -96,7 +97,7 @@ document.querySelectorAll('form[method="POST"]').forEach((form) => {
     });
 });
 const delivery = document.querySelector('[data-delivery-poll]');
-if (delivery?.dataset.deliveryApproved === '1' && ['preparing','sending'].includes(delivery.dataset.deliveryState)) {
+if (delivery?.dataset.deliveryApproved === '1' && delivery.dataset.deliveryInterrupted !== '1' && ['preparing','sending'].includes(delivery.dataset.deliveryState)) {
     let polls = 0;
     const poll = async () => {
         if (document.hidden) { setTimeout(poll, 5000); return; }
@@ -105,7 +106,7 @@ if (delivery?.dataset.deliveryApproved === '1' && ['preparing','sending'].includ
             if (!response.ok) return;
             const data = await response.json();
             delivery.textContent = data.label;
-            if (['accepted','failed','uncertain','cancelled'].includes(data.status)) { location.reload(); return; }
+            if (data.interrupted || ['accepted','failed','uncertain','cancelled'].includes(data.status)) { location.reload(); return; }
             } catch { /* A manual reload still shows the authoritative delivery history. */ }
             if (++polls < 300) setTimeout(poll, 3000);
         };

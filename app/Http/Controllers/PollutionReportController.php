@@ -6,12 +6,15 @@ use App\Http\Requests\StorePollutionReportRequest;
 use App\Models\PollutionReport;
 use App\Models\WaterBody;
 use App\Rules\ReportFormToken;
+use App\Services\ReportSubmissionGuard;
 use App\Support\ExplorerProfile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 use Throwable;
 
 class PollutionReportController extends Controller
@@ -35,8 +38,10 @@ class PollutionReportController extends Controller
         ])->header('Cache-Control', 'no-store, private');
     }
 
-    public function store(StorePollutionReportRequest $request): RedirectResponse
-    {
+    public function store(
+        StorePollutionReportRequest $request,
+        ReportSubmissionGuard $guard
+    ): RedirectResponse {
         $data = $request->validated();
         $photoPath = null;
 
@@ -51,26 +56,60 @@ class PollutionReportController extends Controller
                 $photoPath = $request->file('photo')->store('', ['disk' => 'pollution-reports', 'visibility' => 'private']);
             }
 
-            $report = new PollutionReport;
-            $report->water_body_id = $data['water_body_id'];
-            $report->pollution_type = $data['pollution_type'];
-            $report->description = $data['description'];
-            $report->reporter_name = $data['reporter_name'] ?? null;
-            $report->reporter_email = $data['reporter_email'] ?? null;
-            $report->latitude = $data['latitude'] ?? null;
-            $report->longitude = $data['longitude'] ?? null;
-            $report->landmark = $data['landmark'] ?? null;
-            $report->observed_on = $data['observed_on'] ?? null;
-            $report->location_accuracy_m = $data['location_accuracy_m'] ?? null;
-            $report->photo_path = $photoPath;
-            $report->status = 'pending';
-            $report->save();
+            $report = DB::transaction(function () use (
+                $data,
+                $request,
+                $guard,
+                $photoPath
+            ): PollutionReport {
+                $guard->consume(
+                    $data['reporter_email'],
+                    $request->session()->getId()
+                );
+
+                $report = new PollutionReport;
+                $report->water_body_id = $data['water_body_id'];
+                $report->pollution_type = $data['pollution_type'];
+                $report->description = $data['description'];
+                $report->reporter_name = $data['reporter_name'] ?? null;
+                $report->reporter_email = strtolower(trim($data['reporter_email']));
+                $report->latitude = $data['latitude'] ?? null;
+                $report->longitude = $data['longitude'] ?? null;
+                $report->landmark = $data['landmark'] ?? null;
+                $report->observed_on = $data['observed_on'] ?? null;
+                $report->location_accuracy_m = $data['location_accuracy_m'] ?? null;
+                $report->photo_path = $photoPath;
+                $report->status = 'pending';
+                $report->save();
+
+                return $report;
+            }, 3);
         } catch (Throwable $exception) {
             if ($photoPath !== null) {
                 try {
                     Storage::disk('pollution-reports')->delete($photoPath);
                 } catch (Throwable) {
                     Log::error('Private pollution photo cleanup failed; check storage availability.');
+                }
+            }
+
+            if ($exception instanceof RuntimeException) {
+                if ($exception->getMessage() === 'REPORT_EMAIL_COOLDOWN') {
+                    $message = 'This email has already submitted a report. Please wait 5 hours before submitting another.';
+
+                    return redirect()->route('reports.create')
+                        ->withInput($request->safeOldInput())
+                        ->withErrors(['reporter_email' => $message])
+                        ->header('Cache-Control', 'no-store, private');
+                }
+
+                if ($exception->getMessage() === 'REPORT_EMAIL_NOT_VERIFIED') {
+                    $message = 'Please verify your email with a valid OTP before submitting.';
+
+                    return redirect()->route('reports.create')
+                        ->withInput($request->safeOldInput())
+                        ->withErrors(['reporter_email' => $message])
+                        ->header('Cache-Control', 'no-store, private');
                 }
             }
 

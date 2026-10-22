@@ -21,24 +21,31 @@ class ReportSpamProtectionTest extends TestCase
         $this->artisan('migrate', ['--database' => 'sqlite', '--no-interaction' => true])->assertExitCode(0);
     }
 
-    private function payload(bool $withPhoto = true): array
+    private function payload(bool $withPhoto = true, string $email = 'citizen@example.test'): array
     {
         if (! WaterBody::exists()) {
             $this->seed(WaterBodySeeder::class);
         }
         $token = $this->get(route('reports.create'))->assertOk()->viewData('reportFormToken');
+        $this->verifyEmailSession($email);
 
         if ($withPhoto) {
             Storage::fake('pollution-reports');
         }
 
-        return [...($withPhoto ? ['photo' => UploadedFile::fake()->image('proof.png')] : []), 'water_body_id' => WaterBody::where('name', 'Pandin Lake')->sole()->id,
-            'pollution_type' => 'solid_waste', 'description' => 'Synthetic isolated spam protection fixture.', 'report_form_token' => $token];
+        return [
+            ...($withPhoto ? ['photo' => UploadedFile::fake()->image('proof.png')] : []),
+            'water_body_id' => WaterBody::where('name', 'Pandin Lake')->sole()->id,
+            'pollution_type' => 'solid_waste',
+            'description' => 'Synthetic isolated spam protection fixture.',
+            'report_form_token' => $token,
+            'reporter_email' => $email,
+        ];
     }
 
-    private function readyPayload(): array
+    private function readyPayload(string $email = 'citizen@example.test'): array
     {
-        $payload = $this->payload();
+        $payload = $this->payload(true, $email);
         $this->travel(3)->seconds();
 
         return $payload;
@@ -84,6 +91,7 @@ class ReportSpamProtectionTest extends TestCase
     {
         $payload = $this->readyPayload();
         session()->regenerateToken();
+        session()->save();
         $this->post(route('reports.store'), $payload)->assertSessionHasErrors('report_form_token');
         $this->assertDatabaseCount('pollution_reports', 0);
     }
@@ -95,6 +103,7 @@ class ReportSpamProtectionTest extends TestCase
         $this->post(route('reports.store'), $payload)->assertSessionHasErrors('report_form_token');
         $retry = $this->get(route('reports.create'))->assertOk()->assertSee($payload['description']);
         $payload['report_form_token'] = $retry->viewData('reportFormToken');
+        $this->verifyEmailSession($payload['reporter_email']);
         $this->travel(3)->seconds();
         $this->post(route('reports.store'), $payload)->assertSessionHasNoErrors();
         $this->assertDatabaseCount('pollution_reports', 1);
@@ -136,9 +145,13 @@ class ReportSpamProtectionTest extends TestCase
 
     public function test_recent_same_session_lake_and_type_get_a_warning_but_both_reports_are_saved_pending(): void
     {
-        $payload = $this->readyPayload();
+        $payload = $this->readyPayload('citizen1@example.test');
         $this->post(route('reports.store'), $payload)->assertSessionHas('possible_duplicate', false);
-        $this->post(route('reports.store'), array_replace($payload, ['description' => 'A different legitimate observation.', 'status' => 'verified']))
+        $secondPayload = array_replace($this->readyPayload('citizen2@example.test'), [
+            'description' => 'A different legitimate observation.',
+            'status' => 'verified',
+        ]);
+        $this->post(route('reports.store'), $secondPayload)
             ->assertSessionHasNoErrors()->assertSessionHas('possible_duplicate', true);
         $this->assertDatabaseCount('pollution_reports', 2);
         $this->assertSame(['pending', 'pending'], PollutionReport::orderBy('id')->pluck('status')->all());
@@ -160,24 +173,25 @@ class ReportSpamProtectionTest extends TestCase
 
     public function test_changing_lake_or_type_does_not_trigger_a_repeat_warning(): void
     {
-        $payload = $this->readyPayload();
+        $payload = $this->readyPayload('citizen1@example.test');
         $this->post(route('reports.store'), $payload)->assertSessionHasNoErrors();
-        foreach ([['water_body_id' => WaterBody::where('name', 'Yambo Lake')->sole()->id], ['pollution_type' => 'other']] as $change) {
-            $this->post(route('reports.store'), array_replace($payload, $change))->assertSessionHas('possible_duplicate', false);
+        foreach ([['water_body_id' => WaterBody::where('name', 'Yambo Lake')->sole()->id], ['pollution_type' => 'other']] as $idx => $change) {
+            $this->post(route('reports.store'), array_replace($this->readyPayload("citizen_change_{$idx}@example.test"), $change))->assertSessionHas('possible_duplicate', false);
         }
         $this->assertDatabaseCount('pollution_reports', 3);
     }
 
     public function test_old_receipts_expire_and_new_anonymous_sessions_do_not_inherit_history(): void
     {
-        $payload = $this->readyPayload();
+        $payload = $this->readyPayload('citizen1@example.test');
         $this->post(route('reports.store'), $payload)->assertSessionHasNoErrors();
         $oldId = PollutionReport::sole()->id;
         $this->travel(61)->minutes();
-        $this->post(route('reports.store'), $payload)->assertSessionHas('possible_duplicate', false);
+        $this->post(route('reports.store'), $this->readyPayload('citizen2@example.test'))->assertSessionHas('possible_duplicate', false);
         $this->assertNotContains($oldId, session()->get('recent_pollution_report_ids'));
         $this->flushSession();
-        $this->post(route('reports.store'), $this->readyPayload())->assertSessionHas('possible_duplicate', false);
+        $this->unencryptedCookies = [];
+        $this->post(route('reports.store'), $this->readyPayload('citizen3@example.test'))->assertSessionHas('possible_duplicate', false);
         $this->assertDatabaseCount('pollution_reports', 3);
     }
 

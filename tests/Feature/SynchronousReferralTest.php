@@ -13,6 +13,7 @@ use App\Support\MunicipalityRouting;
 use App\Support\ReferralWorkflow;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Contracts\Queue\Job;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -181,5 +182,189 @@ class SynchronousReferralTest extends TestCase
         $this->assertSame('forwarded', $report->fresh()->category);
         $this->assertSame($before, DB::table('referrals')->get()->map(fn (object $row): array => (array) $row)->all());
         Mail::assertSent(EnvironmentalReferral::class, 1);
+    }
+
+    public function test_stalled_submission_can_be_audited_without_sending_cancelling_or_claiming_acceptance(): void
+    {
+        [$report, $agency, $admin] = $this->fixture();
+        $this->freezeTime();
+        $referral = ReferralWorkflow::enqueue($report, $agency, $admin, false, ReferralWorkflow::reviewHash($report, $agency, false));
+        $referral->forceFill(['status' => 'sending', 'attempts' => 1, 'sending_at' => now()->subMinutes(6), 'updated_at' => now()->subMinutes(6)])->save();
+        $before = $referral->fresh()->getAttributes();
+        $reportBefore = $report->fresh()->getAttributes();
+        $events = $referral->events()->count();
+        $this->getJson(route('admin.referrals.status', $report))->assertOk()
+            ->assertJson(['status' => 'sending', 'label' => 'Delivery outcome unknown', 'interrupted' => true]);
+        $this->assertSame($before, $referral->fresh()->getAttributes());
+        $url = route('admin.referrals.reconcile', [$report, $referral]);
+        $this->post($url)->assertSessionHasErrors('approved');
+        $this->post($url, ['approved' => 1])->assertRedirectToRoute('admin.reports.show', $report);
+        $referral->refresh();
+        $this->assertSame('uncertain', $referral->status);
+        $this->assertSame('smtp_request_interrupted', $referral->error_code);
+        $this->assertNotNull($referral->failed_at);
+        $this->assertNull($referral->sent_at);
+        $this->assertFalse($referral->retryable());
+        $this->assertFalse($referral->cancellable());
+        $this->assertSame($events + 1, $referral->events()->count());
+        $this->assertSame('interrupted_delivery_reconciled_by_admin_'.$admin->id, $referral->events()->reorder('id', 'desc')->first()->event);
+        $this->assertSame($before, array_replace($referral->getAttributes(), array_intersect_key($before, array_flip(['status', 'error_code', 'failed_at', 'updated_at']))));
+        $this->assertSame($reportBefore, $report->fresh()->getAttributes());
+        $this->post($url, ['approved' => 1])->assertConflict();
+        $this->post(route('admin.referrals.retry', [$report, $referral]), ['approved' => 1])->assertConflict();
+        $this->assertSame($events + 1, $referral->events()->count());
+        Mail::assertNothingSent();
+    }
+
+    public function test_reconciliation_blocks_guests_non_admins_wrong_reports_active_and_accepted_deliveries(): void
+    {
+        [$report, $agency, $admin] = $this->fixture();
+        $this->freezeTime();
+        $referral = ReferralWorkflow::enqueue($report, $agency, $admin, false, ReferralWorkflow::reviewHash($report, $agency, false));
+        $referral->forceFill(['status' => 'sending', 'sending_at' => now()])->save();
+        $url = route('admin.referrals.reconcile', [$report, $referral]);
+        $this->post($url, ['approved' => 1])->assertConflict();
+        $this->actingAs(User::factory()->create())->post($url, ['approved' => 1])->assertForbidden();
+        auth()->logout();
+        $this->post($url, ['approved' => 1])->assertRedirectToRoute('admin.login');
+        $other = PollutionReport::forceCreate(['water_body_id' => $report->water_body_id, 'status' => 'pending',
+            'pollution_type' => 'plastic_waste', 'description' => 'Other isolated report']);
+        $this->actingAs($admin)->post(route('admin.referrals.reconcile', [$other, $referral]), ['approved' => 1])->assertNotFound();
+        $referral->forceFill(['status' => 'accepted', 'sent_at' => now(), 'updated_at' => now()->subMinutes(6)])->save();
+        $before = $referral->fresh()->getAttributes();
+        $this->post($url, ['approved' => 1])->assertConflict();
+        $this->assertSame($before, $referral->fresh()->getAttributes());
+        Mail::assertNothingSent();
+    }
+
+    public function test_interrupted_preparation_remains_safely_retryable_without_starting_smtp(): void
+    {
+        [$report, $agency, $admin] = $this->fixture();
+        $this->freezeTime();
+        $referral = ReferralWorkflow::enqueue($report, $agency, $admin, false, ReferralWorkflow::reviewHash($report, $agency, false));
+        $referral->forceFill(['status' => 'preparing', 'updated_at' => now()->subMinutes(6)])->save();
+        $this->post(route('admin.referrals.reconcile', [$report, $referral]), ['approved' => 1])->assertRedirect();
+        $referral->refresh();
+        $this->assertSame('failed', $referral->status);
+        $this->assertSame('preflight_interrupted', $referral->error_code);
+        $this->assertTrue($referral->retryable());
+        $this->assertTrue($referral->cancellable());
+        $this->assertSame('verified', $report->fresh()->status);
+        $this->get(route('admin.reports.show', $report))->assertOk()->assertSee('Preparation was interrupted before SMTP submission started.')
+            ->assertSee('Retry safely')->assertDontSee('The delivery outcome is uncertain.');
+        Mail::assertNothingSent();
+    }
+
+    public function test_late_transport_acknowledgement_can_finish_a_reconciled_attempt_without_duplicate_sending(): void
+    {
+        [$report, $agency, $admin] = $this->fixture();
+        $this->freezeTime();
+        Mail::swap(new MailManager(app()));
+        $transport = \Mockery::mock(TransportInterface::class);
+        $transport->shouldReceive('__toString')->andReturn('smtp');
+        $transport->shouldReceive('send')->once()->andReturnUsing(function ($message, $envelope) use ($admin): SentMessage {
+            $referral = Referral::sole();
+            $this->travel(6)->minutes();
+            ReferralWorkflow::reconcileInterrupted($referral, $admin);
+            $this->assertSame('uncertain', $referral->fresh()->status);
+
+            return new SentMessage($message, $envelope);
+        });
+        Mail::extend('smtp', fn () => $transport);
+        $this->send($report, $agency)->assertRedirect();
+        $this->assertSame('accepted', Referral::sole()->status);
+        $this->assertNotNull(Referral::sole()->sent_at);
+        $this->assertSame('verified', $report->fresh()->status);
+        $this->assertNotSame('resolved', $report->fresh()->status);
+        Queue::assertNothingPushed();
+    }
+
+    public function test_synchronous_send_extends_a_short_php_limit_without_changing_smtp_credentials(): void
+    {
+        [$report, $agency] = $this->fixture();
+        $previous = (int) ini_get('max_execution_time');
+        $mailer = config('mail.mailers.smtp');
+        try {
+            set_time_limit(30);
+            $this->send($report, $agency)->assertRedirect();
+            $this->assertGreaterThanOrEqual(120, (int) ini_get('max_execution_time'));
+            $this->assertSame('accepted', Referral::sole()->status);
+            $this->assertSame($mailer, config('mail.mailers.smtp'));
+            Mail::assertSent(EnvironmentalReferral::class, 1);
+            Queue::assertNothingPushed();
+        } finally {
+            set_time_limit($previous);
+        }
+    }
+
+    public function test_reconciled_legacy_approval_is_not_acceptance_and_cannot_be_retried_confirmed_or_resolved(): void
+    {
+        [$report, $agency, $admin] = $this->fixture();
+        $this->freezeTime();
+        $referral = ReferralWorkflow::enqueue($report, $agency, $admin, false, ReferralWorkflow::reviewHash($report, $agency, false));
+        ReferralWorkflow::record($referral, 'municipality_delivery_confirmed_by_admin_'.$admin->id);
+        $referral->forceFill(['status' => 'uncertain', 'attempts' => 1, 'sending_at' => now()->subMinutes(6),
+            'failed_at' => now(), 'error_code' => 'smtp_request_interrupted'])->save();
+        ReferralWorkflow::record($referral, 'interrupted_delivery_reconciled_by_admin_'.$admin->id);
+        $reportBefore = $report->fresh()->getAttributes();
+        $deliveryBefore = $referral->fresh()->getAttributes();
+        $eventsBefore = $referral->events()->get()->map->getAttributes()->all();
+        $reviewsBefore = $report->reviews()->get()->map->getAttributes()->all();
+
+        $this->get(route('admin.reports.show', $report))->assertOk()->assertSee($referral->reference)
+            ->assertSee('No matching inbox message is not proof of failed delivery.')
+            ->assertSee('Follow-up controls require recorded SMTP acceptance')->assertSee('Mark as Resolved')->assertSee('Close Case')
+            ->assertSee('Supporting Evidence')->assertDontSee('Reconcile interrupted delivery')->assertDontSee('Retry safely')->assertDontSee('Reject Report');
+        $this->assertFalse($report->fresh()->forwarded());
+        $this->assertSame([], $report->fresh()->availableTransitions());
+        $this->post(route('admin.referrals.retry', [$report, $referral]), ['approved' => 1])->assertConflict();
+        $this->post(route('admin.referrals.reconcile', [$report, $referral]), ['approved' => 1])->assertConflict();
+        $this->post(route('admin.referrals.confirm', [$report, $referral]), ['approved' => 1,
+            'confirmation_reference' => $referral->reference])->assertStatus(422);
+        foreach (['under_review', 'in_progress', 'municipality_update', 'resolved', 'closed', 'rejected'] as $target) {
+            $this->patch(route('admin.reports.status', $report), ['status' => $target, 'expected_status' => 'verified',
+                'review_note' => 'Reviewed legacy report.', 'closure_reason' => 'Administrative closure.', 'rejection_reason' => 'Initial rejection.',
+                ...($target === 'resolved' ? ['supporting_evidence' => [UploadedFile::fake()->image('confirmation.png')], 'resolution_confirmed' => 1] : [])])
+                ->assertSessionHasErrors('status');
+        }
+        $this->assertSame($reportBefore, $report->fresh()->getAttributes());
+        $this->assertSame($deliveryBefore, $referral->fresh()->getAttributes());
+        $this->assertSame($eventsBefore, $referral->events()->get()->map->getAttributes()->all());
+        $this->assertSame($reviewsBefore, $report->reviews()->get()->map->getAttributes()->all());
+        $this->assertDatabaseCount('report_evidence', 0);
+        Mail::assertNothingSent();
+    }
+
+    public function test_new_report_sends_normally_without_changing_an_uncertain_legacy_report(): void
+    {
+        [$legacy, $agency, $admin] = $this->fixture();
+        $referral = ReferralWorkflow::enqueue($legacy, $agency, $admin, false, ReferralWorkflow::reviewHash($legacy, $agency, false));
+        $referral->forceFill(['status' => 'uncertain', 'attempts' => 1, 'sending_at' => now()->subMinutes(6),
+            'failed_at' => now(), 'error_code' => 'smtp_request_interrupted'])->save();
+        $legacyBefore = $legacy->fresh()->getAttributes();
+        $deliveryBefore = $referral->fresh()->getAttributes();
+        $eventsBefore = $referral->events()->get()->map->getAttributes()->all();
+        $reviewsBefore = $legacy->reviews()->get()->map->getAttributes()->all();
+        Queue::fake();
+
+        $new = PollutionReport::forceCreate(['water_body_id' => $legacy->water_body_id, 'status' => 'pending',
+            'pollution_type' => 'plastic_waste', 'description' => 'Separate new synthetic observation']);
+        MunicipalityRouting::select($new, $agency, $admin, 'Reviewed the new incident location.', MunicipalityRouting::pointKey($new), 'pending');
+        $this->send($new, $agency)->assertRedirectToRoute('admin.reports.show', $new);
+        $accepted = $new->fresh()->referral;
+        $this->assertSame('accepted', $accepted->status);
+        $this->assertNotNull($accepted->sent_at);
+        $this->assertTrue($accepted->events()->where('event', 'transport_accepted')->exists());
+        $this->assertSame('forwarded', $new->fresh()->category);
+        $this->assertContains('resolved', $new->fresh()->availableTransitions());
+        $this->assertNotSame('resolved', $new->fresh()->status);
+        $this->get(route('admin.reports.show', $new))->assertOk()->assertSee('Mark as Resolved')
+            ->assertDontSee('Follow-up controls require recorded SMTP acceptance');
+        $this->assertSame($legacyBefore, $legacy->fresh()->getAttributes());
+        $this->assertSame($deliveryBefore, $referral->fresh()->getAttributes());
+        $this->assertSame($eventsBefore, $referral->events()->get()->map->getAttributes()->all());
+        $this->assertSame($reviewsBefore, $legacy->reviews()->get()->map->getAttributes()->all());
+        Mail::assertSent(EnvironmentalReferral::class, 1);
+        Queue::assertNothingPushed();
     }
 }

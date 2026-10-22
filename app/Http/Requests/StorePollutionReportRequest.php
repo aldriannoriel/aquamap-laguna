@@ -29,24 +29,105 @@ class StorePollutionReportRequest extends FormRequest
     public function rules(): array
     {
         $category = $this->input('water_body_category');
+
         $categories = is_string($category) && array_key_exists($category, WaterBody::REPORT_CATEGORIES)
-            ? [$category] : array_keys(WaterBody::REPORT_CATEGORIES);
+            ? [$category]
+            : array_keys(WaterBody::REPORT_CATEGORIES);
 
         return [
             'website' => ['nullable', 'string', 'max:2048', 'prohibited'],
-            'report_form_token' => ['bail', 'required', 'string', 'max:2048', new ReportFormToken($this)],
-            'water_body_category' => ['nullable', 'string', Rule::in(array_keys(WaterBody::REPORT_CATEGORIES))],
-            'water_body_id' => ['bail', 'required', 'integer', Rule::exists(WaterBody::class, 'id')->whereIn('category', $categories)->where('site_type', 'water_body')->whereNull('spring_type')],
-            'pollution_type' => ['required', 'string', Rule::in(array_keys(PollutionReport::TYPES))],
-            'description' => ['required', 'string', 'max:5000'],
-            'latitude' => ['nullable', 'required_with:longitude,location_accuracy_m', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'required_with:latitude,location_accuracy_m', 'numeric', 'between:-180,180'],
-            'location_accuracy_m' => ['nullable', 'numeric', 'between:0,100000'],
-            'landmark' => ['nullable', 'string', 'max:200'],
-            'observed_on' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:'.now('Asia/Manila')->toDateString()],
-            'photo' => ['bail', 'required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:5120'],
-            'reporter_name' => ['nullable', 'string', 'max:255'],
-            'reporter_email' => ['nullable', 'string', 'email', 'max:254'],
+
+            'report_form_token' => [
+                'bail',
+                'required',
+                'string',
+                'max:2048',
+                new ReportFormToken($this),
+            ],
+
+            'water_body_category' => [
+                'nullable',
+                'string',
+                Rule::in(array_keys(WaterBody::REPORT_CATEGORIES)),
+            ],
+
+            'water_body_id' => [
+                'bail',
+                'required',
+                'integer',
+                Rule::exists(WaterBody::class, 'id')
+                    ->whereIn('category', $categories)
+                    ->where('site_type', 'water_body')
+                    ->whereNull('spring_type'),
+            ],
+
+            'pollution_type' => [
+                'required',
+                'string',
+                Rule::in(array_keys(PollutionReport::TYPES)),
+            ],
+
+            'description' => [
+                'required',
+                'string',
+                'max:5000',
+            ],
+
+            'latitude' => [
+                'nullable',
+                'required_with:longitude,location_accuracy_m',
+                'numeric',
+                'between:-90,90',
+            ],
+
+            'longitude' => [
+                'nullable',
+                'required_with:latitude,location_accuracy_m',
+                'numeric',
+                'between:-180,180',
+            ],
+
+            'location_accuracy_m' => [
+                'nullable',
+                'numeric',
+                'between:0,100000',
+            ],
+
+            'landmark' => [
+                'nullable',
+                'string',
+                'max:200',
+            ],
+
+            'observed_on' => [
+                'nullable',
+                'date_format:Y-m-d',
+                'before_or_equal:'.now('Asia/Manila')->toDateString(),
+            ],
+
+            'photo' => [
+                'bail',
+                'required',
+                'file',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'extensions:jpg,jpeg,png,webp',
+                'max:5120',
+            ],
+
+            'reporter_name' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'reporter_email' => [
+                'bail',
+                'required',
+                'string',
+                'email',
+                'max:254',
+            ],
         ];
     }
 
@@ -54,26 +135,54 @@ class StorePollutionReportRequest extends FormRequest
     {
         return [
             'website.prohibited' => 'This submission could not be verified. Please review your entries below and try again.',
+
             'report_form_token.required' => 'Please open the reporting form before submitting. Your entries have been kept.',
+
             'water_body_id.required' => 'Please choose a water body.',
+
             'water_body_id.exists' => 'Please choose a listed water body in the selected category.',
+
             'water_body_category.in' => 'Please choose one of the listed categories.',
+
             'pollution_type.required' => 'Please choose an observation type.',
+
             'pollution_type.in' => 'Please choose one of the listed observation types.',
+
             'description.required' => 'Please describe what you observed.',
+
             'photo.required' => 'Please attach a photo showing the visible concern. Photo proof is required for new reports.',
+
             'photo.max' => 'The photo must be no larger than 5 MB.',
+
             'photo.uploaded' => 'The photo could not be uploaded. Please choose a JPEG, PNG or WebP up to 5 MB.',
+
+            'reporter_email.required' => 'Please enter your email address to receive a verification code.',
+
+            'reporter_email.email' => 'Please enter a valid email address.',
         ];
     }
 
     public function safeOldInput(): array
     {
-        $input = array_filter($this->only([
-            'water_body_id', 'water_body_category', 'pollution_type', 'description', 'latitude', 'longitude', 'reporter_name', 'reporter_email',
-            'landmark', 'observed_on', 'location_accuracy_m',
-        ]), fn (mixed $value): bool => is_scalar($value) || $value === null);
+        $input = array_filter(
+            $this->only([
+                'water_body_id',
+                'water_body_category',
+                'pollution_type',
+                'description',
+                'latitude',
+                'longitude',
+                'reporter_name',
+                'reporter_email',
+                'landmark',
+                'observed_on',
+                'location_accuracy_m',
+            ]),
+            fn (mixed $value): bool => is_scalar($value) || $value === null
+        );
+
         $token = $this->input('report_form_token');
+
         if (is_string($token) && strlen($token) <= 2048) {
             $input['report_form_token'] = $token;
         }
@@ -87,8 +196,12 @@ class StorePollutionReportRequest extends FormRequest
             parent::failedValidation($validator);
         }
 
-        throw new HttpResponseException(redirect()->route('reports.create')
-            ->withErrors($validator)->withInput($this->safeOldInput())
-            ->header('Cache-Control', 'no-store, private'));
+        throw new HttpResponseException(
+            redirect()
+                ->route('reports.create')
+                ->withErrors($validator)
+                ->withInput($this->safeOldInput())
+                ->header('Cache-Control', 'no-store, private')
+        );
     }
 }

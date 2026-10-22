@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use RuntimeException;
+
+class ReportSubmissionGuard
+{
+    private function emailHash(string $email): string
+    {
+        return hash_hmac(
+            'sha256',
+            strtolower(trim($email)),
+            config('app.key')
+        );
+    }
+
+    private function sessionHash(string $sessionId): string
+    {
+        return hash_hmac(
+            'sha256',
+            $sessionId,
+            config('app.key')
+        );
+    }
+
+    /**
+     * Must run inside the same database transaction
+     * that saves the pollution report.
+     */
+    public function consume(string $email, string $sessionId): void
+    {
+        $emailHash = $this->emailHash($email);
+        $sessionHash = $this->sessionHash($sessionId);
+
+        DB::table('report_email_cooldowns')->insertOrIgnore([
+            'email_hash' => $emailHash,
+            'last_report_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $cooldown = DB::table('report_email_cooldowns')
+            ->where('email_hash', $emailHash)
+            ->lockForUpdate()
+            ->first();
+
+        if (! $cooldown) {
+            throw new RuntimeException(
+                'Report cooldown record unavailable.'
+            );
+        }
+
+        // One successful report every five hours per email.
+        if (
+            $cooldown->last_report_at !== null &&
+            now()->lessThan(
+                Carbon::parse($cooldown->last_report_at)->addHours(5)
+            )
+        ) {
+            throw new RuntimeException('REPORT_EMAIL_COOLDOWN');
+        }
+
+        // Only an unconsumed, successfully verified session
+        // with an active 30-minute validity is accepted.
+        $verification = DB::table('report_email_verifications')
+            ->where('email_hash', $emailHash)
+            ->where('session_hash', $sessionHash)
+            ->whereNotNull('verified_at')
+            ->whereNull('consumed_at')
+            ->whereNotNull('verification_valid_until')
+            ->where('verification_valid_until', '>', now())
+            ->orderByDesc('id')
+            ->lockForUpdate()
+            ->first();
+
+        if (! $verification) {
+            throw new RuntimeException('REPORT_EMAIL_NOT_VERIFIED');
+        }
+
+        DB::table('report_email_verifications')
+            ->where('id', $verification->id)
+            ->update([
+                'consumed_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        DB::table('report_email_cooldowns')
+            ->where('email_hash', $emailHash)
+            ->update([
+                'last_report_at' => now(),
+                'updated_at' => now(),
+            ]);
+    }
+}

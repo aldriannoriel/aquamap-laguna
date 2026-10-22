@@ -411,4 +411,69 @@ class AdminReportsTest extends TestCase
             ReportReview::flushEventListeners();
         }
     }
+
+    #[TestWith(['pending', 'sending', false])]
+    #[TestWith(['verified', 'sending', false])]
+    #[TestWith(['verified', 'sending', true])]
+    #[TestWith(['verified', 'uncertain', true])]
+    public function test_unacknowledged_submission_shows_controls_with_the_documented_prerequisite(string $status, string $deliveryStatus, bool $stale): void
+    {
+        $this->freezeTime();
+        Mail::fake();
+        Queue::fake();
+        $report = $this->report(['status' => $status]);
+        $admin = $this->admin();
+        $delivery = $this->forwarded($report, $admin);
+        $delivery->forceFill(['status' => $deliveryStatus, 'sent_at' => null,
+            'sending_at' => $deliveryStatus === 'preparing' ? null : now(),
+            'updated_at' => $stale ? now()->subMinutes(6) : now()])->save();
+        $before = $delivery->fresh()->getAttributes();
+        $response = $this->actingAs($admin)->get(route('admin.reports.show', $report))->assertOk()
+            ->assertSee('Follow-up controls require recorded SMTP acceptance')->assertSee('Mark as Resolved')->assertSee('Close Case')
+            ->assertSee('Supporting Evidence')->assertDontSee('id="reject-report-form"', false);
+        $document = new \DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new \DOMXPath($document);
+        $this->assertSame(1, $xpath->query('//form[@data-report-follow-up]/fieldset[@disabled]')->length);
+        $this->assertSame(1, $xpath->query('//form[@data-report-follow-up]//select[@name="status"]')->length);
+        $this->assertSame(1, $xpath->query('//form[@data-report-follow-up]//input[@type="file"]')->length);
+        if ($stale && $deliveryStatus !== 'uncertain') {
+            $response->assertSee('Reconcile interrupted delivery')->assertSee($deliveryStatus === 'sending' ? 'Delivery outcome unknown' : 'Preparation interrupted');
+        } else {
+            $response->assertDontSee('Reconcile interrupted delivery');
+        }
+        foreach (['under_review', 'in_progress', 'resolved', 'closed', 'rejected'] as $target) {
+            $this->patch(route('admin.reports.status', $report), ['status' => $target, 'expected_status' => $status,
+                'closure_reason' => 'Administrative closure.', 'rejection_reason' => 'Unsafe cancellation.',
+                ...($target === 'resolved' ? ['supporting_evidence' => [UploadedFile::fake()->image('cleanup.png')], 'resolution_confirmed' => 1] : [])])
+                ->assertSessionHasErrors('status');
+        }
+        $this->assertSame($status, $report->fresh()->status);
+        $this->assertSame($before, $delivery->fresh()->getAttributes());
+        $this->assertDatabaseCount('report_reviews', 0);
+        Mail::assertNothingSent();
+        Queue::assertNothingPushed();
+    }
+
+    #[TestWith(['pending'])]
+    #[TestWith(['verified'])]
+    public function test_saved_acceptance_unlocks_controls_without_resolving_the_report(string $status): void
+    {
+        $report = $this->report(['status' => $status]);
+        $admin = $this->admin();
+        $this->forwarded($report, $admin);
+        $response = $this->actingAs($admin)->get(route('admin.reports.show', $report))->assertOk()
+            ->assertSee('Mark as Resolved')->assertSee('Close Case')->assertSee('Supporting Evidence');
+        $document = new \DOMDocument;
+        @$document->loadHTML($response->getContent());
+        $xpath = new \DOMXPath($document);
+        $this->assertSame(1, $xpath->query('//form[@data-report-follow-up]/fieldset[not(@disabled)]')->length);
+        $this->assertSame($status, $report->fresh()->status);
+        $url = route('admin.reports.status', $report);
+        $this->patch($url, ['status' => 'resolved', 'expected_status' => $status])->assertSessionHasErrors(['supporting_evidence', 'resolution_confirmed']);
+        $this->patch($url, ['status' => 'closed', 'expected_status' => $status])->assertSessionHasErrors('closure_reason');
+        $this->patch($url, ['status' => 'resolved', 'expected_status' => $status, 'review_note' => '',
+            'supporting_evidence' => [UploadedFile::fake()->image('cleanup.png')], 'resolution_confirmed' => 1])->assertSessionHasNoErrors();
+        $this->assertSame('resolved', $report->fresh()->status);
+    }
 }

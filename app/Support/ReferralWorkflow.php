@@ -17,6 +17,19 @@ use Illuminate\Validation\ValidationException;
 
 class ReferralWorkflow
 {
+    public static function reconcileInterrupted(Referral $referral, User $admin): void
+    {
+        DB::transaction(function () use ($referral, $admin): void {
+            $report = PollutionReport::whereKey($referral->pollution_report_id)->lockForUpdate()->first();
+            $record = Referral::whereKey($referral->id)->lockForUpdate()->firstOrFail();
+            abort_unless($report && $record->interrupted(), 409, 'Only an interrupted delivery with no saved acceptance can be reconciled. Reload the report.');
+            $submitted = $record->status === 'sending';
+            $record->forceFill(['status' => $submitted ? 'uncertain' : 'failed',
+                'error_code' => $submitted ? 'smtp_request_interrupted' : 'preflight_interrupted', 'failed_at' => now()])->save();
+            self::record($record, 'interrupted_delivery_reconciled_by_admin_'.$admin->id);
+        });
+    }
+
     public static function ready(): bool
     {
         $mailer = config('referrals.mailer');

@@ -38,10 +38,12 @@ class ReportCategoryTest extends TestCase
         $this->seed(DatabaseSeeder::class);
         $this->seed(ExplorerSeeder::class);
         $water = WaterBody::where('name', $name)->sole();
+        $email = "citizen_{$category}@example.test";
+        $this->verifyEmailSession($email);
         $form = $this->get(route('reports.create'))->assertOk();
         $this->travel(3)->seconds();
         Storage::fake('pollution-reports');
-        $this->post(route('reports.store'), ['photo' => UploadedFile::fake()->image('proof.png'), 'water_body_category' => $category, 'water_body_id' => $water->id, 'pollution_type' => 'other', 'description' => 'Isolated category fixture', 'report_form_token' => $form->viewData('reportFormToken'), 'status' => 'verified'])
+        $this->post(route('reports.store'), ['photo' => UploadedFile::fake()->image('proof.png'), 'water_body_category' => $category, 'water_body_id' => $water->id, 'pollution_type' => 'other', 'description' => 'Isolated category fixture', 'report_form_token' => $form->viewData('reportFormToken'), 'status' => 'verified', 'reporter_email' => $email])
             ->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
         $report = PollutionReport::sole();
         $this->assertSame($water->id, $report->water_body_id);

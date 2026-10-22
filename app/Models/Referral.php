@@ -19,11 +19,21 @@ class Referral extends Model
 
     public function label(): string
     {
+        if ($this->interrupted()) {
+            return $this->status === 'sending' ? 'Delivery outcome unknown' : 'Preparation interrupted';
+        }
+
         return match ($this->status) {
             'queued', 'cancelled' => 'Not Sent', 'preparing', 'sending' => 'Sending',
             'accepted' => 'Sent / accepted by SMTP', 'failed' => 'Failed',
             'uncertain' => 'Failed', default => ucfirst($this->status),
         };
+    }
+
+    public function interrupted(): bool
+    {
+        return in_array($this->status, ['preparing', 'sending'], true) && $this->sent_at === null
+            && $this->updated_at?->lt(now()->subMinutes(5));
     }
 
     public function retryable(): bool

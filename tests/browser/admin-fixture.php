@@ -5,6 +5,7 @@ use App\Models\PollutionReport;
 use App\Models\Referral;
 use App\Models\User;
 use App\Models\WaterBody;
+use App\Support\ReferralWorkflow;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\ExplorerSeeder;
 use Illuminate\Contracts\Console\Kernel;
@@ -141,6 +142,14 @@ if ($setup) {
                 'recipient_snapshot' => ['name' => 'Retired diagnostic browser receiver', 'email' => Referral::TEST_RECIPIENT]]);
             $legacyReferences[] = $legacy->reference;
         }
+        $stalledReport = PollutionReport::findOrFail(18);
+        $stalled = Referral::forceCreate(['reference' => (string) Str::uuid(), 'dedupe_key' => 'report:18',
+            'pollution_report_id' => $stalledReport->id, 'approved_by' => User::where('is_admin', true)->value('id'),
+            'approved_at' => now()->subMinutes(6), 'queued_at' => now()->subMinutes(6), 'sending_at' => now()->subMinutes(6),
+            'updated_at' => now()->subMinutes(6), 'status' => 'sending', 'attempts' => 1,
+            'payload' => ReferralWorkflow::payload($stalledReport, false),
+            'recipient_snapshot' => ['name' => 'Synthetic interrupted recipient', 'municipality' => 'San Pablo City', 'email' => 'municipality@example.test']]);
+        ReferralWorkflow::record($stalled, Referral::DELIVERY_APPROVAL);
     }
     echo json_encode(['isolated' => true, 'lakes' => DB::table('water_bodies')->count(), 'targetLake' => WaterBody::orderBy('id')->value('id'),
         'legacyReferences' => $legacyReferences]);

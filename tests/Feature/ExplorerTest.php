@@ -218,6 +218,7 @@ class ExplorerTest extends TestCase
         $initial = $this->get(route('reports.create'))->assertOk();
         $this->assertNull($initial->viewData('lakes')->first()->latitude);
         $this->seed(ExplorerSeeder::class);
+        $email = $this->verifyEmailSession('citizen_explorer@example.test');
         $response = $this->get(route('reports.create'))->assertOk()->assertSee('Water body *')->assertSee('Pagsanjan Falls')
             ->assertDontSee('Al Fresco Springs Resort')->assertDontSee('Hidden Valley Springs');
         $waterfall = WaterBody::where('name', 'Pagsanjan Falls')->sole();
@@ -227,7 +228,7 @@ class ExplorerTest extends TestCase
         $this->assertSame(121.4999861, $reference->longitude);
         $this->travel(3)->seconds();
         Storage::fake('pollution-reports');
-        $this->post(route('reports.store'), ['photo' => UploadedFile::fake()->image('proof.png'), 'water_body_id' => $waterfall->id, 'pollution_type' => 'other', 'description' => 'Isolated fixture only', 'report_form_token' => $response->viewData('reportFormToken'), 'status' => 'verified'])->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
+        $this->post(route('reports.store'), ['photo' => UploadedFile::fake()->image('proof.png'), 'water_body_id' => $waterfall->id, 'pollution_type' => 'other', 'description' => 'Isolated fixture only', 'report_form_token' => $response->viewData('reportFormToken'), 'status' => 'verified', 'reporter_email' => $email])->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
         $report = PollutionReport::sole();
         $this->assertSame('pending', $report->status);
         $this->assertNull($report->latitude);

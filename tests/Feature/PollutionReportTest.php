@@ -19,18 +19,25 @@ class PollutionReportTest extends TestCase
         $this->artisan('migrate', ['--database' => 'sqlite', '--no-interaction' => true])->assertExitCode(0);
     }
 
-    private function payload(bool $withPhoto = true): array
+    private function payload(bool $withPhoto = true, string $email = 'citizen@example.test'): array
     {
         $this->seed(WaterBodySeeder::class);
         $token = $this->get(route('reports.create'))->assertOk()->viewData('reportFormToken');
         $this->travel(3)->seconds();
+        $this->verifyEmailSession($email);
 
         if ($withPhoto) {
             Storage::fake('pollution-reports');
         }
 
-        return [...($withPhoto ? ['photo' => UploadedFile::fake()->image('proof.png')] : []), 'water_body_id' => WaterBody::where('name', 'Pandin Lake')->sole()->id,
-            'pollution_type' => 'solid_waste', 'description' => 'Synthetic isolated test observation; never a real report.', 'report_form_token' => $token];
+        return [
+            ...($withPhoto ? ['photo' => UploadedFile::fake()->image('proof.png')] : []),
+            'water_body_id' => WaterBody::where('name', 'Pandin Lake')->sole()->id,
+            'pollution_type' => 'solid_waste',
+            'description' => 'Synthetic isolated test observation; never a real report.',
+            'report_form_token' => $token,
+            'reporter_email' => $email,
+        ];
     }
 
     public function test_form_and_map_navigation_load(): void
@@ -76,9 +83,10 @@ class PollutionReportTest extends TestCase
         $this->assertSame($payload['water_body_id'], $report->water_body_id);
         $this->assertSame('pending', $report->status);
         $this->assertSame($payload['description'], $report->description);
-        foreach (['latitude', 'longitude', 'reporter_name', 'reporter_email'] as $field) {
+        foreach (['latitude', 'longitude', 'reporter_name'] as $field) {
             $this->assertNull($report->$field);
         }
+        $this->assertSame($payload['reporter_email'], $report->reporter_email);
         $this->assertTrue($report->waterBody->pollutionReports->contains($report));
         $this->get(route('reports.create'))->assertOk()->assertSee('Your report has been received.')
             ->assertDontSee($payload['description']);
@@ -90,9 +98,12 @@ class PollutionReportTest extends TestCase
     public function test_optional_photo_contacts_and_incident_point_are_private(string $extension): void
     {
         Storage::fake('pollution-reports');
-        $payload = $this->payload(false) + ['photo' => UploadedFile::fake()->image('private-observation.'.$extension),
-            'reporter_name' => 'Private Test Reporter', 'reporter_email' => 'private-test@example.test',
-            'latitude' => '14.1000000', 'longitude' => '121.3000000'];
+        $payload = array_replace($this->payload(false, 'private-test@example.test'), [
+            'photo' => UploadedFile::fake()->image('private-observation.'.$extension),
+            'reporter_name' => 'Private Test Reporter',
+            'latitude' => '14.1000000',
+            'longitude' => '121.3000000',
+        ]);
         $this->post(route('reports.store'), $payload)->assertRedirectToRoute('reports.create')->assertSessionHasNoErrors();
         $report = PollutionReport::sole();
         $this->assertSame('14.1000000', $report->latitude);
@@ -119,7 +130,7 @@ class PollutionReportTest extends TestCase
     {
         $this->post(route('reports.store'), [])->assertRedirectToRoute('reports.create')->assertSessionHasErrors([
             'water_body_id' => 'Please choose a water body.', 'pollution_type' => 'Please choose an observation type.',
-            'description' => 'Please describe what you observed.']);
+            'description' => 'Please describe what you observed.', 'reporter_email' => 'Please enter your email address to receive a verification code.']);
         $this->assertDatabaseCount('pollution_reports', 0);
     }
 
@@ -251,17 +262,79 @@ class PollutionReportTest extends TestCase
     public function test_sixth_attempt_is_limited_and_limit_expires_and_is_per_address(): void
     {
         $this->freezeTime();
-        $payload = $this->payload();
         for ($i = 0; $i < 5; $i++) {
+            $payload = $this->payload(true, "citizen{$i}@example.test");
             $this->post(route('reports.store'), $payload)->assertRedirect()->assertSessionHasNoErrors();
         }
+        $payload = $this->payload(true, 'citizen_extra@example.test');
         $this->post(route('reports.store'), $payload)->assertStatus(429)->assertSee('Please try again later.')->assertHeader('Retry-After');
         $this->assertDatabaseCount('pollution_reports', 5);
-        $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.10'])->post(route('reports.store'), $payload)->assertRedirect();
+        $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.10'])->post(route('reports.store'), $this->payload(true, 'citizen_remote@example.test'))->assertRedirect();
         $this->assertDatabaseCount('pollution_reports', 6);
         $this->travel(61)->minutes();
-        $this->withServerVariables(['REMOTE_ADDR' => '127.0.0.1'])->post(route('reports.store'), $payload)->assertRedirect();
+        $this->withServerVariables(['REMOTE_ADDR' => '127.0.0.1'])->post(route('reports.store'), $this->payload(true, 'citizen_after_cooldown@example.test'))->assertRedirect();
         $this->assertDatabaseCount('pollution_reports', 7);
+    }
+
+    public function test_unverified_emails_cannot_submit_reports(): void
+    {
+        $payload = $this->payload();
+        $payload['reporter_email'] = 'unverified-person@example.test';
+
+        $this->post(route('reports.store'), $payload)
+            ->assertRedirectToRoute('reports.create')
+            ->assertSessionHasErrors(['reporter_email' => 'Please verify your email with a valid OTP before submitting.']);
+
+        $this->assertDatabaseCount('pollution_reports', 0);
+    }
+
+    public function test_email_verification_expires_after_thirty_minutes(): void
+    {
+        $email = 'expiring-citizen@example.test';
+        $payload = $this->payload(true, $email);
+
+        $this->travel(31)->minutes();
+
+        $this->post(route('reports.store'), $payload)
+            ->assertRedirectToRoute('reports.create')
+            ->assertSessionHasErrors(['reporter_email' => 'Please verify your email with a valid OTP before submitting.']);
+
+        $this->assertDatabaseCount('pollution_reports', 0);
+    }
+
+    public function test_successfully_submitted_report_enforces_five_hour_email_cooldown_across_sessions(): void
+    {
+        $email = 'cooldown-citizen@example.test';
+
+        // Session 1: Submit report successfully
+        $payload1 = $this->payload(true, $email);
+        $this->post(route('reports.store'), $payload1)
+            ->assertRedirectToRoute('reports.create')
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('pollution_reports', 1);
+
+        // Session 2: Clear cookies to simulate a new browser session
+        $this->unencryptedCookies = [];
+        $payload2 = $this->payload(true, $email);
+
+        // Try submitting within 5 hours (1 hour later)
+        $this->travel(1)->hours();
+        $this->post(route('reports.store'), $payload2)
+            ->assertRedirectToRoute('reports.create')
+            ->assertSessionHasErrors(['reporter_email' => 'This email has already submitted a report. Please wait 5 hours before submitting another.']);
+
+        $this->assertDatabaseCount('pollution_reports', 1);
+
+        // After 5 hours (5 hours and 2 minutes from the original report)
+        $this->travel(4)->hours();
+        $this->travel(2)->minutes();
+        $payload3 = $this->payload(true, $email);
+        $this->post(route('reports.store'), $payload3)
+            ->assertRedirectToRoute('reports.create')
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('pollution_reports', 2);
     }
 
     public function test_failed_save_removes_uploaded_photo_and_returns_safe_error(): void

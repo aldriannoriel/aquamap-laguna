@@ -22,13 +22,20 @@ class ReportLocationTest extends TestCase
         Storage::fake('pollution-reports');
     }
 
-    private function payload(): array
+    private function payload(string $email = 'citizen@example.test'): array
     {
         $form = $this->get(route('reports.create'))->assertOk();
         $this->travel(3)->seconds();
+        $this->verifyEmailSession($email);
 
-        return ['water_body_id' => WaterBody::firstOrFail()->id, 'pollution_type' => 'other', 'description' => 'Private location fixture',
-            'photo' => UploadedFile::fake()->image('proof.png'), 'report_form_token' => $form->viewData('reportFormToken')];
+        return [
+            'water_body_id' => WaterBody::firstOrFail()->id,
+            'pollution_type' => 'other',
+            'description' => 'Private location fixture',
+            'photo' => UploadedFile::fake()->image('proof.png'),
+            'report_form_token' => $form->viewData('reportFormToken'),
+            'reporter_email' => $email,
+        ];
     }
 
     public function test_location_landmark_accuracy_and_observation_date_are_private_and_preserved(): void

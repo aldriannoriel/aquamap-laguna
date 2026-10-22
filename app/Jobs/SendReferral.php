@@ -63,6 +63,11 @@ class SendReferral implements ShouldQueue
             return;
         }
         try {
+            // Windows counts SMTP socket waits toward PHP's request execution limit.
+            $limit = (int) ini_get('max_execution_time');
+            if ($limit > 0 && $limit < 120 && (! function_exists('set_time_limit') || ! set_time_limit(120))) {
+                throw new \RuntimeException('The send request execution allowance could not be set.');
+            }
             ReferralWorkflow::assertReady();
             $bytes = $r->include_photo ? ReferralWorkflow::attachment($r->payload) : null;
             $mail = new EnvironmentalReferral($r->payload, $r->reference, $bytes);
@@ -97,9 +102,12 @@ class SendReferral implements ShouldQueue
             if ($id !== null && (! preg_match('/\A[A-Za-z0-9@._<>=+\-]+\z/D', $id) || strlen($id) > 255)) {
                 $id = hash('sha256', $id);
             }
-            DB::transaction(function () use ($r, $id, $administratorId): void {
+            DB::transaction(function () use ($r, $id, $administratorId, $token): void {
                 $report = PollutionReport::whereKey($r->pollution_report_id)->lockForUpdate()->firstOrFail();
                 $r = Referral::whereKey($r->id)->lockForUpdate()->firstOrFail();
+                if ($r->claim_token !== $token || ! in_array($r->status, ['sending', 'uncertain'], true) || $r->sent_at !== null) {
+                    return;
+                }
                 $r->forceFill(['status' => 'accepted', 'sent_at' => now(), 'error_code' => null, 'provider_message_id' => $id])->save();
                 ReferralWorkflow::record($r, 'transport_accepted');
                 if ($report->status === 'pending') {
