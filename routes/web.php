@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\IncidentMunicipalityController;
 use App\Http\Controllers\Admin\ReferralController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReportEvidenceController;
 use App\Http\Controllers\Admin\ReportStatusController;
 use App\Http\Controllers\Admin\SessionController;
 use App\Http\Controllers\MapController;
@@ -37,6 +38,7 @@ Route::prefix('admin')->name('admin.')->middleware(AdminPrivacy::class)->group(f
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/{pollutionReport}', [ReportController::class, 'show'])->name('reports.show');
         Route::get('/reports/{pollutionReport}/photo', [ReportController::class, 'photo'])->name('reports.photo');
+        Route::get('/reports/{pollutionReport}/evidence/{evidence}', [ReportEvidenceController::class, 'show'])->name('reports.evidence');
         Route::patch('/reports/{pollutionReport}/status', ReportStatusController::class)
             ->middleware('throttle:admin-reviews')->name('reports.status');
     });

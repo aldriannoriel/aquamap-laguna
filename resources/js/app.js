@@ -4,6 +4,7 @@ import './report-categories';
 import './incident-map';
 import './admin-report-map';
 import './referral-forms';
+import './evidence-files';
 
 const mapElement = document.getElementById('lake-map');
 if (mapElement) {

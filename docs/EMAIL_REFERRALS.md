@@ -18,7 +18,7 @@ Press Send Email, review the generated message and saved recipient in one confir
 
 The normal interface shows Not Sent, Sending, Sent (with SMTP acceptance explained), or Failed. A transport-uncertain result appears Failed with an explicit investigation message and no retry control. SMTP acceptance never proves inbox receipt, agency action or resolution. Historical attempts/snapshots/events are expandable; a separately verified receiver-receipt audit remains optional and collapsed.
 
-Reject Report requires a reason, sends nothing and safely cancels unsent work. Forwarded cases can Record Municipality Update with required remarks, change Under Review / In Progress, Mark as Resolved with remarks plus a documented confirmation/evidence basis, or Close Case with a distinct reason and optional follow-up attempts. Updates append audits without changing delivery or resolving automatically. Closed cases may reopen to Under Review with a new-information reason; Rejected and Resolved remain final.
+Reject Report requires a reason, sends nothing and safely cancels unsent work. Forwarded cases can Record Municipality Update with required remarks, change Under Review / In Progress, Mark as Resolved with private supporting file uploads and an explicit evidence-based confirmation (remarks optional), or Close Case with a distinct reason and optional follow-up attempts. Updates append audits without changing delivery or resolving automatically. Closed cases may reopen to Under Review with a new-information reason; Rejected and Resolved remain final.
 
 ## Failure handling and safety
 
@@ -32,7 +32,7 @@ From the project root, run the Laravel server normally:
 
     php artisan serve --host=127.0.0.1 --port=8000
 
-A referral worker is unnecessary for Send Email. Existing composer/dev and scripts/serve-local.ps1 worker configuration remains for compatibility; it does not authorize flushing stored jobs. Other background jobs can retain their own workers.
+A referral worker is unnecessary for Send Email. For five-file evidence uploads, restart with `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\serve-local.ps1 -ServerOnly`; it sets 5 MB/file and 32 MB/request limits without starting a worker. Uploaded resolution/follow-up files stay private and are not added to previously sent email snapshots. Existing composer/dev and scripts/serve-local.ps1 worker configuration remains for compatibility; it does not authorize flushing stored jobs. Other background jobs can retain their own workers.
 
 Preserve the existing ignored .env and APP_KEY. Only if an explicit send fails, check locally that MAIL_MAILER/REFERRAL_MAILER select smtp; MAIL_SCHEME is smtp with smtp.gmail.com:587 and TLS, or smtps with port 465; MAIL_USERNAME and MAIL_FROM_ADDRESS match the existing sender; MAIL_PASSWORD is its Gmail app password. Never paste or commit the password. See [Google app-password setup](https://support.google.com/mail/answer/185833?hl=en). After an intentional correction, run php artisan config:clear and reload/restart the local server. UI readiness checks configuration presence, not actual authentication.
 
@@ -40,4 +40,4 @@ Preserve the existing ignored .env and APP_KEY. Only if an explicit send fails, 
 
 Automated tests use Mail::fake or a mocked SMTP transport, confined SQLite and synthetic browser data; they never send real mail. Previous user-initiated referrals had SMTP acceptance and user-confirmed Gmail receipt (2026-10-21). This change does not claim a new real SMTP/inbox test. A new live verification requires the admin's explicit send and separate receiver confirmation.
 
-Current test/browser results and preservation hashes are in CURRENT_STATE.md and ignored storage/app/direct-mail/. Earlier recovery artifacts/backups are retained. No production migration, deletion, import, decision, recipient/credential update or live resend is part of this change.
+Current test/browser results and preservation hashes are in CURRENT_STATE.md and ignored storage/app/direct-mail/. Earlier recovery artifacts/backups are retained. No existing decision, recipient, credential or sent snapshot is changed by evidence uploads. A separately approved additive evidence-table migration is documented in CURRENT_STATE.md; no deletion, import or live resend occurs.

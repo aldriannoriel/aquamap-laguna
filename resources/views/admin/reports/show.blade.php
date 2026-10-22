@@ -36,11 +36,12 @@
                 <dl class="mt-4 space-y-3 text-sm break-words"><div><dt class="font-semibold">Name</dt><dd class="mt-1">{{ $report->reporter_name ?: 'Not provided (anonymous submission).' }}</dd></div><div><dt class="font-semibold">Email</dt><dd class="mt-1">{{ $report->reporter_email ?: 'Not provided.' }}</dd></div></dl>
                 <p class="mt-4 text-xs leading-5 text-muted">Use contact information only for necessary follow-up. Do not copy it into review notes or public channels.</p>
             </section>
+            @include('admin.reports.evidence')
             <section class="rounded-xl border border-line bg-white p-5 sm:p-6">
                 <h2 class="text-lg font-semibold">Audit history</h2>
                 <ol class="mt-4 space-y-5" id="audit-history">
                     @forelse($report->reviews as $review)
-                        <li class="border-l-2 border-water pl-4 text-sm">@if($selection = $review->incidentRouting())<p class="font-semibold">Incident municipality selected: {{ $selection['municipality'] }}</p><p class="mt-2 whitespace-pre-wrap break-words">Selection / override reason: {{ $selection['reason'] }}</p>@else<p class="font-semibold">{{ \App\Models\PollutionReport::STATUSES[$review->previous_status] ?? ucfirst($review->previous_status) }} to {{ \App\Models\PollutionReport::STATUSES[$review->new_status] ?? ucfirst($review->new_status) }}</p><p class="mt-2 leading-6 break-words whitespace-pre-wrap">{{ $review->review_note ?: 'No review note provided.' }}</p>@endif<p class="mt-1 text-xs leading-5 text-muted">{{ $review->administrator->name }} &middot; {{ $review->created_at->format('M j, Y H:i:s') }} {{ config('app.timezone') }}</p></li>
+                        <li id="report-review-{{ $review->id }}" class="border-l-2 border-water pl-4 text-sm">@if($selection = $review->incidentRouting())<p class="font-semibold">Incident municipality selected: {{ $selection['municipality'] }}</p><p class="mt-2 whitespace-pre-wrap break-words">Selection / override reason: {{ $selection['reason'] }}</p>@else<p class="font-semibold">{{ \App\Models\PollutionReport::STATUSES[$review->previous_status] ?? ucfirst($review->previous_status) }} to {{ \App\Models\PollutionReport::STATUSES[$review->new_status] ?? ucfirst($review->new_status) }}</p><p class="mt-2 leading-6 break-words whitespace-pre-wrap">{{ $review->review_note ?: 'No review note provided.' }}</p>@endif<p class="mt-1 text-xs leading-5 text-muted">{{ $review->administrator->name }} &middot; {{ $review->created_at->format('M j, Y H:i:s') }} {{ config('app.timezone') }}</p></li>
                     @empty
                         <li class="text-sm text-muted">No status changes have been recorded.</li>
                     @endforelse

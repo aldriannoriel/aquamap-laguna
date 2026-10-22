@@ -30,6 +30,14 @@ return [
 
     'disks' => [
 
+        'report-evidence' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/report-evidence'),
+            'visibility' => 'private',
+            'serve' => false,
+            'throw' => true,
+        ],
+
         'pollution-reports' => [
             'driver' => 'local',
             'root' => storage_path('app/private/pollution-reports'),

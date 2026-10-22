@@ -44,6 +44,7 @@ $app->afterBootstrapping(LoadConfiguration::class, function () use ($directory, 
         'cache.default' => 'file', 'cache.stores.file.path' => $directory.'/cache',
         'cache.stores.file.lock_path' => $directory.'/cache',
         'filesystems.disks.pollution-reports.root' => $directory.'/photos',
+        'filesystems.disks.report-evidence.root' => $directory.'/evidence',
     ]);
 });
 $app->make(Kernel::class)->bootstrap();

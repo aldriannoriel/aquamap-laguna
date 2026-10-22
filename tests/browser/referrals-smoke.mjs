@@ -22,7 +22,7 @@ try {
     if ($connection->getDriverName() !== 'mysql' || $connection->getDatabaseName() !== 'aquamap_laguna') { exit(1); }
     if ($connection->selectOne('SELECT DATABASE() AS name', [], false)->name !== 'aquamap_laguna') { exit(1); }
     $snapshot = [];
-    foreach (['water_bodies','fish_species','water_body_fish','pollution_reports','users','report_reviews','agencies','agency_water_body','agency_directory_initializations','referrals','referral_events','jobs','failed_jobs','migrations'] as $table) {
+    foreach (['water_bodies','fish_species','water_body_fish','pollution_reports','users','report_reviews','agencies','agency_water_body','agency_directory_initializations','referrals','referral_events','jobs','failed_jobs','migrations','report_evidence'] as $table) {
         $rows = $connection->table($table)->get()->map(fn ($row) => (array) $row)->all();
         usort($rows, fn ($a, $b) => strcmp(json_encode($a), json_encode($b)));
         $snapshot[$table] = $rows;
@@ -55,7 +55,7 @@ function sharedCacheSnapshot() {
 const originalCache=sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'direct-mail/browser';
+const artifactDirectory = 'resolution-evidence/browser';
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
@@ -100,7 +100,11 @@ function fixtureCommand(mode) {
 }
 const fixtureInfo=fixtureCommand('setup');
 assert.equal(fixtureInfo.isolated,true);assert.equal(fixtureInfo.lakes,4);
-const server=spawn('php',['-d','upload_max_filesize=5M','-d','post_max_size=8M','-S','127.0.0.1:'+httpPort,'-t',path.join(root,'public'),path.join(root,'tests/browser/admin-fixture.php')],{cwd:root,env:environment,windowsHide:true,stdio:'ignore'});
+const evidencePhoto = path.join(fixture,'follow-up-photo.png');
+const evidenceDocument = path.join(fixture,'municipality-confirmation.pdf');
+await writeFile(evidencePhoto, Buffer.concat([readFileSync(path.join(fixture,'photos/fixture-evidence.png')), Buffer.alloc(2300000)]));
+await writeFile(evidenceDocument, '%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n');
+const server=spawn('php',['-d','upload_max_filesize=5M','-d','post_max_size=32M','-S','127.0.0.1:'+httpPort,'-t',path.join(root,'public'),path.join(root,'tests/browser/admin-fixture.php')],{cwd:root,env:environment,windowsHide:true,stdio:'ignore'});
 let browser;
 let socket;
 let send;
@@ -286,7 +290,22 @@ try {
     assert.equal(await evaluate('document.getElementById("report-current-status").textContent.includes("Forwarded")'),true);
     assert.equal(await evaluate('!!document.getElementById("reject-report-form")'),false);
     await click('#report-follow-up-form [data-status-choice="municipality_update"]');
+    const chooseEvidence = async (files) => {
+        const { root: documentNode } = await send('DOM.getDocument');
+        const { nodeId } = await send('DOM.querySelector', { nodeId:documentNode.nodeId, selector:'#supporting_evidence' });
+        await send('DOM.setFileInputFiles', { nodeId, files });
+        await waitFor(()=>evaluate('document.querySelectorAll("[data-selected-evidence] li").length === document.getElementById("supporting_evidence").files.length'), 'Selected file list did not update.');
+    };
     assert.equal(await evaluate('document.getElementById("review_note").required'),true);
+    await chooseEvidence([evidencePhoto,evidenceDocument]);
+    assert.equal(await evaluate('document.getElementById("supporting_evidence").files.length'),2);
+    assert.equal(await evaluate('document.getElementById("review_note").required'),false);
+    await waitFor(()=>evaluate('document.querySelector("[data-selected-evidence] img")?.naturalWidth > 0'), 'Selected image preview failed.');
+    await click('[data-selected-evidence] li button');
+    assert.equal(await evaluate('document.getElementById("supporting_evidence").files.length'),1);
+    await chooseEvidence([evidencePhoto]);
+    assert.equal(await evaluate('document.getElementById("supporting_evidence").files.length'),2);
+    await screenshot('selected-evidence-desktop.png',true);
     await field('review_note','Synthetic municipality update: inspection scheduled.');
     await click('#report-follow-up-form button[type=submit]');
     await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("audit-history")?.textContent.includes("Synthetic municipality update: inspection scheduled.")'),'Municipality update audit missing.');
@@ -357,21 +376,32 @@ try {
     await screenshot('rejected-mobile.png',true);
     await navigate('/admin/reports/1','!!document.getElementById("report-follow-up-form")');
     await field('follow_up_status','resolved');
-    assert.equal(await evaluate('document.getElementById("review_note").required && document.getElementById("resolution_basis").required'),true);
+    assert.equal(await evaluate('!document.getElementById("review_note").required && document.getElementById("supporting_evidence").required'),true);
     assert.equal(await evaluate('document.getElementById("report-follow-up-form").checkValidity()'),false);
-    await field('review_note','Synthetic follow-up inspection completed.');
+    await chooseEvidence([evidencePhoto,evidenceDocument]);
+    assert.equal(await evaluate('document.getElementById("review_note").value'), '');
     assert.equal(await evaluate('document.getElementById("report-follow-up-form").checkValidity()'),false);
-    await field('resolution_basis','Synthetic municipality inspection reference FIXTURE-RESOLUTION confirms cleanup.');
+    await evaluate('document.querySelector("input[name=resolution_confirmed]").checked = true');
+    assert.equal(await evaluate('document.getElementById("report-follow-up-form").checkValidity()'),true);
     assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
     await screenshot('resolution-mobile.png',true);
     await click('#report-follow-up-form button[type=submit]');
-    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("report-current-status")?.textContent.includes("Resolved")'),'Documented resolution failed.');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("report-current-status")?.textContent.includes("Resolved")'),'Uploaded-evidence resolution failed.');
     assert.equal(await evaluate('document.getElementById("report-current-status").textContent.includes("Sent / accepted by SMTP")'),true);
     assert.equal(await evaluate('!!document.getElementById("report-follow-up-form")'),false);
     assert.equal(fixtureCommand('deliver-referrals').accepted,1);
+    assert.equal(await evaluate('document.querySelectorAll("[data-stored-evidence]").length'),4);
+    const storedPhotos = await evaluate('(async()=>{const images=[...document.querySelectorAll("[data-stored-evidence] img")];for(const image of images){image.loading="eager";await image.decode();}return images.filter(image=>image.naturalWidth>0).length;})()');
+    assert.equal(storedPhotos,2);
+    const documentDownload = await evaluate('(async()=>{const a=[...document.querySelectorAll("[data-stored-evidence] a")].find(a=>a.textContent.includes("Download document"));const r=await fetch(a.href);return {status:r.status,disposition:r.headers.get("Content-Disposition")};})()');
+    assert.equal(documentDownload.status,200);
+    assert(documentDownload.disposition.startsWith('attachment;'));
     await screenshot('resolved-mobile.png',true);
     await send('Emulation.setTouchEmulationEnabled',{enabled:false});mobile=false;
     await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1100,deviceScaleFactor:1,mobile:false});
+    await navigate('/admin/reports/1','!!document.getElementById("resolution-evidence-heading")');
+    await evaluate('(async()=>{for(const image of document.querySelectorAll("[data-stored-evidence] img")){image.loading="eager";await image.decode();}})()');
+    await screenshot('resolution-evidence-desktop.png',true);
     await navigate('/admin/agencies/1/edit','!!document.getElementById("notes")');
     await field('notes','Browser verified municipality edit');await click('main form .primary-button');
     await waitFor(()=>evaluate('document.readyState==="complete" && document.body.textContent.includes("Recipient updated.")'),'Directory edit failed.');
@@ -389,9 +419,10 @@ try {
     assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
     assert.equal(fixtureCommand('deliver-referrals').retiredQueued,1);
     await screenshot('real-reports-only-mobile.png',true);
+    results.push('Private image/PDF uploads, previews, file removal/reselection, a photo larger than 2 MB, optional empty resolution remarks, explicit confirmation, audit-linked evidence gallery and protected document download passed. Existing incident evidence remains unchanged.');
     results.push('Retired queued/accepted/failed diagnostics are hidden from all report lists and processed history; real referral history remains visible, real-report totals stay correct and queued diagnostics stay unsent.');
     results.push('Five dashboard categories, compact private cards, inline closure/follow-up attempts, reasoned reopening and mobile inline rejection passed. Incident selection and reason now open one final confirmation without a separate Save step. Report 4 Balanac/Pagsanjan fixture previews manually selected Magdalena; cancellation preserves Pending and sends nothing.');
-    results.push('Desktop/mobile: confirmed direct send, duplicate prevention, synchronous transport acceptance, distinct report/email statuses, forwarded grouping, Under Review/In Progress, required rejection reason, required resolution remarks/basis, final-state history and unchanged accepted referral passed. Municipality CRUD/snapshots and private map controls passed. Mail::fake() and simulated tiles/GPS only; no real email sent.');
+    results.push('Desktop/mobile: confirmed direct send, duplicate prevention, synchronous transport acceptance, distinct report/email statuses, forwarded grouping, Under Review/In Progress, required rejection reason, required uploaded resolution evidence with optional remarks and explicit confirmation, final-state history and unchanged accepted referral passed. Municipality CRUD/snapshots and private map controls passed. Mail::fake() and simulated tiles/GPS only; no real email sent.');
 
     assert.deepEqual(failures, [], 'Browser JavaScript exceptions occurred.');
     assert.equal(databaseSnapshot(), originalRecords, 'Browser verification changed lake or fish records.');

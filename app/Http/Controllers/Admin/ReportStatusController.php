@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\ReviewReportRequest;
 use App\Models\PollutionReport;
 use App\Models\ReportReview;
 use App\Support\ReferralWorkflow;
+use App\Support\ReportEvidenceStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,8 +19,9 @@ class ReportStatusController extends Controller
     public function __invoke(ReviewReportRequest $request, PollutionReport $pollutionReport): RedirectResponse
     {
         $data = $request->validated();
+        $createdPaths = [];
         try {
-            DB::transaction(function () use ($request, $pollutionReport, $data): void {
+            DB::transaction(function () use ($request, $pollutionReport, $data, &$createdPaths): void {
                 $report = PollutionReport::query()->lockForUpdate()->findOrFail($pollutionReport->id);
                 $report->setRelation('referral', $report->referral()->lockForUpdate()->first());
                 $update = $data['status'] === 'municipality_update';
@@ -36,28 +38,36 @@ class ReportStatusController extends Controller
                 $previous = $report->status;
                 if (! $update) {
                     $report->status = $data['status'];
-                    $report->save();
                 }
                 $review = new ReportReview;
                 $review->administrator_id = $request->user()->id;
                 $review->previous_status = $previous;
                 $review->new_status = $report->status;
-                $review->review_note = $update ? 'Municipality update:'."\n".$data['review_note'] : match ($report->status) {
+                $review->review_note = $update ? 'Municipality update:'."\n".($data['review_note'] ?? 'Supporting evidence attached.') : match ($report->status) {
                     'rejected' => 'Rejection reason:'."\n".$data['rejection_reason'],
-                    'resolved' => 'Remarks:'."\n".$data['review_note']."\n\n".'Documented resolution basis / supporting evidence:'."\n".$data['resolution_basis'],
+                    'resolved' => 'Resolution explicitly confirmed by the administrator using the attached supporting evidence.'
+                        .(filled($data['review_note'] ?? null) ? "\n\n".'Remarks:'."\n".$data['review_note'] : ''),
                     'closed' => 'Closure reason (not resolved):'."\n".$data['closure_reason'].(filled($data['follow_up_attempts'] ?? null) ? "\n\n".'Follow-up attempts:'."\n".$data['follow_up_attempts'] : '').(filled($data['review_note'] ?? null) ? "\n\n".'Remarks:'."\n".$data['review_note'] : ''),
                     default => $previous === 'closed' ? 'Reopened — new information:'."\n".$data['reopen_reason'] : ($data['review_note'] ?? null),
                 };
                 $report->reviews()->save($review);
+                foreach ($request->file('supporting_evidence', []) as $file) {
+                    ReportEvidenceStorage::store($file, $review, $createdPaths);
+                }
+                if (! $update) {
+                    $report->save();
+                }
             });
         } catch (ValidationException $exception) {
+            ReportEvidenceStorage::cleanup($createdPaths);
             throw $exception;
         } catch (Throwable $exception) {
+            ReportEvidenceStorage::cleanup($createdPaths);
             Log::error('Report review could not be saved.', ['exception_type' => $exception::class]);
 
             return redirect()->route('admin.reports.show', $pollutionReport)
-                ->withErrors(['status' => 'The review could not be saved. No status change was recorded. Please try again.'])
-                ->withInput($request->only(['review_note', 'rejection_reason', 'resolution_basis', 'closure_reason', 'follow_up_attempts', 'reopen_reason']));
+                ->withErrors(['status' => 'The review or evidence could not be saved. No status change was recorded. Please reselect the files and try again.'])
+                ->withInput($request->only(['review_note', 'rejection_reason', 'closure_reason', 'follow_up_attempts', 'reopen_reason']));
         }
 
         return redirect()->route('admin.reports.show', $pollutionReport)->with('review_saved', true);

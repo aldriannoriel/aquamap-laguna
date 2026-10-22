@@ -55,7 +55,7 @@ class ReportController extends Controller
 
     public function show(PollutionReport $pollutionReport): View
     {
-        $pollutionReport->load(['waterBody:id,name,municipality', 'reviews.administrator:id,name']);
+        $pollutionReport->load(['waterBody:id,name,municipality', 'reviews.administrator:id,name', 'reviews.evidence']);
 
         $recipients = Agency::where('active', true)->orderBy('municipality')->get()
             ->filter(fn (Agency $agency): bool => ReferralWorkflow::eligible($agency, $pollutionReport));

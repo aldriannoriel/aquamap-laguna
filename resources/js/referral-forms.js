@@ -1,12 +1,21 @@
 const form = document.getElementById('municipality-send-form');
 document.querySelectorAll('[data-report-follow-up]').forEach((followUp) => {
     const status = followUp.elements.status;
+    const evidence = followUp.querySelector('[data-evidence-input]');
+    const confirmation = followUp.elements.resolution_confirmed;
     const updateRequirements = () => {
         const resolved = status.value === 'resolved';
         const closed = status.value === 'closed';
-        followUp.elements.review_note.required = resolved || status.value === 'municipality_update';
-        followUp.elements.resolution_basis.required = resolved;
+        const attachmentsAllowed = ['resolved','municipality_update','under_review','in_progress'].includes(status.value);
+        evidence.required = resolved;
+        evidence.disabled = !attachmentsAllowed;
+        confirmation.required = resolved;
+        confirmation.disabled = !resolved;
+        if (!resolved) confirmation.checked = false;
+        followUp.elements.review_note.required = status.value === 'municipality_update' && evidence.files.length === 0;
         followUp.elements.closure_reason.required = closed;
+        followUp.querySelector('[data-evidence-fields]').hidden = !attachmentsAllowed;
+        followUp.querySelector('[data-evidence-required]').hidden = !resolved;
         followUp.querySelector('[data-resolution-fields]').hidden = !resolved;
         followUp.querySelector('[data-closure-fields]').hidden = !closed;
         followUp.querySelector('[data-status-submit]').textContent = resolved ? 'Confirm resolution' : (closed ? 'Confirm closure' : 'Save follow-up');
@@ -17,6 +26,7 @@ document.querySelectorAll('[data-report-follow-up]').forEach((followUp) => {
         (status.value === 'closed' ? followUp.elements.closure_reason : followUp.elements.review_note).focus();
     }));
     status.addEventListener('change', updateRequirements);
+    evidence.addEventListener('evidencechanged', () => { confirmation.checked = false; updateRequirements(); });
     updateRequirements();
 });
 if (form) {

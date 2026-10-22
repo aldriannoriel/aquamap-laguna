@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ReportReview extends Model
 {
@@ -29,5 +30,10 @@ class ReportReview extends Model
     public function administrator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'administrator_id');
+    }
+
+    public function evidence(): HasMany
+    {
+        return $this->hasMany(ReportEvidence::class)->chaperone('review');
     }
 }

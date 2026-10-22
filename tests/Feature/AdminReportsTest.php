@@ -23,6 +23,7 @@ class AdminReportsTest extends TestCase
     {
         parent::setUp();
         $this->withoutVite();
+        Storage::fake('report-evidence');
         $this->artisan('migrate', ['--database' => 'sqlite', '--no-interaction' => true])->assertExitCode(0);
     }
 
@@ -69,7 +70,7 @@ class AdminReportsTest extends TestCase
 
         $this->forwarded($report->fresh(), $admin);
         $this->patch(route('admin.reports.status', $report), ['status' => 'resolved', 'expected_status' => 'verified',
-            'review_note' => 'Follow-up inspection completed.', 'resolution_basis' => 'Municipality inspection record FIXTURE-01 confirms cleanup.'])
+            'review_note' => 'Follow-up inspection completed.', 'resolution_confirmed' => 1, 'supporting_evidence' => [UploadedFile::fake()->image('cleanup.jpg')], 'resolution_basis' => 'Municipality inspection record FIXTURE-01 confirms cleanup.'])
             ->assertRedirectToRoute('admin.reports.show', $report)->assertSessionHasNoErrors();
         $resolved = $this->get(route('map.index'))->assertOk()->assertDontSee($report->description);
         $this->assertArrayNotHasKey('report_categories', $resolved->viewData('profiles')[$report->water_body_id]);
@@ -226,7 +227,7 @@ class AdminReportsTest extends TestCase
         $report = $this->report(['status' => $from]);
         $response = $this->actingAs($admin)->from(route('admin.reports.show', $report))->patch(route('admin.reports.status', $report), [
             'expected_status' => $from, 'status' => $to, 'review_note' => 'Isolated decision fixture.',
-            'rejection_reason' => 'Isolated decision fixture.', 'resolution_basis' => 'Documented isolated follow-up basis.',
+            'rejection_reason' => 'Isolated decision fixture.', ...($to === 'resolved' ? ['resolution_confirmed' => 1, 'supporting_evidence' => [UploadedFile::fake()->image('cleanup.jpg')]] : []),
             'administrator_id' => 9999, 'previous_status' => 'invented', 'created_at' => '2000-01-01',
         ]);
         if ($valid) {
@@ -252,7 +253,7 @@ class AdminReportsTest extends TestCase
         $report = $this->report();
         $this->actingAs($this->admin())->patch(route('admin.reports.status', $report), ['expected_status' => 'pending', 'status' => 'verified', 'review_note' => '<script>auditFixture()</script>'])->assertSessionHasNoErrors();
         $this->patch(route('admin.reports.status', $report), ['expected_status' => 'pending', 'status' => 'resolved',
-            'review_note' => 'Stale review.', 'resolution_basis' => 'Stale documented inspection.'])->assertSessionHasErrors('status');
+            'review_note' => 'Stale review.', 'resolution_confirmed' => 1, 'supporting_evidence' => [UploadedFile::fake()->image('cleanup.jpg')], 'resolution_basis' => 'Stale documented inspection.'])->assertSessionHasErrors('status');
         $this->assertSame('verified', $report->fresh()->status);
         $this->assertDatabaseCount('report_reviews', 1);
         $this->get(route('admin.reports.show', $report))->assertSee('Pending to Verified')->assertSee('&lt;script&gt;auditFixture()', false)->assertDontSee('<script>auditFixture()', false);
@@ -300,19 +301,19 @@ class AdminReportsTest extends TestCase
         $this->patch($url, ['status' => 'rejected', 'expected_status' => 'verified', 'rejection_reason' => 'Must use separate closure.'])->assertSessionHasErrors('status');
         $this->patch($url, ['status' => 'under_review', 'expected_status' => 'verified', 'review_note' => 'Municipality review started.'])->assertSessionHasNoErrors();
         $this->patch($url, ['status' => 'in_progress', 'expected_status' => 'under_review', 'review_note' => 'Cleanup scheduled.'])->assertSessionHasNoErrors();
-        $this->patch($url, ['status' => 'resolved', 'expected_status' => 'in_progress'])->assertSessionHasErrors(['review_note', 'resolution_basis']);
-        $this->patch($url, ['status' => 'resolved', 'expected_status' => 'in_progress', 'review_note' => 'Completion reported.'])->assertSessionHasErrors('resolution_basis');
+        $this->patch($url, ['status' => 'resolved', 'expected_status' => 'in_progress'])->assertSessionHasErrors(['supporting_evidence', 'resolution_confirmed']);
+        $this->patch($url, ['status' => 'resolved', 'expected_status' => 'in_progress', 'review_note' => 'Completion reported.'])->assertSessionHasErrors('supporting_evidence');
         $this->assertSame('in_progress', $report->fresh()->status);
         $this->assertDatabaseCount('report_reviews', 2);
-        $this->patch($url, ['status' => 'resolved', 'expected_status' => 'in_progress', 'review_note' => 'Inspection completed.',
-            'resolution_basis' => '<script>unsafeBasis()</script> Inspection reference FIXTURE-02.'])->assertSessionHasNoErrors();
+        $this->patch($url, ['status' => 'resolved', 'expected_status' => 'in_progress', 'review_note' => '<script>unsafeBasis()</script> Inspection completed.',
+            'resolution_confirmed' => 1, 'supporting_evidence' => [UploadedFile::fake()->image('cleanup.jpg')], 'resolution_basis' => '<script>unsafeBasis()</script> Inspection reference FIXTURE-02.'])->assertSessionHasNoErrors();
         $this->assertSame('resolved', $report->fresh()->status);
         $this->assertSame(['under_review', 'in_progress', 'resolved'], $report->reviews()->pluck('new_status')->all());
         $this->assertSame($deliveryBefore, $delivery->fresh()->getAttributes());
         $this->assertEquals($original, $report->fresh()->only(array_keys($original)));
         Storage::disk('pollution-reports')->assertExists($path);
         $this->get(route('admin.reports.show', $report))->assertOk()->assertSee('&lt;script&gt;unsafeBasis()', false)
-            ->assertSee('Documented resolution basis / supporting evidence:')->assertDontSee('<script>unsafeBasis()', false);
+            ->assertSee('Resolution Evidence')->assertSee('cleanup.jpg')->assertDontSee('<script>unsafeBasis()', false);
         $this->patch($url, ['status' => 'under_review', 'expected_status' => 'resolved'])->assertSessionHasErrors('status');
         $this->assertDatabaseCount('report_reviews', 3);
         $this->get(route('admin.reports.index', ['queue' => 'processed', 'status' => 'resolved']))
@@ -329,7 +330,7 @@ class AdminReportsTest extends TestCase
         $this->actingAs($admin);
         foreach (['under_review', 'in_progress', 'resolved', 'closed'] as $status) {
             $this->patch($url, ['status' => $status, 'expected_status' => 'verified', 'review_note' => 'No referral yet.',
-                'resolution_basis' => 'Cannot claim follow-up without forwarding.', 'closure_reason' => 'Cannot close as forwarded.'])->assertSessionHasErrors('status');
+                ...($status === 'resolved' ? ['resolution_confirmed' => 1, 'supporting_evidence' => [UploadedFile::fake()->image('cleanup.jpg')]] : []), 'closure_reason' => 'Cannot close as forwarded.'])->assertSessionHasErrors('status');
         }
         $this->assertDatabaseCount('report_reviews', 0);
         $this->forwarded($report, $admin);
@@ -379,7 +380,7 @@ class AdminReportsTest extends TestCase
         $this->assertStringContainsString('Contacted municipality twice.', $closure['review_note']);
         $data = ['status' => 'under_review', 'expected_status' => 'closed', 'reopen_reason' => 'New inspection evidence received.'];
         $this->actingAs(User::factory()->create())->patch($url, $data)->assertForbidden();
-        $this->actingAs($admin)->patch($url, [...$data, 'status' => 'resolved', 'review_note' => 'Invalid shortcut.', 'resolution_basis' => 'Invalid.'])->assertSessionHasErrors('status');
+        $this->actingAs($admin)->patch($url, [...$data, 'status' => 'resolved', 'review_note' => 'Invalid shortcut.', 'resolution_confirmed' => 1, 'supporting_evidence' => [UploadedFile::fake()->image('cleanup.jpg')], 'resolution_basis' => 'Invalid.'])->assertSessionHasErrors('status');
         $this->patch($url, [...$data, 'reopen_reason' => '   '])->assertSessionHasErrors('reopen_reason');
         $this->patch($url, $data)->assertSessionHasNoErrors();
         $this->assertSame('under_review', $report->fresh()->status);
