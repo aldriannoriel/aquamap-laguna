@@ -37,7 +37,7 @@ class ReferralController extends Controller
         abort_unless(ReferralWorkflow::eligible($agency, $pollutionReport), 422, 'Choose an active municipality recipient or verified routing assignment.');
         $photo = $request->boolean('include_photo');
         $existing = $pollutionReport->referral;
-        if (! $existing || ($existing->status === 'queued' && ! $existing->deliveryApproved())) {
+        if (! $existing || $existing->status === 'queued') {
             ReferralWorkflow::assertIncidentRecipient($pollutionReport, $agency);
         }
 
@@ -62,12 +62,12 @@ class ReferralController extends Controller
     {
         $data = $request->validate(['agency_id' => ['required', 'integer', 'exists:agencies,id'], 'include_photo' => ['required', 'boolean'],
             'review_hash' => ['required', 'string', 'size:64'], 'approved' => ['accepted']]);
-        $referral = ReferralWorkflow::enqueue($pollutionReport, Agency::findOrFail($data['agency_id']), $request->user(),
+        $referral = ReferralWorkflow::sendNow($pollutionReport, Agency::findOrFail($data['agency_id']), $request->user(),
             $request->boolean('include_photo'), $data['review_hash']);
         $message = $referral->status === 'accepted'
             ? 'Referral email sent successfully (accepted by SMTP). '.($referral->inbox_confirmed_at
                 ? 'Receiver inbox receipt was separately confirmed.' : 'Inbox receipt is unverified.')
-            : ($referral->status === 'queued' ? 'Referral queued for sending. Waiting for the municipality worker.' : $referral->label().'. Review delivery history.');
+            : $referral->label().'. Review Email Information for the result and safe next steps.';
 
         return to_route('admin.reports.show', $pollutionReport)->with('referral_saved', $message);
     }
@@ -83,9 +83,11 @@ class ReferralController extends Controller
     {
         abort_unless($referral->pollution_report_id === $pollutionReport->id, 404);
         $request->validate(['approved' => ['accepted']]);
-        ReferralWorkflow::retry($referral);
+        ReferralWorkflow::retry($referral, synchronous: true, admin: $request->user());
 
-        return to_route('admin.reports.show', $pollutionReport)->with('referral_saved', 'Retry queued. Email is not marked Sent until SMTP accepts it.');
+        return to_route('admin.reports.show', $pollutionReport)->with('referral_saved', $referral->refresh()->status === 'accepted'
+            ? 'Referral email sent successfully (accepted by SMTP). Inbox receipt is unverified.'
+            : $referral->label().'. Review Email Information before retrying.');
     }
 
     public function confirm(Request $request, PollutionReport $pollutionReport, Referral $referral): RedirectResponse

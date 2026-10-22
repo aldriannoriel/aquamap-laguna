@@ -145,8 +145,6 @@ if ($setup) {
         'legacyReferences' => $legacyReferences]);
 } elseif (PHP_SAPI === 'cli') {
     if (getenv('AQUAMAP_BROWSER_REFERRALS') === '1' && ($argv[1] ?? '') === 'deliver-referrals') {
-        Artisan::call('queue:work', ['connection' => 'referrals', '--queue' => config('referrals.queue'), '--stop-when-empty' => true,
-            '--sleep' => 0, '--tries' => 3, '--timeout' => 45]);
         echo json_encode(['accepted' => Referral::whereNotNull('pollution_report_id')->where('status', 'accepted')->count(),
             'retiredQueued' => Referral::whereNull('pollution_report_id')->where('status', 'queued')->count()]);
         exit;

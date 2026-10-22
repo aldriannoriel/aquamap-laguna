@@ -9,6 +9,7 @@
     <div class="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div class="min-w-0 space-y-6">
             <section class="rounded-xl border border-line bg-white p-5 sm:p-6">
+                <h2 class="mb-4 text-lg font-semibold">Report Information</h2>
                 <h2 class="text-xl font-semibold">{{ $report->waterBody->name }}</h2>
                 <p class="mt-2 text-sm text-muted">{{ $report->waterBody->municipality }} &middot; {{ \App\Models\PollutionReport::TYPES[$report->pollution_type] ?? 'Other observation' }}</p>
                 <p class="mt-2 text-xs leading-5 text-muted">Submitted {{ $report->created_at->format('M j, Y H:i:s') }} {{ config('app.timezone') }}</p>
@@ -48,8 +49,10 @@
         </div>
         <div class="min-w-0 space-y-6">
             @include('admin.reports.incident-municipality')
-            <section class="rounded-xl border border-line bg-white p-5 sm:p-6" aria-labelledby="review-heading">@include('admin.reports.send')</section>
+            @if($canSendReferral)<section class="rounded-xl border border-line bg-white p-5 sm:p-6" aria-labelledby="review-heading">@include('admin.reports.send')</section>@endif
             @include('admin.reports.actions')
+            @if($referral)@include('admin.reports.delivery', ['delivery'=>$referral,'allowActions'=>true])
+            @else<section class="rounded-xl border border-line bg-white p-5 sm:p-6"><h2 class="text-lg font-semibold">Email Information</h2><p class="mt-3 text-sm">Not Sent</p><p class="mt-2 text-xs text-muted">No email attempt has been made.</p></section>@endif
         </div>
     </div>
 @endsection

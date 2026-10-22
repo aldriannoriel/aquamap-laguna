@@ -73,7 +73,7 @@ class MunicipalityRouting
             abort_unless($agency->active && self::exact($agency->municipality) !== null, 422, 'Select an active Laguna municipality recipient.');
             $referral = $report->referral()->first();
             if ($referral !== null) {
-                abort_unless($referral->status === 'queued' && ! $referral->deliveryApproved() && $referral->attempts === 0
+                abort_unless($referral->status === 'queued' && $referral->attempts === 0
                     && $referral->agency_id === $agency->id && ($referral->recipient_snapshot['municipality'] ?? null) === $agency->municipality,
                     409, 'The existing referral snapshot cannot be rerouted. Review its delivery history.');
             }

@@ -22,8 +22,10 @@ class ReportStatusController extends Controller
             DB::transaction(function () use ($request, $pollutionReport, $data): void {
                 $report = PollutionReport::query()->lockForUpdate()->findOrFail($pollutionReport->id);
                 $report->setRelation('referral', $report->referral()->lockForUpdate()->first());
+                $update = $data['status'] === 'municipality_update';
                 if ($report->status !== $data['expected_status']
-                    || ! in_array($data['status'], $report->availableTransitions(), true)) {
+                    || ($update ? (! $report->forwarded() || ! in_array($report->status, ['verified', 'under_review', 'in_progress'], true))
+                        : ! in_array($data['status'], $report->availableTransitions(), true))) {
                     throw ValidationException::withMessages(['status' => 'This status change is no longer available. Reload the report and review its current status.'])
                         ->redirectTo(route('admin.reports.show', $pollutionReport));
                 }
@@ -32,13 +34,15 @@ class ReportStatusController extends Controller
                     ReferralWorkflow::record($report->referral, 'cancelled_report_rejected_by_admin_'.$request->user()->id);
                 }
                 $previous = $report->status;
-                $report->status = $data['status'];
-                $report->save();
+                if (! $update) {
+                    $report->status = $data['status'];
+                    $report->save();
+                }
                 $review = new ReportReview;
                 $review->administrator_id = $request->user()->id;
                 $review->previous_status = $previous;
                 $review->new_status = $report->status;
-                $review->review_note = match ($report->status) {
+                $review->review_note = $update ? 'Municipality update:'."\n".$data['review_note'] : match ($report->status) {
                     'rejected' => 'Rejection reason:'."\n".$data['rejection_reason'],
                     'resolved' => 'Remarks:'."\n".$data['review_note']."\n\n".'Documented resolution basis / supporting evidence:'."\n".$data['resolution_basis'],
                     'closed' => 'Closure reason (not resolved):'."\n".$data['closure_reason'].(filled($data['follow_up_attempts'] ?? null) ? "\n\n".'Follow-up attempts:'."\n".$data['follow_up_attempts'] : '').(filled($data['review_note'] ?? null) ? "\n\n".'Remarks:'."\n".$data['review_note'] : ''),

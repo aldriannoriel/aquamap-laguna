@@ -25,9 +25,9 @@ class ReviewReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', 'string', Rule::in(['verified', 'rejected', 'under_review', 'in_progress', 'resolved', 'closed'])],
+            'status' => ['required', 'string', Rule::in(['verified', 'rejected', 'under_review', 'in_progress', 'resolved', 'closed', 'municipality_update'])],
             'expected_status' => ['required', 'string', Rule::in(array_keys(PollutionReport::STATUSES))],
-            'review_note' => ['required_if:status,resolved', 'nullable', 'string', 'max:2000'],
+            'review_note' => ['required_if:status,resolved,municipality_update', 'nullable', 'string', 'max:2000'],
             'rejection_reason' => ['exclude_unless:status,rejected', 'required', 'string', 'max:2000'],
             'resolution_basis' => ['exclude_unless:status,resolved', 'required', 'string', 'max:4000'],
             'closure_reason' => ['exclude_unless:status,closed', 'required', 'string', 'max:2000'],
@@ -39,7 +39,7 @@ class ReviewReportRequest extends FormRequest
     public function messages(): array
     {
         return ['rejection_reason.required' => 'Explain why this report is being rejected.',
-            'review_note.required_if' => 'Resolution remarks are required.',
+            'review_note.required_if' => 'Remarks are required for resolution or a municipality update.',
             'resolution_basis.required' => 'Provide a documented resolution basis or supporting evidence reference.',
             'closure_reason.required' => 'Explain why this forwarded report is being closed without resolution.',
             'reopen_reason.required' => 'Explain the new information supporting reopening this closed case.'];

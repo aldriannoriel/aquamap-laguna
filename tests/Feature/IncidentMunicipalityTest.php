@@ -76,9 +76,9 @@ class IncidentMunicipalityTest extends TestCase
         $approval = ['agency_id' => $magdalena->id, 'include_photo' => 0, 'review_hash' => $preview->json('hash'), 'approved' => 1];
         $this->post(route('admin.referrals.store', $report), $approval)->assertSessionHasNoErrors();
         $this->post(route('admin.referrals.store', $report), $approval)->assertSessionHasNoErrors();
-        $this->assertSame('pending', $report->fresh()->category);
-        $this->assertSame('queued', Referral::sole()->status);
-        Queue::assertPushed(SendReferral::class, 1);
+        $this->assertSame('forwarded', $report->fresh()->category);
+        $this->assertSame('accepted', Referral::sole()->status);
+        Queue::assertNothingPushed();
         (new SendReferral(Referral::sole()->id))->handle();
         $this->assertSame('forwarded', $report->fresh()->category);
         $this->assertSame('verified', $report->fresh()->status);
@@ -137,7 +137,7 @@ class IncidentMunicipalityTest extends TestCase
         $this->assertSame('Magdalena', $referral->payload['incident_municipality']);
         $this->assertSame('Pagsanjan', $referral->payload['municipality']);
         $this->assertSame('Magdalena', $referral->recipient_snapshot['municipality']);
-        Queue::assertPushed(SendReferral::class, 1);
+        Queue::assertNothingPushed();
         (new SendReferral($referral->id))->handle();
         (new SendReferral($referral->id))->handle();
         Mail::assertSent(EnvironmentalReferral::class, 1);

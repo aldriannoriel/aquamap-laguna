@@ -98,7 +98,7 @@ class ReferralTest extends TestCase
         $this->post(route('admin.referrals.store', $r), $data)->assertRedirectToRoute('admin.reports.show', $r);
         $this->post(route('admin.referrals.store', $r), $data)->assertRedirectToRoute('admin.reports.show', $r);
         $this->assertDatabaseCount('referrals', 1);
-        Queue::assertPushed(SendReferral::class, 1);
+        Queue::assertNothingPushed();
         $ref = Referral::sole();
         $this->assertSame($u->id, $ref->approved_by);
         $this->assertStringNotContainsString('private@example.test', json_encode($ref->payload));
@@ -169,7 +169,7 @@ class ReferralTest extends TestCase
         $this->post('/admin/referrals/test', ['approved' => 1])->assertNotFound();
         $r = $this->report();
         $a = $this->agency($r);
-        $this->get(route('admin.reports.show', $r))->assertOk()->assertDontSee('Record decision')->assertDontSee('Referrals &amp; email test', false)->assertSee('Send to Municipality');
+        $this->get(route('admin.reports.show', $r))->assertOk()->assertDontSee('Record decision')->assertDontSee('Referrals &amp; email test', false)->assertSee('Send Email');
         config(['referrals.mailer' => 'log']);
         $this->post(route('admin.referrals.store', $r), ['agency_id' => $a->id, 'include_photo' => 0, 'review_hash' => ReferralWorkflow::reviewHash($r, $a, false), 'approved' => 1])->assertSessionHasErrors('delivery');
         Mail::assertNothingSent();
@@ -235,8 +235,8 @@ class ReferralTest extends TestCase
         $photo = $r->photo_path;
         $this->get(route('admin.reports.show', $r))->assertOk()->assertSee('Your decision was recorded');
         $data = ['agency_id' => $a->id, 'include_photo' => 0, 'review_hash' => ReferralWorkflow::reviewHash($r, $a, false), 'approved' => 1];
-        $this->post(route('admin.referrals.store', $r), $data)->assertSessionHas('referral_saved', 'Referral queued for sending. Waiting for the municipality worker.');
-        $this->get(route('admin.reports.index', ['queue' => 'action']))->assertSee('Queued');
+        $this->post(route('admin.referrals.store', $r), $data)->assertSessionHas('referral_saved', 'Referral email sent successfully (accepted by SMTP). Inbox receipt is unverified.');
+        $this->get(route('admin.reports.index', ['queue' => 'action']))->assertDontSee('Report #'.$r->id);
         $ref = Referral::sole();
         (new SendReferral($ref->id))->handle();
         $this->get(route('admin.reports.index', ['queue' => 'action']))->assertDontSee('Report #'.$r->id);
@@ -245,7 +245,7 @@ class ReferralTest extends TestCase
         $this->get(route('admin.reports.show', $r))->assertSee('Referral email sent successfully.');
         $this->post(route('admin.referrals.store', $r), $data)->assertSessionHas('referral_saved', 'Referral email sent successfully (accepted by SMTP). Inbox receipt is unverified.');
         (new SendReferral($ref->id))->handle();
-        Queue::assertPushed(SendReferral::class, 1);
+        Queue::assertNothingPushed();
         Mail::assertSent(EnvironmentalReferral::class, 1);
         $this->assertDatabaseCount('report_reviews', 2);
         $this->assertSame($photo, $r->fresh()->photo_path);
@@ -324,7 +324,7 @@ class ReferralTest extends TestCase
         Mail::assertSent(EnvironmentalReferral::class, 1);
     }
 
-    public function test_pending_report_is_approved_and_queued_atomically_by_one_explicit_send(): void
+    public function test_pending_report_is_forwarded_after_synchronous_transport_acceptance(): void
     {
         $r = $this->report();
         $r->forceFill(['status' => 'pending'])->save();
@@ -338,10 +338,9 @@ class ReferralTest extends TestCase
         $this->post(route('admin.referrals.store', $r), [...$data, 'approved' => 1])->assertRedirect();
         $this->assertSame('verified', $r->fresh()->status);
         $this->assertDatabaseCount('report_reviews', 2);
-        $this->assertSame('queued', Referral::sole()->status);
-        Queue::assertPushed(SendReferral::class, fn ($job) => $job->connection === 'referrals' && $job->queue === 'municipality-referrals');
-        Queue::assertPushed(SendReferral::class, 1);
-        Mail::assertNothingSent();
+        $this->assertSame('accepted', Referral::sole()->status);
+        Queue::assertNothingPushed();
+        Mail::assertSent(EnvironmentalReferral::class, 1);
         $this->assertContains('php artisan queue:work referrals --queue=municipality-referrals --tries=3 --timeout=45', array_column(DevCommands::commands(), 'command'));
     }
 
@@ -371,7 +370,7 @@ class ReferralTest extends TestCase
             }
         }
         $this->get(route('admin.reports.show', $report))->assertOk()->assertSee($real->reference)
-            ->assertSee('transport_accepted')->assertSee('Delivery history');
+            ->assertSee('transport_accepted')->assertSee('Email Information');
         $this->assertSame($before, DB::table('referrals')->orderBy('id')->get()->toJson());
         $this->assertDatabaseCount('referrals', 4);
         $this->assertDatabaseCount('pollution_reports', 1);
@@ -439,7 +438,7 @@ class ReferralTest extends TestCase
         $data = ['agency_id' => $a->id, 'include_photo' => 0, 'review_hash' => ReferralWorkflow::existingHash($legacy), 'approved' => 1];
         $this->post(route('admin.referrals.store', $r), $data)->assertRedirect();
         $this->post(route('admin.referrals.store', $r), $data)->assertRedirect();
-        Queue::assertPushed(SendReferral::class, 1);
+        Queue::assertNothingPushed();
         (new SendReferral($legacy->id))->handle();
         (new SendReferral($legacy->id))->handle();
         Mail::assertSent(EnvironmentalReferral::class, 1);

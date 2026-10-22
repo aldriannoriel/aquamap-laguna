@@ -55,7 +55,7 @@ function sharedCacheSnapshot() {
 const originalCache=sharedCacheSnapshot();
 const browserPath = process.env.AQUAMAP_BROWSER || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
 assert(existsSync(browserPath), 'Set AQUAMAP_BROWSER to an installed Chromium browser.');
-const artifactDirectory = 'report-management/browser';
+const artifactDirectory = 'direct-mail/browser';
 const output = path.join(root, 'storage/app', artifactDirectory);
 const profile = path.resolve(output, `profile-${Date.now()}`);
 assert(profile.startsWith(`${path.resolve(root, 'storage/app', artifactDirectory)}${path.sep}`));
@@ -263,14 +263,15 @@ try {
     await waitFor(()=>evaluate('document.getElementById("municipality-confirmation").open'),'Municipality preview did not open.');
     await evaluate('document.querySelector("#municipality-confirmation input[name=approved]").checked=true');
     assert.equal(await evaluate('(()=>{const form=document.getElementById("municipality-send-form");form.requestSubmit();const disabled=document.getElementById("confirm-municipality-send").disabled;form.requestSubmit();return disabled;})()'),true);
-    await waitFor(()=>evaluate('document.readyState==="complete" && document.body.textContent.includes("Referral queued for sending.")'),'Queue acknowledgement missing.');
-    assert.equal(await evaluate('document.body.textContent.includes("Referral email sent successfully")'),false);
-    await screenshot('queued.png',true);
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.body.textContent.includes("Referral email sent successfully")'),'Immediate SMTP acknowledgement missing.');
+    assert.equal(await evaluate('document.body.textContent.includes("Queued")'),false);
+    await screenshot('direct-send.png',true);
     assert.equal(fixtureCommand('deliver-referrals').accepted,1);
     assert.equal(fixtureCommand('deliver-referrals').accepted,1);
     await waitFor(()=>evaluate('document.readyState==="complete" && document.body.textContent.includes("Referral email sent successfully")'),'Transport acceptance did not update the report.');
     await screenshot('accepted.png',true);
-    const reference=await evaluate('document.querySelector("[aria-label=\\"Delivery history\\"] h3").textContent.trim()');
+    const reference=await evaluate('document.querySelector("[data-delivery-reference]").dataset.deliveryReference');
+    await evaluate('document.getElementById("confirmation_reference").closest("details").open=true');
     await field('confirmation_reference',reference);
     await evaluate('document.querySelector("form[action$=\\"/confirm\\"] input[name=approved]").checked=true');
     await click('form[action$="/confirm"] .secondary-button');
@@ -284,6 +285,12 @@ try {
     await navigate('/admin/reports/1','!!document.getElementById("report-follow-up-form")');
     assert.equal(await evaluate('document.getElementById("report-current-status").textContent.includes("Forwarded")'),true);
     assert.equal(await evaluate('!!document.getElementById("reject-report-form")'),false);
+    await click('#report-follow-up-form [data-status-choice="municipality_update"]');
+    assert.equal(await evaluate('document.getElementById("review_note").required'),true);
+    await field('review_note','Synthetic municipality update: inspection scheduled.');
+    await click('#report-follow-up-form button[type=submit]');
+    await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("audit-history")?.textContent.includes("Synthetic municipality update: inspection scheduled.")'),'Municipality update audit missing.');
+    assert.equal(await evaluate('document.getElementById("report-current-status").textContent.includes("Forwarded")'),true);
     await field('follow_up_status','under_review'); await field('review_note','Synthetic municipality review started.');
     await click('#report-follow-up-form button[type=submit]');
     await waitFor(()=>evaluate('document.readyState==="complete" && document.getElementById("report-current-status")?.textContent.includes("Under Review")'),'Under Review update failed.');
@@ -384,7 +391,7 @@ try {
     await screenshot('real-reports-only-mobile.png',true);
     results.push('Retired queued/accepted/failed diagnostics are hidden from all report lists and processed history; real referral history remains visible, real-report totals stay correct and queued diagnostics stay unsent.');
     results.push('Five dashboard categories, compact private cards, inline closure/follow-up attempts, reasoned reopening and mobile inline rejection passed. Incident selection and reason now open one final confirmation without a separate Save step. Report 4 Balanac/Pagsanjan fixture previews manually selected Magdalena; cancellation preserves Pending and sends nothing.');
-    results.push('Desktop/mobile: confirmed direct send, duplicate prevention, isolated worker, distinct report/email statuses, forwarded grouping, Under Review/In Progress, required rejection reason, required resolution remarks/basis, final-state history and unchanged accepted referral passed. Municipality CRUD/snapshots and private map controls passed. Mail::fake() and simulated tiles/GPS only; no real email sent.');
+    results.push('Desktop/mobile: confirmed direct send, duplicate prevention, synchronous transport acceptance, distinct report/email statuses, forwarded grouping, Under Review/In Progress, required rejection reason, required resolution remarks/basis, final-state history and unchanged accepted referral passed. Municipality CRUD/snapshots and private map controls passed. Mail::fake() and simulated tiles/GPS only; no real email sent.');
 
     assert.deepEqual(failures, [], 'Browser JavaScript exceptions occurred.');
     assert.equal(databaseSnapshot(), originalRecords, 'Browser verification changed lake or fish records.');

@@ -20,9 +20,9 @@ class Referral extends Model
     public function label(): string
     {
         return match ($this->status) {
-            'queued' => 'Queued', 'preparing', 'sending' => 'Sending',
+            'queued', 'cancelled' => 'Not Sent', 'preparing', 'sending' => 'Sending',
             'accepted' => 'Sent / accepted by SMTP', 'failed' => 'Failed',
-            'uncertain' => 'Delivery uncertain / action required', default => ucfirst($this->status),
+            'uncertain' => 'Failed', default => ucfirst($this->status),
         };
     }
 

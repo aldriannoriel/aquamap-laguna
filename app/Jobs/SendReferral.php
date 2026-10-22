@@ -3,7 +3,9 @@
 namespace App\Jobs;
 
 use App\Mail\EnvironmentalReferral;
+use App\Models\PollutionReport;
 use App\Models\Referral;
+use App\Models\ReportReview;
 use App\Support\ReferralWorkflow;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -30,8 +32,14 @@ class SendReferral implements ShouldQueue
         $this->onQueue(config('referrals.queue'));
     }
 
-    public function handle(): void
+    public function handle(?int $administratorId = null): void
     {
+        // Stored jobs are preserved but require a new explicit synchronous admin action.
+        if ($this->job !== null) {
+            $this->release(86400);
+
+            return;
+        }
         $approval = Referral::find($this->referralId);
         if ($approval && ! $approval->deliveryApproved()) {
             if ($this->job !== null) {
@@ -89,10 +97,18 @@ class SendReferral implements ShouldQueue
             if ($id !== null && (! preg_match('/\A[A-Za-z0-9@._<>=+\-]+\z/D', $id) || strlen($id) > 255)) {
                 $id = hash('sha256', $id);
             }
-            DB::transaction(function () use ($r, $id): void {
+            DB::transaction(function () use ($r, $id, $administratorId): void {
+                $report = PollutionReport::whereKey($r->pollution_report_id)->lockForUpdate()->firstOrFail();
                 $r = Referral::whereKey($r->id)->lockForUpdate()->firstOrFail();
                 $r->forceFill(['status' => 'accepted', 'sent_at' => now(), 'error_code' => null, 'provider_message_id' => $id])->save();
                 ReferralWorkflow::record($r, 'transport_accepted');
+                if ($report->status === 'pending') {
+                    $report->forceFill(['status' => 'verified'])->save();
+                    $review = new ReportReview;
+                    $review->forceFill(['administrator_id' => $administratorId ?? $r->approved_by, 'previous_status' => 'pending', 'new_status' => 'verified',
+                        'review_note' => 'Forwarded after SMTP transport acceptance; resolution remains pending.']);
+                    $report->reviews()->save($review);
+                }
             });
         } catch (Throwable $exception) {
             $code = null;

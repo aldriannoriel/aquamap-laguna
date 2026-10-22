@@ -65,7 +65,7 @@ class ReportController extends Controller
             && $agency->municipality === $routingSelection['municipality']) : null;
         $referral = $pollutionReport->referral?->load('events');
         $options = [];
-        if ($selectedRecipient && $referral && $referral->status === 'queued' && ! $referral->deliveryApproved() && in_array($pollutionReport->status, ['pending', 'verified'], true)) {
+        if ($selectedRecipient && $referral && $referral->status === 'queued' && in_array($pollutionReport->status, ['pending', 'verified'], true)) {
             $options[(string) $referral->agency_id] = [($referral->include_photo ? '1' : '0') => ['hash' => ReferralWorkflow::existingHash($referral),
                 'text' => view('mail.referral-text', ['details' => $referral->payload, 'reference' => $referral->reference])->render(),
                 'recipient' => $referral->recipient_snapshot['name'].' / '.$referral->recipient_snapshot['email']]];
@@ -91,9 +91,9 @@ class ReportController extends Controller
             'suggestedRecipient' => $selectedRecipient?->id, 'selectedRecipient' => $selectedRecipient,
             'incidentRouting' => $incidentRouting, 'routingSelection' => $routingSelection,
             'canSendReferral' => in_array($pollutionReport->status, ['pending', 'verified'], true) && $pollutionReport->waterBody()->supported()->exists()
-                && (! $referral || ($referral->status === 'queued' && ! $referral->deliveryApproved() && $referral->attempts === 0)),
+                && (! $referral || ($referral->status === 'queued' && $referral->attempts === 0)),
             'canSelectMunicipality' => in_array($pollutionReport->status, ['pending', 'verified'], true) && (! $referral
-                || ($referral->status === 'queued' && ! $referral->deliveryApproved() && $referral->attempts === 0)),
+                || ($referral->status === 'queued' && $referral->attempts === 0)),
             'referral' => $referral, 'sendOptions' => $options, 'ready' => ReferralWorkflow::ready(),
         ]);
     }

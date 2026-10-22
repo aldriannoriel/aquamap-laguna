@@ -1,75 +1,43 @@
 # Municipality referrals and Gmail delivery
 
-Updated 2026-10-21 for delivery against b167ce5, report follow-up against 3f59ae0 retired diagnostic UI cleanup against ca8db85 incident routing against 0433697 and simplified management against d310dcc. Eight municipality/city entries now include the requested provisional Magdalena recipient at aquamaplaguna@gmail.com; existing entries/edits were preserved and these labels do not verify government office identity or jurisdiction. Sender credentials and installed schema are unchanged.
+Updated 2026-10-22 against f7511c4. New admin sends and safe retries are synchronous. Existing queues, failed-job handling, reports, snapshots, delivery events, recipients and credentials remain stored.
 
-## Diagnosis and verified delivery
+## Confirmed cause and current behavior
 
-Five database jobs on queue referrals had zero attempts, no reservations and no failures. The running worker listened elsewhere, so those jobs never reached SMTP. Installed Laravel/Symfony supports the configured Gmail SMTP/STARTTLS connection on port 587; the transport now requires TLS. Credentials were inspected without printing values.
+Read-only inspection found two municipality-referrals jobs with zero attempts and five older referrals jobs, also unattempted. No PHP queue worker was running. No failed job or SMTP rejection explained the current backlog: it had not reached the transport. Gmail SMTP on port 587, required TLS, a 20-second socket timeout and credential presence were verified without printing credentials. No connection/authentication probe or real mail was sent.
 
-Fresh approvals use database connection referrals and queue municipality-referrals across dispatch, configuration and startup. All five original jobs (one report, four diagnostics) stay unchanged and paused on referrals. Do not start an old-queue worker, bulk retry or delete them. A report-bound municipality_delivery_confirmed event gates sending. Explicit admin reapproval can queue the old real report snapshot/reference on the new queue without changing its old job. Diagnostics cannot be sent.
+The normal admin request now prepares its immutable referral transaction, then invokes the existing SendReferral handler immediately after commit. It inserts no queue job and has no queue-driver/worker dependency. SMTP acceptance and its audit event are saved before a pending report becomes internally verified / visibly Forwarded. Failure leaves a new report internally Pending; uncertain acknowledgement stays blocked against resend. These Laravel mail APIs are documented in [Laravel 13 mail](https://laravel.com/docs/13.x/mail#sending-mail).
 
-After the correct worker started, the user explicitly sent a new report referral and reapproved the old real report snapshot. Both were SMTP accepted on attempt one with no error. The user confirmed Gmail receipt in chat; the reapproved report also records a separate matching in-app receiver-confirmation event and actor. The newer report's optional receipt audit remains unset. All five original job rows are still unchanged. Automated tests use Mail::fake() and do not establish real delivery.
+All seven existing jobs must remain preserved. Do not start a worker to flush them, bulk retry them, or delete them. SendReferral releases actual queued executions without sending; an old real report can send only through a newly reviewed explicit admin action. Diagnostics remain hidden and cannot send or retry. Other job classes and application queue configuration are unchanged.
 
-## Start the server and worker
+## Simple admin workflow
 
-From the project root, choose one process setup. Restart workers after code or mail-configuration changes.
+Review Report Information, evidence and the saved incident point. Select the incident municipality from the Agency Directory and enter a short selection reason. No verified municipal boundary layer exists, so coordinates, the water body's locality and nearest-town guesses never select jurisdiction automatically. The point fingerprint, municipality, reason and administrator are audited. Eight current directory entries are preserved, including Magdalena; municipality labels alone do not verify a government office.
 
-Windows server plus supervised municipality worker:
+Press Send Email, review the generated message and saved recipient in one confirmation, then confirm sending. No manual referral message or separate approval form is required. Photo inclusion remains an explicit permission choice. The confirmation authorizes necessary sharing of the displayed incident description/coordinates/evidence; reporter contact fields and public evidence URLs are excluded. Preview cancellation records only the routing review and sends nothing. Current point/recipient/content hashes protect stale forms. Missing, inactive or invalid recipients block sending.
 
-    powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\serve-local.ps1
+The normal interface shows Not Sent, Sending, Sent (with SMTP acceptance explained), or Failed. A transport-uncertain result appears Failed with an explicit investigation message and no retry control. SMTP acceptance never proves inbox receipt, agency action or resolution. Historical attempts/snapshots/events are expandable; a separately verified receiver-receipt audit remains optional and collapsed.
 
-If a server is already running, start only the supervised worker:
+Reject Report requires a reason, sends nothing and safely cancels unsent work. Forwarded cases can Record Municipality Update with required remarks, change Under Review / In Progress, Mark as Resolved with remarks plus a documented confirmation/evidence basis, or Close Case with a distinct reason and optional follow-up attempts. Updates append audits without changing delivery or resolving automatically. Closed cases may reopen to Under Review with a new-information reason; Rejected and Resolved remain final.
 
-    powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\serve-local.ps1 -WorkerOnly
+## Failure handling and safety
 
-Add -Check to inspect commands without starting processes. -Port changes the server port. The script restarts an exited worker and stops its owned children on Ctrl+C. Private logs stay under ignored storage/app/direct-referrals/. The server retains the Laravel router and 5 MB upload / 8 MB request limits.
+Authentication rejection, definitive provider rejection and recognized connection/TLS failure permit an explicitly confirmed safe retry. Retry uses the original snapshot/reference, retains total attempts/events, checks the report remains eligible and returns an immediate result. Unknown submission outcomes cannot be retried automatically; investigate provider/inbox records first. Row claims, unique referral keys and terminal-state checks prevent duplicate clicks/interleaved calls from sending twice. Exactly-once SMTP delivery is not promised after an ambiguous acknowledgement. Raw transport exceptions and secrets are not displayed or stored in error summaries.
 
-Alternatively, composer run dev includes the registered municipality worker with the standard development processes. Dedicated foreground worker:
+Approved private attachments retain path, size, type, pixel and source-hash checks and JPEG re-encoding; original photos remain unchanged. Recipient snapshots/history survive directory edits or deletion. Private middleware, authorization, no-store responses and existing report/location protections remain.
 
-    php artisan queue:work referrals --queue=municipality-referrals --tries=3 --timeout=45
+## Local setup
 
-Reservation: 180 seconds; SMTP timeout: 20 seconds. This worker consumes newly approved referrals, leaving the five old jobs alone. Do not use queue:retry all; the report's confirmed safe retry preserves the immutable snapshot, total attempts and audit.
+From the project root, run the Laravel server normally:
 
-## Gmail configuration
+    php artisan serve --host=127.0.0.1 --port=8000
 
-Preserve working credentials in ignored .env. Only if sending fails, check these settings locally; never paste passwords into chat, agency records, logs or Git:
+A referral worker is unnecessary for Send Email. Existing composer/dev and scripts/serve-local.ps1 worker configuration remains for compatibility; it does not authorize flushing stored jobs. Other background jobs can retain their own workers.
 
-    MAIL_MAILER=smtp
-    REFERRAL_MAILER=smtp
-    MAIL_SCHEME=smtp
-    MAIL_HOST=smtp.gmail.com
-    MAIL_PORT=587
-    MAIL_USERNAME="your-existing-sender@gmail.com"
-    MAIL_PASSWORD="your-app-password-without-spaces"
-    MAIL_FROM_ADDRESS="your-existing-sender@gmail.com"
-    MAIL_FROM_NAME="AquaMap Laguna"
+Preserve the existing ignored .env and APP_KEY. Only if an explicit send fails, check locally that MAIL_MAILER/REFERRAL_MAILER select smtp; MAIL_SCHEME is smtp with smtp.gmail.com:587 and TLS, or smtps with port 465; MAIL_USERNAME and MAIL_FROM_ADDRESS match the existing sender; MAIL_PASSWORD is its Gmail app password. Never paste or commit the password. See [Google app-password setup](https://support.google.com/mail/answer/185833?hl=en). After an intentional correction, run php artisan config:clear and reload/restart the local server. UI readiness checks configuration presence, not actual authentication.
 
-Do not replace working values with these placeholders. Gmail requires an eligible account with 2-Step Verification and an app password; see [Google app-password setup](https://support.google.com/mail/answer/185833?hl=en). An alternative implicit-TLS setup uses MAIL_SCHEME=smtps and port 465. Live referrals require encrypted SMTP and reject log/array/failover sending. Keep APP_KEY stable for encrypted snapshots.
+## Validation and prior live evidence
 
-After an intentional correction, run php artisan config:clear and restart the worker. UI readiness never exposes passwords. Authentication, connection/TLS, provider rejection and preparation errors have credential-free remedies. Unknown submission outcomes require provider/inbox investigation before any resend.
+Automated tests use Mail::fake or a mocked SMTP transport, confined SQLite and synthetic browser data; they never send real mail. Previous user-initiated referrals had SMTP acceptance and user-confirmed Gmail receipt (2026-10-21). This change does not claim a new real SMTP/inbox test. A new live verification requires the admin's explicit send and separate receiver confirmation.
 
-## Admin workflow and history
-
-In Manage Reports, review the concern, evidence and saved incident coordinates. The water-body recorded municipality is context only. No verified municipality boundary GIS exists in this project: tracked polygons are water bodies, the ignored GeoJSON is a river course, and no municipal-boundary table is installed. All current points, near-boundary/uncertain cases and missing GPS require a deliberate municipality choice; no nearest-town inference or geocoder is used.
-
-Choose the incident municipality recipient, document the selection/override reason, and press Send to Municipality. One confirmation dialog replaces the separate Save step. Its private POST preview atomically saves the timestamped same-status routing audit with the saved latitude/longitude/accuracy fingerprint and returns the exact preview/hash. Opening or cancelling this preview changes no decision and queues no mail; the reviewed selection stays audited. Identical repeated selections add no duplicate audit. Both recorded locality and incident municipality remain visible.
-
-Send to Municipality stays disabled until a municipality and nonblank reason are entered and SMTP is ready. The server verifies the active recipient, current point and expected status before preparing the confirmation, with both locality fields shown. The backend rejects missing/mismatched selections and stale previews. Multiple water bodies and spanning rivers can use the same selected municipality; stored catalogue associations never override incident routing. Existing approved snapshots/history remain immutable. Legacy unapproved reapproval requires explicit point review for the same preserved recipient.
-
-Review the dialog's actual recipient, complete text, precise location and optional photo permission, then confirm. Pending-report verification, moderation audit, unique encrypted snapshot and database job commit atomically. A fingerprint rejects changed report/recipient/photo content or incident-routing audit. Repeat approval returns the existing referral. Legacy confirmation preserves the original content/reference/recipient even after directory edits.
-
-Queued means waiting for a worker; Sending means claimed/prepared or submitting. Sent / accepted by SMTP appears only after acceptance; it does not prove inbox receipt or government action. Open report details poll delivery state and show authoritative acceptance/failure. Dashboard and report navigation use Pending, Forwarded, Resolved, Rejected and Closed, plus a total. Queued/failed or approved-unsent reports remain Pending. Accepted nonterminal referrals become Forwarded; Under Review/In Progress stay within Forwarded. Stored terminal decisions keep their own category. Unknown unsent legacy states require review under Pending; none are rewritten. Compact private cards offer evidence previews/location, inline reasoned rejection and inline follow-up/closure/reopening. Report status and Email delivery are displayed separately. This grouping follows SMTP acceptance; report resolution status is unchanged until an explicit follow-up decision. Email never resolves an environmental concern automatically.
-
-After personally finding the exact reference in the receiver inbox, an administrator can submit Confirm receiver inbox receipt on the report. This creates a separate idempotent audit. The old Referrals & email test page, navigation and live-test endpoint are removed. Retired diagnostic records remain stored but are hidden from every normal admin report/referral/processed view. The shared delivery view requires a real report, as do sending and retry approval; no jobs/history are deleted.
-
-Reject Report requires a reason and is available only before forwarding, while any existing referral is safely cancellable. Report/referral row locks atomically append the rejection audit, cancel queued/preparing or definitively failed delivery and record its event. Submitting/uncertain/accepted mail cannot be rejected. Cancelled snapshots/events remain readable and cannot send or retry. Forwarded reports instead support Under Review, In Progress, Resolved or separate administrative Closed. Resolved requires remarks and a documented inspection/municipality response/case reference or other supporting basis; the original concern photo and sent email alone do not establish resolution. Closed requires a distinct closure reason and makes no resolution claim. These decisions append labelled notes to existing audit rows, queue no mail and preserve original evidence/timestamps. Historical decisions are not backfilled. Rejected and Resolved remain final. Closed cases may reopen only to Under Review after an authorized administrator records the new information/reopen reason. Closure reasons, optional follow-up attempts and the original decision remain in the audit; reopening sends no mail. Resolution date and administrator are recorded by the resolution audit timestamp/actor.
-
-Unique keys, locks and claim tokens prevent duplicate processing. Preparation retries are bounded. Explicit SMTP rejection or recognized connection/STARTTLS failure before submission permits confirmed manual retry with the same snapshot; attempts/events survive. Unknown outcomes stay Uncertain and cannot be blindly resent. SMTP cannot guarantee exactly-once delivery after ambiguous acknowledgement. failed_jobs remains available for investigation; report-level errors are sanitized.
-
-## Directory, privacy and recovery
-
-Agency Directory CRUD retains one canonical municipality identity independent of name/active state. Multiple municipalities may share the testing inbox. The explicit agencies:initialize marker never recreates deliberately deleted entries. Initialization/normalization never runs from page requests, migrations or automatic seeders. The explicit agencies:ensure-magdalena command added only the requested missing Magdalena entry, initially aquamaplaguna@gmail.com and provisional. Running it again preserves all existing edits, active state and timestamps. It does not modify the initialization marker, report decisions or queue, and never runs from startup/seeding/migrations.
-
-Snapshots/events survive directory edits/deletion. Reporter contacts and public evidence URLs are excluded from mail. Approved attachments use confined private paths, size/type/pixel/hash checks and JPEG re-encoding to strip metadata; original photos stay intact. Coordinates, evidence, contacts and audits remain administrator-only. GPS/manual/drag controls and reporting protections remain unchanged.
-
-CURRENT_STATE.md and ignored storage/app/incident-routing/ hold current incident-routing validation/recovery evidence; earlier lifecycle evidence remains under storage/app/report-workflow/; earlier delivery evidence remains under storage/app/direct-referrals/. Retained-data hashes and the five original jobs were verified; the user's live approval accounts for new moderation/referral/audit data. Earlier verified SQL/schema backups remain under storage/app/referrals/. No migration, deletion, import or credential update ran here. The sole authorized persistent change for incident routing is the missing Magdalena recipient; all earlier directory/report/referral rows are preserved. Keep private artifacts out of Git. Legacy Spring/Resort deletion requires separate approval; Patola and Alpine.js remain outside scope.
+Current test/browser results and preservation hashes are in CURRENT_STATE.md and ignored storage/app/direct-mail/. Earlier recovery artifacts/backups are retained. No production migration, deletion, import, decision, recipient/credential update or live resend is part of this change.

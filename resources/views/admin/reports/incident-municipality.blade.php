@@ -1,5 +1,7 @@
 <section class="rounded-xl border border-line bg-white p-5 sm:p-6" aria-labelledby="incident-municipality-heading">
-    <h2 id="incident-municipality-heading" class="text-lg font-semibold">Incident municipality</h2>
+    <h2 id="incident-municipality-heading" class="text-lg font-semibold">Recipient Municipality</h2>
+    <p class="mt-3 break-words text-sm">Saved recipient email: <strong>{{ $referral?->recipient_snapshot['email'] ?? $selectedRecipient?->email ?? 'Select an incident municipality to see its recipient' }}</strong></p>
+    @if($recipients->isEmpty())<p role="alert" class="mt-3 text-sm text-red-800">No valid active municipality recipient exists. Update the Agency Directory before sending.</p>@endif
     <p class="mt-3 text-sm">Water-body recorded municipality: <strong>{{ $report->waterBody->municipality }}</strong></p>
     <p class="mt-3 text-sm">Incident municipality: <strong id="incident-municipality">{{ $routingSelection['municipality'] ?? 'Not selected / not verified' }}</strong>@if($routingSelection) (admin selected)@endif</p>
     <p class="mt-3 text-xs text-muted">{{ $incidentRouting['status'] === 'missing_incident_point' ? 'No saved incident coordinates are available.' : 'Saved incident coordinates are the routing reference, but no verified municipality boundary layer is installed.' }} Select the municipality manually after reviewing the location. Water-body locality, nearest town centres and routing assignments do not establish incident jurisdiction.</p>

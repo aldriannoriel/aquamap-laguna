@@ -4,7 +4,7 @@ document.querySelectorAll('[data-report-follow-up]').forEach((followUp) => {
     const updateRequirements = () => {
         const resolved = status.value === 'resolved';
         const closed = status.value === 'closed';
-        followUp.elements.review_note.required = resolved;
+        followUp.elements.review_note.required = resolved || status.value === 'municipality_update';
         followUp.elements.resolution_basis.required = resolved;
         followUp.elements.closure_reason.required = closed;
         followUp.querySelector('[data-resolution-fields]').hidden = !resolved;
@@ -57,7 +57,6 @@ if (form) {
             document.getElementById('send-recipient-preview').textContent = preview.recipient;
             document.getElementById('send-message-preview').textContent = preview.text;
             document.getElementById('send-photo-preview').textContent = photo ? 'Approved supporting photo will be attached.' : 'No photo attachment.';
-            form.querySelector('[name=approved]').checked = false;
             dialog.showModal();
             const heading = document.getElementById('municipality-confirm-heading');
             heading.tabIndex = -1;
@@ -83,11 +82,11 @@ document.querySelectorAll('form[method="POST"]').forEach((form) => {
         form.setAttribute('aria-busy', 'true');
         form.querySelectorAll('button').forEach((button) => { button.disabled = true; });
         const submit = form.querySelector('button[type=submit]') || form.querySelector('button:not([type])');
-        if (submit) submit.textContent = 'Queueing approved referral...';
+        if (submit) submit.textContent = 'Sending...';
     });
 });
 const delivery = document.querySelector('[data-delivery-poll]');
-if (delivery?.dataset.deliveryApproved === '1' && ['queued','preparing','sending'].includes(delivery.dataset.deliveryState)) {
+if (delivery?.dataset.deliveryApproved === '1' && ['preparing','sending'].includes(delivery.dataset.deliveryState)) {
     let polls = 0;
     const poll = async () => {
         if (document.hidden) { setTimeout(poll, 5000); return; }
