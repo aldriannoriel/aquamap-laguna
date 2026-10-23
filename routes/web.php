@@ -15,7 +15,7 @@ use App\Http\Middleware\AdminPrivacy;
 use Illuminate\Support\Facades\Route;
 
 // Public AquaMap pages.
-Route::redirect('/', '/map')->name('home');
+Route::view('/', 'landing')->name('home');
 
 Route::get('/map', [MapController::class, 'index'])
     ->name('map.index');

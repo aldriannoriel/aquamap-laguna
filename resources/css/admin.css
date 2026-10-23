@@ -1,0 +1,217 @@
+﻿/* Administrator presentation only. Keep all workflow and map behavior intact. */
+.aquamap-admin > div.border-b nav a[aria-current='page'] {
+    background-color: var(--ui-soft);
+    box-shadow: inset 0 -2px var(--ui-accent);
+}
+
+.aquamap-admin #main :is(h1, h2, h3, legend),
+.aquamap-admin #main .form-label {
+    color: var(--ui-ink);
+}
+
+.aquamap-admin #main .text-muted {
+    color: var(--ui-muted);
+}
+
+.aquamap-admin #main .form-input {
+    color: var(--ui-ink);
+    background-color: var(--ui-panel);
+    caret-color: var(--ui-accent);
+}
+
+.aquamap-admin #main .form-input:not([aria-invalid='true']) {
+    border-color: #6f928d;
+}
+
+.aquamap-admin #main .form-input::placeholder {
+    color: var(--ui-muted);
+    opacity: 1;
+}
+
+.aquamap-admin #main .form-input:hover:not(:disabled):not([aria-invalid='true']) {
+    border-color: var(--ui-accent);
+}
+
+.aquamap-admin #main .form-input[aria-invalid='true'] {
+    border-color: #b42330;
+    box-shadow: inset 3px 0 #b42330;
+}
+
+.aquamap-admin #main :is(.primary-button, #admin-sign-in, #apply-filters) {
+    color: #ffffff;
+    background-color: var(--ui-accent);
+    box-shadow: 0 2px 5px rgb(22 59 67 / 9%);
+}
+
+.aquamap-admin #main :is(.primary-button, #admin-sign-in, #apply-filters):hover:not(:disabled) {
+    background-color: #124e57;
+}
+
+.aquamap-admin .secondary-button {
+    border-color: #6f928d;
+}
+
+.aquamap-admin .secondary-button:hover:not(:disabled) {
+    background-color: #deeee8;
+    border-color: var(--ui-accent);
+}
+
+.aquamap-admin #main :is(.form-input, .primary-button, .secondary-button, #admin-sign-in, #apply-filters):disabled {
+    color: var(--ui-muted);
+    background-color: var(--ui-soft);
+    border-color: #b4cfca;
+    box-shadow: none;
+    opacity: 1;
+}
+
+.aquamap-admin #main :is(input[type='checkbox'], input[type='radio']) {
+    accent-color: var(--ui-accent);
+}
+
+.aquamap-admin #main input[type='file']::file-selector-button {
+    color: var(--ui-accent);
+    background-color: var(--ui-soft);
+    border: 0;
+    border-radius: .5rem;
+    padding: .45rem .6rem;
+}
+
+.aquamap-admin #main :is(input, select, textarea, button, summary):focus-visible,
+.aquamap-admin #main a:not(:where(.leaflet-container *)):focus-visible,
+.aquamap-admin > div.border-b :is(a, button):focus-visible {
+    outline: 3px solid var(--ui-accent);
+    outline-offset: 3px;
+}
+
+.aquamap-admin #main .form-input[aria-invalid='true']:focus-visible {
+    outline-color: #9c2330;
+}
+
+.aquamap-admin #main :is(p, dd, dt, label, legend, h1, h2, h3) {
+    overflow-wrap: anywhere;
+}
+
+.aquamap-admin #main a.rounded-xl:has([data-count]) {
+    border-color: #c9dedd;
+}
+
+.aquamap-admin #main a.rounded-xl:has([data-count]):hover {
+    border-color: #6f928d;
+    background-color: #f2f8f5;
+}
+
+.aquamap-admin #admin-report-list article {
+    border-color: var(--ui-line);
+}
+
+.aquamap-admin #admin-report-list article:hover {
+    border-color: #b4cfca;
+}
+
+.aquamap-admin #report-current-status > span.rounded-lg,
+.aquamap-admin #admin-report-list article > div:first-child .rounded-lg {
+    color: var(--ui-ink);
+    background-color: var(--ui-soft);
+    box-shadow: inset 0 0 0 1px var(--ui-line);
+}
+
+.aquamap-admin #main nav[aria-label='Report workflow'] a[aria-current='page'] {
+    color: #ffffff;
+    background-color: var(--ui-accent);
+    border-color: var(--ui-accent);
+}
+
+.aquamap-admin #main nav[aria-label='Report workflow'] a:hover:not([aria-current='page']) {
+    color: var(--ui-accent);
+    background-color: var(--ui-soft);
+    border-color: #6f928d;
+}
+
+.aquamap-admin #main nav[role='navigation'] a:hover {
+    color: var(--ui-accent);
+    background-color: var(--ui-soft);
+}
+
+.aquamap-admin #main summary {
+    color: var(--ui-accent);
+    text-underline-offset: .2em;
+}
+
+.aquamap-admin #main summary:hover {
+    text-decoration: underline;
+}
+
+.aquamap-admin #audit-history > li {
+    border-left-color: #6f928d;
+}
+
+.aquamap-admin [data-stored-evidence],
+.aquamap-admin [data-selected-evidence] > li {
+    background-color: var(--ui-paper);
+    border-color: var(--ui-line);
+}
+
+.aquamap-admin [data-stored-evidence] h3,
+.aquamap-admin [data-selected-evidence] span,
+.aquamap-admin [data-delivery-reference] :is(p, pre, li),
+.aquamap-admin #send-message-preview {
+    overflow-wrap: anywhere;
+}
+
+.aquamap-admin #municipality-confirmation {
+    color: var(--ui-ink);
+    background-color: var(--ui-panel);
+    border-color: #b4cfca;
+    box-shadow: 0 12px 36px rgb(22 59 67 / 20%);
+}
+
+.aquamap-admin #municipality-confirmation::backdrop {
+    background-color: rgb(22 59 67 / 42%);
+}
+
+.aquamap-admin #delivery-current-status {
+    padding: .55rem .65rem;
+    border-radius: .5rem;
+    color: var(--ui-ink);
+    background-color: var(--ui-soft);
+    font-weight: 600;
+}
+
+.aquamap-admin #delivery-current-status[data-delivery-state='accepted'] {
+    color: #215e4a;
+    background-color: #edf6ef;
+}
+
+.aquamap-admin #delivery-current-status:is([data-delivery-state='uncertain'], [data-delivery-interrupted='1']) {
+    color: #75420b;
+    background-color: #fff5df;
+    box-shadow: inset 3px 0 #ad7426;
+}
+
+.aquamap-admin #delivery-current-status[data-delivery-state='failed'] {
+    color: #9c2330;
+    background-color: #fff0f0;
+}
+
+.aquamap-admin #main [role='alert'] {
+    color: #75420b;
+}
+
+.aquamap-admin #main :is(#form-errors, #send-preview-error, [data-evidence-error]) {
+    color: #9c2330;
+    border-color: #b42330;
+}
+
+.aquamap-admin #main #form-errors {
+    background-color: #fffafa;
+}
+
+.aquamap-admin #main #form-errors h2 {
+    color: #9c2330;
+}
+
+.aquamap-admin #review-success {
+    color: #215e4a;
+    background-color: #f2f8f5;
+    border-color: #83b4a4;
+}

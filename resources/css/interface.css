@@ -1,0 +1,174 @@
+/* Shared app surfaces. The landing page keeps its own independent stylesheet. */
+.aquamap-ui {
+    --ui-ink: #163b43;
+    --ui-muted: #48696f;
+    --ui-accent: #155966;
+    --ui-paper: #f7faf9;
+    --ui-panel: #ffffff;
+    --ui-soft: #edf5f2;
+    --ui-line: #d5e3df;
+    --ui-radius: 1rem;
+    --ui-shadow: 0 6px 22px rgb(22 59 67 / 5.5%);
+    background-color: var(--ui-paper);
+    background-image: linear-gradient(180deg, #eef5f2, var(--ui-paper) 26rem);
+}
+
+.aquamap-ui > header {
+    color: var(--ui-ink);
+    background: rgb(249 253 252 / 96%);
+    border-bottom-color: var(--ui-line);
+    box-shadow: 0 3px 16px rgb(22 59 67 / 4%);
+    backdrop-filter: blur(6px);
+}
+
+.aquamap-ui > header .text-muted {
+    color: var(--ui-muted);
+}
+
+.aquamap-ui > header nav a {
+    border-radius: .4rem;
+    text-underline-offset: .3em;
+}
+
+.aquamap-ui > header nav a:hover {
+    color: var(--ui-accent);
+    background-color: var(--ui-soft);
+}
+
+.aquamap-ui > header nav a[aria-current='page'] {
+    color: var(--ui-accent);
+    background-color: var(--ui-soft);
+    border-bottom-color: var(--ui-accent);
+}
+
+.aquamap-ui > header a:focus-visible,
+.aquamap-ui .form-input:focus-visible,
+.aquamap-ui .primary-button:focus-visible,
+.aquamap-ui .secondary-button:focus-visible,
+.aquamap-admin #admin-sign-in:focus-visible {
+    outline: 3px solid #197789;
+    outline-offset: 4px;
+}
+
+.aquamap-admin > div.border-b {
+    background-color: var(--ui-soft);
+    border-bottom-color: var(--ui-line);
+}
+
+.aquamap-admin > div.border-b nav a {
+    border-radius: .35rem;
+    color: var(--ui-accent);
+    text-underline-offset: .35em;
+}
+
+.aquamap-admin > div.border-b nav a:hover,
+.aquamap-admin > div.border-b nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+.aquamap-ui #main :where(.bg-white.rounded-xl, .bg-white.rounded-2xl) {
+    background-color: var(--ui-panel);
+    border-radius: var(--ui-radius);
+    box-shadow: var(--ui-shadow);
+}
+
+.aquamap-ui #main :where(.bg-white.rounded-xl, .bg-white.rounded-2xl).border-line {
+    border-color: var(--ui-line);
+}
+
+.aquamap-ui .form-label {
+    color: var(--ui-ink);
+}
+
+.aquamap-ui .form-input {
+    background-color: var(--ui-panel);
+    border-radius: .65rem;
+    box-shadow: inset 0 1px 2px rgb(22 59 67 / 3%);
+}
+
+.aquamap-ui .form-input:not([aria-invalid='true']) {
+    border-color: var(--ui-line);
+}
+
+.aquamap-ui .primary-button,
+.aquamap-admin #admin-sign-in {
+    color: #ffffff;
+    background-color: var(--ui-accent);
+    border-radius: .75rem;
+    box-shadow: 0 2px 5px rgb(22 59 67 / 9%);
+}
+
+.aquamap-ui .primary-button:hover:not(:disabled),
+.aquamap-admin #admin-sign-in:hover:not(:disabled) {
+    background-color: #124e57;
+}
+
+.aquamap-ui .secondary-button {
+    color: var(--ui-accent);
+    background-color: var(--ui-panel);
+    border-color: var(--ui-line);
+    border-radius: .65rem;
+    box-shadow: 0 1px 2px rgb(22 59 67 / 3%);
+}
+
+.aquamap-ui .secondary-button:hover:not(:disabled) {
+    background-color: var(--ui-soft);
+    border-color: #b4cfca;
+}
+
+.aquamap-ui .explorer-layout {
+    background-color: var(--ui-panel);
+    border-color: var(--ui-line);
+    border-radius: var(--ui-radius);
+    box-shadow: var(--ui-shadow);
+}
+
+.aquamap-ui .explorer-sidebar,
+.aquamap-ui .water-list {
+    background-color: var(--ui-panel);
+}
+
+.aquamap-ui .sidebar-controls,
+.aquamap-ui .sidebar-toggle,
+.aquamap-ui .map-toolbar {
+    background-color: #f8fbfa;
+}
+
+.aquamap-ui .sidebar-controls,
+.aquamap-ui .explorer-sidebar,
+.aquamap-ui .map-toolbar,
+.aquamap-ui .map-status {
+    border-color: var(--ui-line);
+}
+
+.aquamap-ui .water-list .lake-card {
+    border-radius: .65rem;
+}
+
+.aquamap-ui .water-list .lake-card:hover {
+    background-color: #f2f8f5;
+}
+
+.aquamap-ui .water-list .lake-card[aria-pressed='true'] {
+    background-color: var(--ui-soft);
+    border-color: #b4cfca;
+}
+
+.aquamap-ui .water-profile {
+    background-color: var(--ui-panel);
+    border-color: #c9dedd;
+    border-radius: var(--ui-radius);
+    box-shadow: 0 8px 28px rgb(22 59 67 / 16%);
+}
+
+.aquamap-ui .profile-header,
+.aquamap-ui .profile-tabs {
+    background-color: var(--ui-panel);
+    border-color: var(--ui-line);
+}
+
+.aquamap-ui .profile-close,
+.aquamap-ui .profile-tabs [aria-selected='true'] {
+    background-color: var(--ui-soft);
+}

@@ -1,0 +1,203 @@
+/* Water Explorer presentation only; existing layout and Leaflet styles stay intact. */
+.map-dashboard .sidebar-controls h2,
+.map-dashboard .water-row-name,
+.map-dashboard .profile-header h2,
+.map-dashboard .profile-content :is(h2, h3, h4, h5) {
+    color: var(--ui-ink);
+    letter-spacing: -.015em;
+}
+
+.map-dashboard .water-search-wrap svg {
+    color: var(--ui-accent);
+}
+
+.map-dashboard #water-search {
+    border-color: #b4cfca;
+    box-shadow: inset 0 1px 2px rgb(22 59 67 / 3%);
+}
+
+.map-dashboard #water-search::placeholder {
+    color: var(--ui-muted);
+    opacity: 1;
+}
+
+.map-dashboard #water-search:focus-visible {
+    outline: 3px solid var(--ui-accent);
+    outline-offset: 2px;
+    border-color: var(--ui-accent);
+}
+
+.map-dashboard .category-filter {
+    color: var(--ui-ink);
+    background-color: var(--ui-panel);
+    border-color: var(--ui-line);
+    border-radius: .65rem;
+}
+
+.map-dashboard .category-filter:hover {
+    background-color: var(--ui-soft);
+    border-color: #b4cfca;
+}
+
+.map-dashboard .category-filter [data-category-count] {
+    padding: .125rem .35rem;
+    border-radius: .35rem;
+    color: var(--ui-accent);
+    background-color: var(--ui-soft);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.map-dashboard .category-filter[aria-pressed='true'] {
+    color: #ffffff;
+    background-color: var(--ui-accent);
+    border-color: var(--ui-accent);
+}
+
+.map-dashboard .category-filter[aria-pressed='true'] [data-category-count] {
+    color: #ffffff;
+    background-color: rgb(255 255 255 / 14%);
+}
+
+.map-dashboard .water-list > li + li {
+    box-shadow: 0 -1px 0 rgb(213 227 223 / 65%);
+}
+
+.map-dashboard .water-list .lake-card:hover {
+    background-color: #f2f8f5;
+    border-color: var(--ui-line);
+}
+
+.map-dashboard .water-list .lake-card[aria-pressed='true'] {
+    background-color: var(--ui-soft);
+    border-color: var(--ui-accent);
+    box-shadow: inset 4px 0 var(--ui-accent);
+}
+
+.map-dashboard .water-row-name,
+.map-dashboard .water-row-place {
+    overflow-wrap: anywhere;
+}
+
+.map-dashboard .water-row-place,
+.map-dashboard .water-row-unmapped,
+.map-dashboard .profile-eyebrow,
+.map-dashboard .profile-note,
+.map-dashboard .profile-content .text-muted {
+    color: var(--ui-muted);
+}
+
+.map-dashboard .water-row-meta {
+    color: var(--ui-ink);
+}
+
+.map-dashboard .water-list .selection-label {
+    font-weight: 500;
+}
+
+.map-dashboard .lake-card:is(:hover, [aria-pressed='true']) .selection-label {
+    text-decoration: underline;
+    text-underline-offset: .2em;
+}
+
+.map-dashboard .profile-header {
+    background-color: #f8fbfa;
+}
+
+.map-dashboard .profile-close {
+    color: var(--ui-accent);
+    box-shadow: inset 0 0 0 1px var(--ui-line);
+}
+
+.map-dashboard .profile-close:hover {
+    background-color: #deeee8;
+}
+
+.map-dashboard .profile-category,
+.map-dashboard .profile-content .lake-detail-source,
+.map-dashboard .profile-report-link {
+    color: var(--ui-accent);
+}
+
+.map-dashboard .profile-content :is(p, dd, figcaption, a, summary) {
+    overflow-wrap: anywhere;
+}
+
+.map-dashboard .profile-content [data-water-type-basis] {
+    padding: .5rem .6rem;
+    border-left: 2px solid #b4cfca;
+    border-radius: .35rem;
+    background-color: var(--ui-paper);
+}
+
+.map-dashboard .profile-tabs [role='tab'] {
+    border-radius: .5rem;
+}
+
+.map-dashboard .profile-tabs [role='tab']:hover {
+    color: var(--ui-accent);
+    background-color: #f2f8f5;
+}
+
+.map-dashboard .profile-tabs [aria-selected='true'] {
+    color: var(--ui-accent);
+    background-color: var(--ui-soft);
+    box-shadow: inset 0 -3px var(--ui-accent), inset 0 0 0 1px #c9dedd;
+}
+
+.map-dashboard .source-group > summary,
+.map-dashboard .possible-fish-reasons > summary,
+.map-dashboard [data-documented-fish] > summary {
+    color: var(--ui-ink);
+    text-underline-offset: .2em;
+}
+
+.map-dashboard .source-group > summary:hover,
+.map-dashboard .possible-fish-reasons > summary:hover,
+.map-dashboard [data-documented-fish] > summary:hover {
+    text-decoration: underline;
+}
+
+.map-dashboard [data-research-card] > details {
+    border-color: var(--ui-line);
+    border-radius: .65rem;
+    background-color: var(--ui-paper);
+}
+
+.map-dashboard [data-fish-card] > div:first-child {
+    background-color: var(--ui-soft);
+}
+
+.map-dashboard .possible-fish-thumb {
+    border-color: #c9dedd;
+    border-radius: .65rem;
+    background-color: var(--ui-paper);
+}
+
+.map-dashboard .possible-fish-placeholder {
+    color: var(--ui-muted);
+    background-color: var(--ui-soft);
+    font-size: .625rem;
+}
+
+.map-dashboard .possible-fish-name {
+    color: var(--ui-ink);
+    font-weight: 600;
+}
+
+.map-dashboard .category-filter:focus-visible,
+.map-dashboard .water-list .lake-card:focus-visible,
+.map-dashboard .profile-close:focus-visible,
+.map-dashboard .profile-tabs [role='tab']:focus-visible {
+    outline: 3px solid var(--ui-accent);
+    outline-offset: -3px;
+}
+
+.map-dashboard .category-filter[aria-pressed='true']:focus-visible {
+    outline-color: #ffffff;
+}
+
+.map-dashboard .profile-content :is(a, summary):focus-visible {
+    outline: 3px solid var(--ui-accent);
+    outline-offset: 2px;
+}

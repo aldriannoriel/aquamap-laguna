@@ -13,8 +13,8 @@
                 <h2 class="text-xl font-semibold">{{ $report->waterBody->name }}</h2>
                 <p class="mt-2 text-sm text-muted">{{ $report->waterBody->municipality }} &middot; {{ \App\Models\PollutionReport::TYPES[$report->pollution_type] ?? 'Other observation' }}</p>
                 <p class="mt-2 text-xs leading-5 text-muted">Submitted {{ $report->created_at->format('M j, Y H:i:s') }} {{ config('app.timezone') }}</p>
-                <h3 class="mt-5 text-sm font-semibold">Observation</h3><p id="report-description" class="mt-2 text-sm leading-7 break-words whitespace-pre-wrap">{{ $report->description }}</p>
-                <h3 class="mt-5 text-sm font-semibold">Reported incident location</h3>
+                <h3 class="mt-5 text-sm font-semibold">What the reporter saw</h3><p id="report-description" class="mt-2 text-sm leading-7 break-words whitespace-pre-wrap">{{ $report->description }}</p>
+                <h3 class="mt-5 text-sm font-semibold">Reported problem location</h3>
                 @if($report->latitude !== null && $report->longitude !== null)
                     <div id="private-report-map" class="mt-3 h-72 rounded-lg border border-line" role="region" aria-label="Private reported problem location" data-latitude="{{ $report->latitude }}" data-longitude="{{ $report->longitude }}"></div>
                     <p id="private-tiles" role="status" class="mt-2 text-sm text-muted" hidden>Basemap tiles are unavailable. The saved coordinates and incident marker remain available below and on this map.</p>

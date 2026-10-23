@@ -82,6 +82,9 @@ if (form) {
             updateSendButton();
         }
     });
+    dialog.addEventListener('close', () => {
+        if (!sendButton.disabled) sendButton.focus();
+    });
     document.getElementById('cancel-municipality-send').addEventListener('click', () => dialog.close());
 }
 document.querySelectorAll('form[method="POST"]').forEach((form) => {

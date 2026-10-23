@@ -49,7 +49,7 @@ class DashboardRedesignTest extends TestCase
         $water = WaterBody::firstOrFail();
         $legacy = PollutionReport::forceCreate(['water_body_id' => $water->id, 'pollution_type' => 'other', 'description' => 'Legacy report without photograph', 'photo_path' => null]);
         $before = $legacy->fresh()->toArray();
-        $form = $this->get(route('reports.create'))->assertOk()->assertSee('Photo proof')->assertSee('required');
+        $form = $this->get(route('reports.create'))->assertOk()->assertSee('Photo of the problem')->assertSee('required');
         $this->travel(3)->seconds();
         $payload = ['water_body_id' => $water->id, 'pollution_type' => 'other', 'description' => 'New proofless submission', 'report_form_token' => $form->viewData('reportFormToken')];
         $this->postJson(route('reports.store'), $payload)->assertUnprocessable()->assertJsonValidationErrors('photo');

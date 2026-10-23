@@ -8,7 +8,7 @@
     <title>Water explorer | AquaMap Laguna</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="map-dashboard min-h-screen bg-mist font-sans text-ink antialiased">
+<body class="aquamap-ui map-dashboard min-h-screen bg-mist font-sans text-ink antialiased">
     <a href="#main" class="skip-link">Skip to water explorer</a>
     @include('partials.header')
     <main id="main" class="explorer-main">

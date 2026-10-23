@@ -7,10 +7,10 @@
     <form id="report-filters" method="GET" action="{{ route('admin.reports.index') }}" class="mt-6 grid gap-4 rounded-xl border border-line bg-white p-5 sm:grid-cols-2 lg:grid-cols-4">
         <input type="hidden" name="queue" value="{{ $queue }}">
         @if(isset($filters['category']))<input type="hidden" name="category" value="{{ $filters['category'] }}">@endif
-        <div class="sm:col-span-2"><label for="q" class="form-label">Search observations</label><input id="q" name="q" maxlength="200" value="{{ $filters['q'] ?? '' }}" class="form-input" placeholder="Description or lake name"></div>
+        <div class="sm:col-span-2"><label for="q" class="form-label">Search reports</label><input id="q" name="q" maxlength="200" value="{{ $filters['q'] ?? '' }}" class="form-input" placeholder="Description or water body name"></div>
         <div><label for="lake" class="form-label">Water body</label><select id="lake" name="lake" class="form-input"><option value="">All water bodies</option>@foreach($lakes as $lake)<option value="{{ $lake->id }}" @selected((string)($filters['lake'] ?? '') === (string)$lake->id)>{{ $lake->name }}</option>@endforeach</select></div>
         <div><label for="status" class="form-label">Detailed status (optional)</label><select id="status" name="status" class="form-input"><option value="">All detailed statuses</option>@foreach(\App\Models\PollutionReport::STATUSES as $value => $label)<option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
-        <div><label for="type" class="form-label">Observation type</label><select id="type" name="type" class="form-input"><option value="">All types</option>@foreach(\App\Models\PollutionReport::TYPES as $value => $label)<option value="{{ $value }}" @selected(($filters['type'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
+        <div><label for="type" class="form-label">Type of problem</label><select id="type" name="type" class="form-input"><option value="">All types</option>@foreach(\App\Models\PollutionReport::TYPES as $value => $label)<option value="{{ $value }}" @selected(($filters['type'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
         @foreach(['from' => 'Submitted from', 'to' => 'Submitted through'] as $field => $label)
             <div><label for="{{ $field }}" class="form-label">{{ $label }}</label><input type="date" id="{{ $field }}" name="{{ $field }}" value="{{ $filters[$field] ?? '' }}" class="form-input"></div>
         @endforeach

@@ -1,0 +1,139 @@
+﻿/* Citizen reporting presentation. Keep form structure and Leaflet rules intact. */
+.aquamap-reporting #main :is(h1, legend, .form-label) {
+    color: var(--ui-ink);
+}
+
+.aquamap-reporting #main .text-muted {
+    color: var(--ui-muted);
+}
+
+.aquamap-reporting #report-form {
+    border-color: #c9dedd;
+}
+
+.aquamap-reporting #report-form :is(fieldset, div).border-t {
+    border-color: var(--ui-line);
+}
+
+.aquamap-reporting #report-form .form-input {
+    color: var(--ui-ink);
+    background-color: var(--ui-panel);
+    caret-color: var(--ui-accent);
+}
+
+.aquamap-reporting #report-form .form-input::placeholder {
+    color: var(--ui-muted);
+    opacity: 1;
+}
+
+.aquamap-reporting #report-form .form-input:hover:not(:disabled):not([aria-invalid='true']) {
+    border-color: #92b7b1;
+}
+
+.aquamap-reporting #report-form .form-input:focus-visible,
+.aquamap-reporting #report-form .secondary-button:focus-visible,
+.aquamap-reporting #submit-report:focus-visible,
+.aquamap-reporting #report-success button:focus-visible {
+    outline: 3px solid var(--ui-accent);
+    outline-offset: 3px;
+}
+
+.aquamap-reporting #report-form .form-input[aria-invalid='true'] {
+    border-color: #b42330;
+    box-shadow: inset 3px 0 #b42330;
+}
+
+.aquamap-reporting #report-form .form-input[aria-invalid='true']:focus-visible {
+    outline-color: #9c2330;
+}
+
+.aquamap-reporting #report-form .form-error {
+    color: #9c2330;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.aquamap-reporting #report-form .form-input:disabled,
+.aquamap-reporting #report-form .secondary-button:disabled,
+.aquamap-reporting #submit-report:disabled {
+    color: var(--ui-muted);
+    background-color: var(--ui-soft);
+    border-color: #b4cfca;
+    box-shadow: none;
+    opacity: 1;
+}
+
+.aquamap-reporting #report-form .secondary-button:not(:disabled) {
+    border-color: #b4cfca;
+}
+
+.aquamap-reporting #report-form .secondary-button:hover:not(:disabled) {
+    background-color: #deeee8;
+    border-color: #92b7b1;
+}
+
+.aquamap-reporting #photo::file-selector-button {
+    color: var(--ui-accent);
+    background-color: var(--ui-soft);
+    border-radius: .5rem;
+}
+
+.aquamap-reporting #photo:hover::file-selector-button {
+    background-color: #deeee8;
+}
+
+.aquamap-reporting #report-email-verification {
+    background-color: #f2f8f5;
+    border-color: #b4cfca;
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 75%);
+}
+
+.aquamap-reporting #report-otp-heading {
+    color: var(--ui-ink);
+}
+
+.aquamap-reporting #otp-status {
+    padding: .6rem .75rem;
+    border-left: 3px solid #92b7b1;
+    border-radius: .35rem;
+    color: var(--ui-ink);
+    background-color: var(--ui-panel);
+    overflow-wrap: anywhere;
+}
+
+.aquamap-reporting #submit-report:not(:disabled) {
+    color: #ffffff;
+    background-color: var(--ui-accent);
+    box-shadow: 0 2px 5px rgb(22 59 67 / 9%);
+}
+
+.aquamap-reporting #submit-report:hover:not(:disabled) {
+    background-color: #124e57;
+}
+
+.aquamap-reporting #form-errors {
+    border-color: #b42330;
+    background-color: #fffafa;
+}
+
+.aquamap-reporting #form-errors h2 {
+    color: #9c2330;
+}
+
+.aquamap-reporting #report-success {
+    border-color: #83b4a4;
+    background-color: #f2f8f5;
+}
+
+.aquamap-reporting #report-success h2 {
+    color: #215e4a;
+}
+
+.aquamap-reporting #main :is(p, label, legend, li) {
+    overflow-wrap: anywhere;
+}
+
+.aquamap-reporting #main :is(#form-errors, #report-success, aside) a:focus-visible {
+    outline: 3px solid var(--ui-accent);
+    outline-offset: 3px;
+}

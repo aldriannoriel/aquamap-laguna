@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('title', 'Agency directory')
 @section('content')
-<div class="flex flex-wrap items-center justify-between gap-4"><div><h1 class="text-3xl font-semibold">Agency directory</h1><p class="mt-2 text-sm text-muted">One recipient per municipality or city covers its verified water-body localities. Explicit assignments require routing verification.</p></div><a href="{{ route('admin.agencies.create') }}" class="primary-button">Add recipient</a></div>
+<div class="flex flex-wrap items-center justify-between gap-4"><div><h1 class="text-3xl font-semibold">Agency directory</h1><p class="mt-2 text-sm text-muted">Keep one recipient per municipality or city. Check the problem location before choosing a recipient; catalogue matches and saved associations do not confirm jurisdiction.</p></div><a href="{{ route('admin.agencies.create') }}" class="primary-button">Add recipient</a></div>
 @if(session('directory_saved'))<p role="status" class="mt-5 rounded-lg border border-line bg-white p-4">{{ session('directory_saved') }}</p>@endif
 <form method="GET" class="mt-6 grid gap-3 sm:grid-cols-4">
 <div><label class="form-label" for="q">Search municipality, name or email</label><input class="form-input" id="q" name="q" value="{{ $filters['q'] ?? '' }}"></div>

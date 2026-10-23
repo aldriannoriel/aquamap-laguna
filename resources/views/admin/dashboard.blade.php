@@ -15,7 +15,7 @@
         @endforeach
     </div>
     <section class="mt-7 rounded-xl border border-line bg-white p-6">
-        <h2 class="text-lg font-semibold">A careful review, with a record</h2>
+        <h2 class="text-lg font-semibold">Keep a record of each decision</h2>
         <p class="mt-3 max-w-2xl text-sm leading-6 text-muted">Send Pending reports to the incident municipality or reject with a reason. Only SMTP acceptance moves a report to Forwarded; Under Review and In Progress remain within Forwarded. Mark as Resolved with remarks and documented confirmation, or Close Case with a separate administrative reason. Closed cases can reopen when new information is documented. Email never resolves a report; every decision stays in the audit history.</p>
         <p class="mt-3 max-w-2xl text-xs leading-5 text-muted">Review statuses do not establish measured water quality or habitat suitability. Keep contact details and evidence within this workspace.</p>
     </section>

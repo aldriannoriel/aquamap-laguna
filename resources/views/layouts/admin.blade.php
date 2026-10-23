@@ -8,7 +8,7 @@
         <title>@yield('title', 'Administrator') | AquaMap Laguna</title>
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-mist font-sans text-ink antialiased">
+    <body class="aquamap-ui aquamap-admin min-h-screen bg-mist font-sans text-ink antialiased">
         <a href="#main" class="skip-link">Skip to administrator content</a>
         @include('partials.header')
         @can('access-admin')
@@ -17,7 +17,7 @@
                     <nav aria-label="Administrator navigation" class="flex flex-wrap items-center gap-5 text-sm font-semibold text-estuary">
                         <a href="{{ route('admin.dashboard') }}" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif>Overview</a>
                         <a href="{{ route('admin.reports.index', ['queue'=>'action']) }}" @if(request()->routeIs('admin.reports.*')) aria-current="page" @endif>Manage reports</a>
-                        <a href="{{ route('admin.agencies.index') }}">Agency directory</a>
+                        <a href="{{ route('admin.agencies.index') }}" @if(request()->routeIs('admin.agencies.*')) aria-current="page" @endif>Agency directory</a>
                     </nav>
                     <form method="POST" action="{{ route('admin.logout') }}">@csrf<button id="admin-logout" class="secondary-button" type="submit">Sign out</button></form>
                 </div>
