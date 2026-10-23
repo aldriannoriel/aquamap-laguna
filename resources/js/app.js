@@ -1,3 +1,4 @@
+import Alpine from 'alpinejs';
 import L from 'leaflet';
 import { addMapTiles } from './map-tiles';
 import './report-categories';
@@ -5,6 +6,8 @@ import './incident-map';
 import './admin-report-map';
 import './referral-forms';
 import './evidence-files';
+
+Alpine.start();
 
 const mapElement = document.getElementById('lake-map');
 if (mapElement) {

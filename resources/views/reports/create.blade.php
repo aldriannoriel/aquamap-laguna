@@ -3,13 +3,18 @@
 @section('content')
     <div class="mb-7 max-w-2xl">
         <p class="text-sm font-medium text-water">Community observations</p>
-        <h1 class="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Help care for our waters.</h1>
+        <h1 id="report-page-title" tabindex="-1" class="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Help care for our waters.</h1>
         <p class="mt-3 text-sm leading-6 text-muted">Share a pollution concern you have observed. Your report stays private and pending review; it is not a verified pollution finding.</p>
     </div>
 
     @if (session('report_received'))
-        <section id="report-success" role="status" tabindex="-1" class="mb-6 rounded-xl border border-moss/30 bg-white p-5">
-            <h2 class="text-lg font-semibold text-moss">Your report has been received.</h2>
+        <section id="report-success" x-data="{ dismissed: false }" x-show="!dismissed" role="status" tabindex="-1" class="mb-6 rounded-xl border border-moss/30 bg-white p-5">
+            <div class="flex items-start justify-between gap-4">
+                <h2 class="text-lg font-semibold text-moss">Your report has been received.</h2>
+                <button type="button" x-on:click="dismissed = true; $nextTick(() => document.getElementById('report-page-title').focus())" aria-label="Dismiss report confirmation" class="rounded text-muted hover:text-ink focus:outline-2 focus:outline-offset-2 focus:outline-estuary">
+                    <svg viewBox="0 0 20 20" class="size-5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg>
+                </button>
+            </div>
             <p class="mt-2 text-sm leading-6">Status: pending review. Your report, photo and contact details are not published. Review and response times are not guaranteed.</p>
             @if (session('possible_duplicate'))
                 <div id="duplicate-warning" class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
